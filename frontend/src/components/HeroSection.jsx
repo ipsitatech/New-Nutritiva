@@ -67,7 +67,7 @@ function HeroSection() {
 <div className="relative flex items-center">
 
   {/* IMAGE 1 */}
-  <div className="w-80 h-80 rounded-2xl overflow-hidden shadow-lg">
+  <div className="w-80 h-120 rounded-2xl overflow-hidden shadow-lg">
     <img
       src={images[current]}
       className="w-full h-full object-cover hover:scale-105 transition duration-300"
@@ -75,7 +75,7 @@ function HeroSection() {
   </div>
 
   {/* IMAGE 2 */}
-  <div className="w-80 h-80 rounded-2xl overflow-hidden shadow-lg -ml-8">
+  <div className="w-80 h-120 rounded-2xl overflow-hidden shadow-lg -ml-8">
     <img
       src={images[(current + 1) % images.length]}
       className="w-full h-full object-cover hover:scale-105 transition duration-300"

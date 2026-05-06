@@ -4,6 +4,7 @@ import Footer from "../components/Footer.jsx";
 import TopBar from "../components/TopBar.jsx";
 import BottomStrip from "../components/BottomStrip.jsx";
 import HotDealsSection from "../components/HotDealsSection.jsx";
+import SubscriptionPage from "../components/SubscriptionPage.jsx";
 
 function LandingPage() {
   return (
@@ -13,6 +14,7 @@ function LandingPage() {
       <BottomStrip />
       <FeaturesSection />
       <HotDealsSection />
+      <SubscriptionPage />
       <Footer />
       
     </>

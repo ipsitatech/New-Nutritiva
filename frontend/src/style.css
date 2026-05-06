@@ -3,4 +3,97 @@
 
 body{
     font-family: 'DM Sans', sans-serif;
+    body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #f8f9f7;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 80px 100px;
+}
+
+/* LEFT SIDE */
+.hero-left {
+  max-width: 550px;
+}
+
+.badge {
+  background: #e6f4ea;
+  color: #2e7d32;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.hero-left h1 {
+  font-size: 48px;
+  margin: 20px 0;
+  line-height: 1.2;
+}
+
+.hero-left h1 span {
+  color: #2e7d32;
+}
+
+.hero-left p {
+  color: #555;
+  font-size: 16px;
+  margin-bottom: 25px;
+}
+
+/* BUTTONS */
+.buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.primary {
+  background: #2e7d32;
+  color: white;
+  padding: 12px 22px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.secondary {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 12px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* RIGHT SIDE */
+.hero-right {
+  display: flex;
+  gap: 20px;
+}
+
+.image-box {
+  width: 180px;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+}
+
+
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+  animation: marquee 15s linear infinite;
 }

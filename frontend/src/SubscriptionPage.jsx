@@ -134,7 +134,7 @@ const SubscriptionPage = () => {
                   <p className="text-gray-400 text-xs mt-1">Every 30 days</p>
                 </div>
 
-                <ul className="space-y-4 mb-10 flex-grow">
+                <ul className="space-y-4 mb-10 grow">
                   {p.features.map((f, j) => (
                     <li
                       key={j}
@@ -166,7 +166,7 @@ const SubscriptionPage = () => {
             How It Works
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 relative">
-            <div className="absolute top-8 left-[10%] right-[10%] h-[1px] bg-gray-100 hidden md:block" />
+            <div className="absolute top-8 left-[10%] right-[10%] h-px bg-gray-100 hidden md:block" />
 
             {[
               {

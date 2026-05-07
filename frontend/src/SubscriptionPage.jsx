@@ -70,7 +70,7 @@ const SubscriptionPage = () => {
   ];
 
   return (
-    <div className="bg-white py-16 font-sans">
+    <div className="bg-white py-16 ">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-10">

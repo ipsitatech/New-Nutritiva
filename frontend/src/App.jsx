@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 import LandingPage from "./pages/LandingPage.jsx";
 import ProductsPage from "./pages/ProductsPage.jsx";
+// import FeaturesSection from './FeaturesSection';
+// import SubscriptionPage from './SubscriptionPage';
 
 function App() {
   return (
@@ -12,6 +13,11 @@ function App() {
       </Routes>
     </BrowserRouter>
   );
+    <div>
+      <FeaturesSection />
+      <SubscriptionPage/>
+    </div>
+  
 }
 
 export default App;

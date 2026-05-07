@@ -1,11 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 @import "tailwindcss";
 
-body{
-    font-family: 'DM Sans', sans-serif;
-    body {
+body {
+  font-family: 'DM Sans', sans-serif;
   margin: 0;
-  font-family: "Segoe UI", sans-serif;
   background: #f8f9f7;
 }
 
@@ -86,12 +84,16 @@ body{
   height: 100%;
   object-fit: cover;
 }
-}
 
 
 @keyframes marquee {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 .animate-marquee {

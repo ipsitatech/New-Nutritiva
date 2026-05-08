@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./FAQ.css";
 import { FiPlus, FiX } from "react-icons/fi";
 
 const faqData = [
@@ -43,34 +42,50 @@ const FAQ = () => {
   };
 
   return (
-    <section className="faq">
-      <div className="faq-container">
+    <section className="bg-white py-20 px-[100px] font-['Inter',sans-serif]">
+      <div className="max-w-[880px] mx-auto">
+        
+        <p className="text-center text-xs text-[#9ca3af] tracking-[1px] mb-[10px]">
+          GOT QUESTIONS?
+        </p>
+        <h2 className="text-center text-[34px] font-semibold text-[#111827] mb-10">
+          Frequently Asked Questions
+        </h2>
 
-        <p className="faq-label">GOT QUESTIONS?</p>
-        <h2 className="faq-title">Frequently Asked Questions</h2>
-
-        <div className="faq-list">
+        <div className="flex flex-col gap-4">
           {faqData.map((item, index) => {
             const isOpen = activeIndex === index;
 
             return (
               <div
                 key={index}
-                className={`faq-item ${isOpen ? "open" : ""}`}
+                className={`border rounded-xl py-5 px-6 cursor-pointer transition-all duration-200 ease-out ${
+                  isOpen 
+                    ? "border-[#1f7a5a] bg-[#f3fbf7]" 
+                    : "border-[#e5e7eb] bg-white"
+                }`}
                 onClick={() => toggleFAQ(index)}
               >
-                <div className="faq-header">
-                  <span className="faq-question">{item.question}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-[15.5px] font-medium text-[#111827]">
+                    {item.question}
+                  </span>
 
                   {isOpen ? (
-                    <FiX className="faq-icon" />
+                    <FiX className="text-[20px] text-[#1f7a5a]" />
                   ) : (
-                    <FiPlus className="faq-icon" />
+                    <FiPlus className="text-[20px] text-[#1f7a5a]" />
                   )}
                 </div>
 
-                <div className="faq-body">
-                  <p>{item.answer}</p>
+                <div 
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                    isOpen ? "max-h-[220px]" : "max-h-0"
+                  }`}
+                >
+                  <p className="mt-[14px] text-sm text-[#6b7280] leading-relaxed">
+                    {item.answer}
+                  </p>
                 </div>
               </div>
             );

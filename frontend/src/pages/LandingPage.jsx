@@ -6,8 +6,10 @@ import BottomStrip from "../components/BottomStrip.jsx";
 import HotDealsSection from "../components/HotDealsSection.jsx";
 import SubscriptionPage from "../components/SubscriptionPage.jsx";
 import HamperSection from "../components/HamperSection.jsx";
+import CorporateBulkOrders from "../components/CorporateBulkOrders.jsx";
+import FAQ from "../components/FAQ.jsx";
 import HamperData from "../data/HamperData.json";
-import landingConfig from "../data/landingConfig.json";
+import landingConfig from "../data/landingConfig.json"; 
 
 function LandingPage() {
   const { hamperTabs, customHamperCta } = landingConfig;
@@ -19,13 +21,17 @@ function LandingPage() {
       <HeroSection />
       <BottomStrip />
       <FeaturesSection />
+      {/* <ShopByCategory /> */}
       <HotDealsSection />
-      <SubscriptionPage />
       <HamperSection 
         tabs={hamperTabs} 
         hampers={HamperData} 
         customCta={customHamperCta}
       />
+      {/* <Testimonials /> */}
+      <CorporateBulkOrders />
+      <SubscriptionPage />
+      <FAQ />
       <Footer />
       
     </>

@@ -99,3 +99,254 @@ body {
 .animate-marquee {
     animation: marquee 15s linear infinite;
 }
+
+/* FAQ SECTION */
+.faq {
+    background: #ffffff;
+    padding: 80px 100px;
+    font-family: "Inter", sans-serif;
+  }
+  
+  .faq-container {
+    max-width: 880px;
+    margin: 0 auto;
+  }
+  
+  .faq-label {
+    text-align: center;
+    font-size: 12px;
+    color: #9ca3af;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  
+  .faq-title {
+    text-align: center;
+    font-size: 34px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 40px;
+  }
+  
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .faq-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px 24px;
+    cursor: pointer;
+    background: #ffffff;
+    transition: all 0.25s ease;
+  }
+  
+  .faq-item.open {
+    border: 1px solid #1f7a5a;
+    background: #f3fbf7;
+  }
+  
+  .faq-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .faq-question {
+    font-size: 15.5px;
+    font-weight: 500;
+    color: #111827;
+  }
+  
+  .faq-icon {
+    font-size: 20px;
+    color: #1f7a5a;
+  }
+  
+  .faq-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .faq-body p {
+    margin-top: 14px;
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.6;
+  }
+  
+  .faq-item.open .faq-body {
+    max-height: 220px;
+  }
+
+/* CORPORATE BULK ORDERS SECTION */
+.cbo-section {
+    background: #f9fafb;
+    padding: 70px 90px;
+    font-family: "Inter", sans-serif;
+  }
+  
+  .cbo-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
+  }
+  
+  .cbo-left {
+    flex: 1;
+  }
+  
+  .cbo-tag {
+    background: #fde9dc;
+    color: #e67e22;
+    padding: 6px 14px;
+    font-size: 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 18px;
+  }
+  
+  .cbo-title {
+    font-size: 38px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  
+  .cbo-title span {
+    color: #e67e22;
+  }
+  
+  .cbo-desc {
+    color: #6b7280;
+    margin-bottom: 25px;
+    line-height: 1.6;
+  }
+  
+  .cbo-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+    margin-bottom: 30px;
+  }
+  
+  .cbo-feature {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .cbo-feature h4 {
+    font-size: 14px;
+  }
+  
+  .cbo-feature p {
+    font-size: 12px;
+    color: #6b7280;
+  }
+  
+  .cbo-icon {
+    font-size: 20px;
+    margin-top: 4px;
+  }
+  
+  .cbo-orange {
+    color: #e67e22;
+  }
+  
+  .cbo-purple {
+    color: #6c5ce7;
+  }
+  
+  .cbo-pricing {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 22px;
+  }
+  
+  .cbo-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .cbo-row:last-child {
+    border-bottom: none;
+  }
+  
+  .cbo-row h5 {
+    font-size: 14px;
+  }
+  
+  .cbo-row p {
+    font-size: 12px;
+    color: #6b7280;
+  }
+  
+  .cbo-row span {
+    color: #e67e22;
+    font-weight: 600;
+  }
+  
+  .cbo-highlight {
+    background: #fde9dc;
+  }
+  
+  .cbo-btn {
+    width: 100%;
+    background: #1f7a5a;
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .cbo-btn:hover {
+    background: #176347;
+  }
+  
+  .cbo-right {
+    flex: 1;
+    position: relative;
+  }
+  
+  .cbo-right img {
+    width: 100%;
+    border-radius: 16px;
+    object-fit: cover;
+  }
+  
+  .cbo-badge {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: #fff;
+    padding: 10px 14px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .cbo-badge strong {
+    font-size: 14px;
+  }
+  
+  .cbo-badge p {
+    font-size: 12px;
+    color: #6b7280;
+  }
+  
+  .cbo-whatsapp-icon {
+    font-size: 18px;
+  }

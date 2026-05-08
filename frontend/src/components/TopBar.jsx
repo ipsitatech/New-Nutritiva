@@ -1,18 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 
-const LOCATIONS = [
-  "Mumbai",
-  "Pune",
-  "Nagpur",
-  "Kanpur",
-  "Delhi",
-  "Chennai",
-  "Hyderabad",
-  "Kolkata",
-  "Bhubaneswar",
-  "Lucknow",
-];
+import navData from "../data/navigation.json";
+
+const { locations: LOCATIONS, roles } = navData;
+
 
 export default function TopBar() {
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -178,7 +170,7 @@ export default function TopBar() {
                 className="absolute top-full left-0 mt-2 bg-white border border-[#EAEAEA] rounded-[10px] shadow-lg z-1100 overflow-hidden py-1 min-w-35"
                 style={{ boxShadow: "0 8px 28px rgba(0,0,0,0.09)" }}
               >
-                {["Buyer", "Seller"].map((role) => (
+                {roles.signIn.map((role) => (
                   <li key={role}>
                     <button
                       onClick={() => {
@@ -242,7 +234,7 @@ export default function TopBar() {
                 className="absolute top-full left-0 mt-2 bg-white border border-[#EAEAEA] rounded-[10px] shadow-lg z-1100 overflow-hidden py-1 min-w-35"
                 style={{ boxShadow: "0 8px 28px rgba(0,0,0,0.09)" }}
               >
-                {["Buyer", "Seller", "Guest"].map((role) => (
+                {roles.signUp.map((role) => (
                   <li key={role}>
                     <button
                       onClick={() => {
@@ -359,7 +351,7 @@ export default function TopBar() {
               Sign in as
             </p>
             <div className="flex flex-col gap-2">
-              {["Buyer", "Seller"].map((role) => (
+              {roles.signIn.map((role) => (
                 <button
                   key={role}
                   onClick={() => {
@@ -389,7 +381,7 @@ export default function TopBar() {
               Sign up as
             </p>
             <div className="flex flex-col gap-2">
-              {["Buyer", "Seller", "Guest"].map((role) => (
+              {roles.signUp.map((role) => (
                 <button
                   key={role}
                   onClick={() => {

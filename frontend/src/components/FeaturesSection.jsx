@@ -1,29 +1,18 @@
 import React from 'react';
 import { CheckCircle2, Truck, ShieldCheck, Star } from 'lucide-react';
 
+import featuresData from "../data/features.json";
+
+const ICON_MAP = {
+  CheckCircle2: CheckCircle2,
+  Truck: Truck,
+  ShieldCheck: ShieldCheck,
+  Star: Star,
+};
+
 const FeaturesSection = () => {
-  const features = [
-    {
-      icon: <CheckCircle2 className="w-6 h-6 text-emerald-800" />,
-      title: "100% Authentic",
-      description: "Premium Grade Products directly from source farms. No adulteration, no compromise."
-    },
-    {
-      icon: <Truck className="w-6 h-6 text-emerald-800" />,
-      title: "Fast Delivery",
-      description: "Pan India shipping within 2-5 business days. Express delivery in metro cities."
-    },
-    {
-      icon: <ShieldCheck className="w-6 h-6 text-emerald-800" />,
-      title: "Hygienic Packaging",
-      description: "Temperature-controlled, airtight packaging preserves freshness for months."
-    },
-    {
-      icon: <Star className="w-6 h-6 text-emerald-800" />,
-      title: "Quality Assured",
-      description: "FSSAI certified. Transparent sourcing with full lab certifications available."
-    }
-  ];
+  const features = featuresData;
+
 
   return (
     <section className="py-12 bg-white">
@@ -36,7 +25,10 @@ const FeaturesSection = () => {
             >
               {/* Icon Container */}
               <div className="w-16 h-16 flex items-center justify-center rounded-full bg-emerald-50 mb-6">
-                {feature.icon}
+                {(() => {
+                  const Icon = ICON_MAP[feature.icon];
+                  return Icon ? <Icon className="w-6 h-6 text-emerald-800" /> : null;
+                })()}
               </div>
               
               {/* Content */}

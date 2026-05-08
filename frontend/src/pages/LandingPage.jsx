@@ -6,18 +6,12 @@ import BottomStrip from "../components/BottomStrip.jsx";
 import HotDealsSection from "../components/HotDealsSection.jsx";
 import SubscriptionPage from "../components/SubscriptionPage.jsx";
 import HamperSection from "../components/HamperSection.jsx";
-import HamperData from "../HamperData.json";
-
+import HamperData from "../data/HamperData.json";
+import landingConfig from "../data/landingConfig.json";
 
 function LandingPage() {
-  const hamperTabs = ["All Hampers", "Weddings", "Diwali", "Corporate", "Housewarming"];
-  
-  const customHamperCta = {
-    title: "Need a Custom Selection?",
-    description: "Work with our gifting experts to create a bespoke hamper tailored to your exact needs and budget.",
-    waLink: "https://wa.me/919876543210?text=I%20want%20to%20discuss%20a%20custom%20hamper",
-    buttonLabel: "Chat with Experts"
-  };
+  const { hamperTabs, customHamperCta } = landingConfig;
+
 
   return (
     <>

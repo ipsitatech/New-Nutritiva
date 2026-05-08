@@ -3,42 +3,22 @@ import walnuts from "../assets/product_imgs/walnuts.png";
 import pistachios from "../assets/product_imgs/pistachios.png";
 import goji from "../assets/product_imgs/goji_berries.png";
 
+import hotDealsData from "../data/hotDeals.json";
+
+const IMAGE_MAP = {
+  almonds,
+  walnuts,
+  pistachios,
+  goji,
+};
+
 function HotDealsSection() {
 
-  const products = [
-    {
-      image: almonds,
-      name: "Premium California Almonds",
-      weight: "500g",
-      price: "₹899",
-      oldPrice: "₹1,199",
-      discount: "25% OFF",
-    },
-    {
-      image: walnuts,
-      name: "Kashmiri Walnut Kernels",
-      weight: "500g",
-      price: "₹1,299",
-      oldPrice: "₹1,599",
-      discount: "19% OFF",
-    },
-    {
-      image: pistachios,
-      name: "Premium Iranian Pistachios",
-      weight: "500g",
-      price: "₹1,499",
-      oldPrice: "₹1,899",
-      discount: "21% OFF",
-    },
-    {
-      image: goji,
-      name: "Organic Goji Berries",
-      weight: "250g",
-      price: "₹799",
-      oldPrice: "₹999",
-      discount: "20% OFF",
-    },
-  ];
+  const products = hotDealsData.map((p) => ({
+    ...p,
+    image: IMAGE_MAP[p.imageKey],
+  }));
+
 
   // 📱 WhatsApp redirect function
   const handleWhatsApp = (productName) => {

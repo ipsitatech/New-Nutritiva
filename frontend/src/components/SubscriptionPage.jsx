@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import { Box, Truck, Gift, CheckSquare, Check } from "lucide-react";
 
+import subscriptionData from "../data/subscription.json";
+
+const ICON_MAP = {
+  Box: Box,
+  Truck: Truck,
+  Gift: Gift,
+  CheckSquare: CheckSquare,
+};
+
 const SubscriptionPage = () => {
   const [selectedPack, setSelectedPack] = useState("Wellness Box");
   const WHATSAPP_NUMBER = "917262866254";
@@ -13,64 +22,11 @@ const SubscriptionPage = () => {
     window.open(whatsappUrl, "_blank");
   };
 
-  const topBenefits = [
-    {
-      icon: <Box className="w-6 h-6 text-[#c2916b]" />,
-      text: "Curated Monthly Boxes",
-    },
-    {
-      icon: <Truck className="w-6 h-6 text-[#f97316]" />,
-      text: "Free Delivery",
-    },
-    {
-      icon: <Gift className="w-6 h-6 text-[#ef4444]" />,
-      text: "Exclusive Gifts",
-    },
-    {
-      icon: <CheckSquare className="w-6 h-6 text-[#10b981]" />,
-      text: "Flexible Plans",
-    },
-  ];
+  const { topBenefits, packs, howItWorks } = subscriptionData;
 
-  const packs = [
-    {
-      title: "Wellness Box",
-      features: [
-        "500g Premium Almonds",
-        "500g Mixed Nuts",
-        "250g Goji Berries",
-        "500g Chia Seeds",
-        "Free Recipe Card",
-      ],
-      isPopular: true,
-    },
-    {
-      title: "Family Pack",
-      features: [
-        "1kg Premium Almonds",
-        "1kg Cashews",
-        "500g Walnuts",
-        "500g Dates",
-        "500g Raisins",
-        "Free Storage Container",
-      ],
-      isPopular: false,
-    },
-    {
-      title: "Superfood Box",
-      features: [
-        "250g Goji Berries",
-        "500g Chia Seeds",
-        "500g Pumpkin Seeds",
-        "250g Flax Seeds",
-        "Health Guide Book",
-      ],
-      isPopular: false,
-    },
-  ];
 
   return (
-    <div className="bg-white py-16 font-sans">
+    <div className="bg-white py-16 ">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-10">
@@ -86,19 +42,21 @@ const SubscriptionPage = () => {
           </p>
         </div>
 
-        {/* Top Benefits Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 border border-gray-100 rounded-xl mb-16 shadow-sm">
-          {topBenefits.map((b, i) => (
-            <div
-              key={i}
-              className="flex flex-col items-center p-6 border-r border-gray-100 last:border-0"
-            >
-              {b.icon}
-              <span className="text-[11px] font-bold mt-3 text-gray-800 uppercase tracking-tight">
-                {b.text}
-              </span>
-            </div>
-          ))}
+          {topBenefits.map((b, i) => {
+            const Icon = ICON_MAP[b.icon];
+            return (
+              <div
+                key={i}
+                className="flex flex-col items-center p-6 border-r border-gray-100 last:border-0"
+              >
+                {Icon && <Icon className="w-6 h-6" style={{ color: b.color }} />}
+                <span className="text-[11px] font-bold mt-3 text-gray-800 uppercase tracking-tight">
+                  {b.text}
+                </span>
+              </div>
+            );
+          })}
         </div>
 
         {/* Pricing Grid */}
@@ -168,24 +126,7 @@ const SubscriptionPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 relative">
             <div className="absolute top-8 left-[10%] right-[10%] h-[1px] bg-gray-100 hidden md:block" />
 
-            {[
-              {
-                n: 1,
-                t: "Choose Your Plan",
-                d: "Pick the subscription that fits your lifestyle",
-              },
-              {
-                n: 2,
-                t: "Customize",
-                d: "Personalize your box based on preferences",
-              },
-              {
-                n: 3,
-                t: "Receive Monthly",
-                d: "Fresh products delivered to your door",
-              },
-              { n: 4, t: "Enjoy & Save", d: "Save up to 30% on every order" },
-            ].map((s, i) => (
+            {howItWorks.map((s, i) => (
               <div key={i} className="relative z-10 flex flex-col items-center">
                 <div className="w-16 h-16 bg-[#064e3b] text-white rounded-full flex items-center justify-center text-xl font-bold mb-6 shadow-md">
                   {s.n}

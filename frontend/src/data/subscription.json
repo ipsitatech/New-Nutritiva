@@ -1,0 +1,82 @@
+{
+  "topBenefits": [
+    {
+      "icon": "Box",
+      "text": "Curated Monthly Boxes",
+      "color": "#c2916b"
+    },
+    {
+      "icon": "Truck",
+      "text": "Free Delivery",
+      "color": "#f97316"
+    },
+    {
+      "icon": "Gift",
+      "text": "Exclusive Gifts",
+      "color": "#ef4444"
+    },
+    {
+      "icon": "CheckSquare",
+      "text": "Flexible Plans",
+      "color": "#10b981"
+    }
+  ],
+  "packs": [
+    {
+      "title": "Wellness Box",
+      "features": [
+        "500g Premium Almonds",
+        "500g Mixed Nuts",
+        "250g Goji Berries",
+        "500g Chia Seeds",
+        "Free Recipe Card"
+      ],
+      "isPopular": true
+    },
+    {
+      "title": "Family Pack",
+      "features": [
+        "1kg Premium Almonds",
+        "1kg Cashews",
+        "500g Walnuts",
+        "500g Dates",
+        "500g Raisins",
+        "Free Storage Container"
+      ],
+      "isPopular": false
+    },
+    {
+      "title": "Superfood Box",
+      "features": [
+        "250g Goji Berries",
+        "500g Chia Seeds",
+        "500g Pumpkin Seeds",
+        "250g Flax Seeds",
+        "Health Guide Book"
+      ],
+      "isPopular": false
+    }
+  ],
+  "howItWorks": [
+    {
+      "n": 1,
+      "t": "Choose Your Plan",
+      "d": "Pick the subscription that fits your lifestyle"
+    },
+    {
+      "n": 2,
+      "t": "Customize",
+      "d": "Personalize your box based on preferences"
+    },
+    {
+      "n": 3,
+      "t": "Receive Monthly",
+      "d": "Fresh products delivered to your door"
+    },
+    {
+      "n": 4,
+      "t": "Enjoy & Save",
+      "d": "Save up to 30% on every order"
+    }
+  ]
+}

@@ -8,6 +8,8 @@ import SubscriptionPage from "../components/SubscriptionPage.jsx";
 import HamperSection from "../components/HamperSection.jsx";
 import CorporateBulkOrders from "../components/CorporateBulkOrders.jsx";
 import FAQ from "../components/FAQ.jsx";
+import Categories from "../components/Categories.jsx";
+import Testimonials from "../components/Testimonials.jsx";
 import HamperData from "../data/HamperData.json";
 import landingConfig from "../data/landingConfig.json"; 
 
@@ -21,14 +23,14 @@ function LandingPage() {
       <HeroSection />
       <BottomStrip />
       <FeaturesSection />
-      {/* <ShopByCategory /> */}
+      <Categories />
       <HotDealsSection />
       <HamperSection 
         tabs={hamperTabs} 
         hampers={HamperData} 
         customCta={customHamperCta}
       />
-      {/* <Testimonials /> */}
+      <Testimonials />
       <CorporateBulkOrders />
       <SubscriptionPage />
       <FAQ />

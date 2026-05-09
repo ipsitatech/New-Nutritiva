@@ -1,16 +1,27 @@
-import React from 'react';
+import categoriesData from "../data/categories.json";
+import cat_almonds from "../assets/product_imgs/almonds.png";
+import cat_dryfruits from "../assets/product_imgs/mixed_dryfruit.png";
+import cat_berries from "../assets/product_imgs/mixed_berries.png";
+import cat_seeds from "../assets/product_imgs/pumpkin_seeds.png";
+import cat_hampers from "../assets/product_imgs/dryfruits_falling.png";
+import cat_bulk from "../assets/product_imgs/dryfruit bowl.png";
+import cat_pistachios from "../assets/product_imgs/pistachios.png";
+import cat_organic from "../assets/product_imgs/goji_berries.png";
+
+const IMAGE_MAP = {
+  "almonds": cat_almonds,
+  "mixed_dryfruit": cat_dryfruits,
+  "mixed_berries": cat_berries,
+  "pumpkin_seeds": cat_seeds,
+  "dryfruits_falling": cat_hampers,
+  "dryfruit bowl": cat_bulk,
+  "almonds_box": cat_almonds, // Assuming some shared images
+  "goji_berries": cat_organic,
+  "pistachios": cat_pistachios
+};
 
 const Categories = () => {
-  const categories = [
-    { name: 'Exotic Nuts', img: '/imgs/cat_almonds.png' },
-    { name: 'Dry Fruits', img: '/imgs/cat_dryfruits.png' },
-    { name: 'Berries', img: '/imgs/cat_berries.png' },
-    { name: 'Seeds &\nSuperfoods', img: '/imgs/cat_seeds.png' },
-    { name: 'Gift Hampers', img: '/imgs/cat_hampers.png' },
-    { name: 'Corporate Packs', img: '/imgs/cat_berries.png' },
-    { name: 'Subscription\nBoxes', img: '/imgs/cat_pistachios.png' },
-    { name: 'Organic\nSuperfoods', img: '/imgs/cat_organic.png' },
-  ];
+  const categories = categoriesData;
 
   return (
     <section className="py-16 md:py-24 bg-nutri-green-pale relative overflow-hidden" id="products">
@@ -31,7 +42,7 @@ const Categories = () => {
           {categories.map((cat, index) => (
             <div key={index} className="flex flex-col items-center shrink-0 group cursor-pointer w-[80px] sm:w-[100px] md:w-[110px] lg:w-[120px]">
               <div className="w-[80px] h-[80px] sm:w-[100px] sm:h-[100px] md:w-[110px] md:h-[110px] lg:w-[120px] lg:h-[120px] rounded-[18px] sm:rounded-[24px] overflow-hidden mb-3 shadow-[0_4px_10px_rgba(0,0,0,0.08)] transition-transform duration-300 group-hover:-translate-y-1">
-                <img src={cat.img} alt={cat.name.replace('\n', ' ')} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <img src={IMAGE_MAP[cat.img] || cat.img} alt={cat.name.replace('\n', ' ')} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
               </div>
               <span className="text-[10px] sm:text-[11px] md:text-xs font-semibold text-[#222] text-center leading-tight whitespace-pre-line">
                 {cat.name}

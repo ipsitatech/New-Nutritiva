@@ -1,38 +1,7 @@
 import React, { useState } from "react";
 import { Plus, X } from "lucide-react";
 
-const faqData = [
-  {
-    question: "Can I pause or cancel my subscription?",
-    answer:
-      "Yes! You can pause, skip, or cancel your subscription anytime from your account dashboard. No questions asked.",
-  },
-  {
-    question: "When will I receive my first box?",
-    answer:
-      "Your first box will be delivered within 2–5 business days depending on your location.",
-  },
-  {
-    question: "Can I customize my subscription box?",
-    answer:
-      "Yes, you can customize your box with your preferred products and quantities.",
-  },
-  {
-    question: "Is there a minimum commitment period?",
-    answer:
-      "No, there is no minimum commitment. You can cancel anytime.",
-  },
-  {
-    question: "Do you offer bulk or corporate orders?",
-    answer:
-      "Yes, we provide corporate bulk orders with special pricing and custom branding.",
-  },
-  {
-    question: "Are your products lab tested?",
-    answer:
-      "Yes, all our products are FSSAI certified and lab tested for quality assurance.",
-  },
-];
+import faqData from "../data/faq.json";
 
 const FAQ = () => {
   const [activeIndex, setActiveIndex] = useState(0);

@@ -16,7 +16,7 @@ export default function HamperCustomCTA({
 }) {
   return (
     <div
-      className="bg-[#EFF7F2] rounded-[10px] border-2 border-dashed border-[#C8E6D4] px-10 py-8.5 text-center"
+      className="bg-[#EFF7F2] rounded-[10px] border-2 border-dashed border-[#2D7A4F]/20 px-10 py-8.5 text-center"
       style={{ fontFamily: "'DM Sans', sans-serif" }}
     >
       <h3 className="text-[20px] font-bold text-[#141414] mb-1.5">{title}</h3>
@@ -27,7 +27,7 @@ export default function HamperCustomCTA({
         href={waLink}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-6 py-2.75 bg-[#2D7A4F] hover:bg-[#3EA66A] hover:shadow-[0_6px_20px_rgba(45,122,79,0.25)] text-white text-[14px] font-semibold rounded-lg border-2 border-[#2D7A4F] hover:border-[#3EA66A] transition-all duration-200"
+        className="inline-flex items-center gap-2 px-6 py-2.75 bg-[#2D7A4F] hover:bg-[#1e5235] hover:shadow-[0_6px_20px_rgba(45,122,79,0.25)] text-white text-[14px] font-semibold rounded-lg border-2 border-[#2D7A4F] hover:border-[#1e5235] transition-all duration-200"
       >
         {buttonLabel}
       </a>

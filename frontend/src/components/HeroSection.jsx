@@ -1,13 +1,16 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import almonds from "../assets/product_imgs/almonds.png";
 import berries from "../assets/product_imgs/mixed_berries.png";
 import cashews from "../assets/product_imgs/cashews_bowl.png";
 import walnuts from "../assets/product_imgs/walnuts.png";
 
+import heroData from "../data/hero.json";
+
 function HeroSection() {
   const images = [almonds, berries, cashews, walnuts];
   const [current, setCurrent] = useState(0);
+  const { badge, headingMain, headingHighlight, headingSub, description, primaryBtn, secondaryBtn } = heroData;
 
   // Auto slide
   useEffect(() => {
@@ -52,8 +55,8 @@ function HeroSection() {
 
           {/* Badge */}
           <span className="
-            bg-green-100 
-            text-green-700 
+            bg-[#EFF7F2] 
+            text-[#2D7A4F] 
             px-5 
             py-2 
             rounded-full 
@@ -61,7 +64,7 @@ function HeroSection() {
             font-medium
             inline-block
           ">
-            🌿 100% Premium Quality
+            {badge}
           </span>
 
           {/* Heading */}
@@ -74,14 +77,17 @@ function HeroSection() {
             mt-6 
             text-gray-900
           ">
-            India's Most{" "}
-            <span className="text-green-700">
-              Trusted
+            {headingMain}{" "}
+            <span className="text-[#2D7A4F]">
+              {headingHighlight}
             </span>
             <br />
-            Dry Fruits &
-            <br />
-            Superfoods Brand
+            {headingSub.split('\n').map((line, i) => (
+              <React.Fragment key={i}>
+                {line}
+                <br />
+              </React.Fragment>
+            ))}
           </h1>
 
           {/* Paragraph */}
@@ -94,9 +100,7 @@ function HeroSection() {
             mx-auto
             lg:mx-0
           ">
-            Premium grade products with transparent sourcing,
-            temperature-controlled packaging, and nationwide delivery.
-            Nourishing families across India.
+            {description}
           </p>
 
           {/* Buttons */}
@@ -111,16 +115,16 @@ function HeroSection() {
           ">
 
             <button className="
-              bg-green-700 
+              bg-[#2D7A4F] 
               text-white 
               px-8 
               py-4 
               rounded-xl 
               text-lg 
-              hover:bg-green-800 
+              hover:bg-[#1e5235] 
               transition
             ">
-              Shop Now
+              {primaryBtn}
             </button>
 
             <button className="
@@ -133,7 +137,7 @@ function HeroSection() {
               hover:bg-gray-100 
               transition
             ">
-              View Subscriptions
+              {secondaryBtn}
             </button>
 
           </div>

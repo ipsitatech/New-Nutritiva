@@ -1,6 +1,6 @@
 [
   {
-    "imageKey": "almonds",
+    "image": "almonds",
     "name": "Premium California Almonds",
     "weight": "500g",
     "price": "₹899",
@@ -8,7 +8,7 @@
     "discount": "25% OFF"
   },
   {
-    "imageKey": "walnuts",
+    "image": "walnuts",
     "name": "Kashmiri Walnut Kernels",
     "weight": "500g",
     "price": "₹1,299",
@@ -16,7 +16,7 @@
     "discount": "19% OFF"
   },
   {
-    "imageKey": "pistachios",
+    "image": "pistachios",
     "name": "Premium Iranian Pistachios",
     "weight": "500g",
     "price": "₹1,499",
@@ -24,7 +24,7 @@
     "discount": "21% OFF"
   },
   {
-    "imageKey": "goji",
+    "image": "goji",
     "name": "Organic Goji Berries",
     "weight": "250g",
     "price": "₹799",

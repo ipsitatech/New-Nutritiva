@@ -31,7 +31,7 @@
         "500g Chia Seeds",
         "Free Recipe Card"
       ],
-      "isPopular": true
+      "isPopular": false
     },
     {
       "title": "Family Pack",
@@ -43,7 +43,7 @@
         "500g Raisins",
         "Free Storage Container"
       ],
-      "isPopular": false
+      "isPopular": true
     },
     {
       "title": "Superfood Box",

@@ -11,7 +11,7 @@ const ICON_MAP = {
 };
 
 const SubscriptionPage = () => {
-  const [selectedPack, setSelectedPack] = useState("Wellness Box");
+  const [selectedPack, setSelectedPack] = useState("Family Pack");
   const WHATSAPP_NUMBER = "917262866254";
 
   const handleWhatsAppRedirect = (planTitle) => {
@@ -30,11 +30,11 @@ const SubscriptionPage = () => {
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-10">
-          <span className="bg-[#064e3b] text-white px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+          <span className="bg-[#2D7A4F] text-white px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
             Save up to 30%
           </span>
           <h1 className="text-4xl font-bold mt-4 text-gray-900">
-            Subscription <span className="text-[#10b981]">Packs</span>
+            Subscription <span className="text-[#2D7A4F]">Packs</span>
           </h1>
           <p className="text-gray-500 mt-3 max-w-xl mx-auto text-sm leading-relaxed">
             Get your favourite premium dry fruits delivered every month. Cancel
@@ -50,7 +50,7 @@ const SubscriptionPage = () => {
                 key={i}
                 className="flex flex-col items-center p-6 border-r border-gray-100 last:border-0"
               >
-                {Icon && <Icon className="w-6 h-6" style={{ color: b.color }} />}
+                {Icon && <Icon className="w-6 h-6" style={{ color: "#2D7A4F" }} />}
                 <span className="text-[11px] font-bold mt-3 text-gray-800 uppercase tracking-tight">
                   {b.text}
                 </span>
@@ -73,14 +73,16 @@ const SubscriptionPage = () => {
                 onClick={() => setSelectedPack(p.title)} // Updates state on click
                 className={`relative flex flex-col p-8 rounded-[1.2rem] border transition-all duration-300 cursor-pointer ${
                   isSelected
-                    ? "border-emerald-500 shadow-xl scale-[1.02]"
-                    : "border-gray-200 shadow-sm opacity-80"
+                    ? "border-[#2D7A4F] shadow-xl scale-[1.02] opacity-100"
+                    : p.isPopular 
+                      ? "border-gray-200 shadow-sm opacity-100" 
+                      : "border-gray-200 shadow-sm opacity-80"
                 }`}
               >
-                {/* Badge only shows if this pack is selected */}
+                {/* Badge shows if this pack is the popular one */}
 
-                {isSelected && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#064e3b] text-white px-4 py-1 rounded-full text-[10px] font-bold whitespace-nowrap">
+                {p.isPopular && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#2D7A4F] text-white px-4 py-1 rounded-full text-[10px] font-bold whitespace-nowrap">
                     MOST POPULAR
                   </span>
                 )}
@@ -97,7 +99,7 @@ const SubscriptionPage = () => {
                     <li
                       key={j}
                       className="flex items-center text-gray-700 text-sm font-medium">
-                      <span className="bg-[#10b981] p-0.5 rounded-md mr-3 shadow-sm">
+                      <span className="bg-[#2D7A4F] p-0.5 rounded-md mr-3 shadow-sm">
                         <Check className="w-3 h-3 text-white" strokeWidth={4} />
                       </span>
                       {f}
@@ -110,7 +112,7 @@ const SubscriptionPage = () => {
                     e.stopPropagation(); // Prevents the card click from firing when clicking the button
                     handleWhatsAppRedirect(p.title);
                   }}
-                  className="w-full bg-[#059669] text-white font-bold py-4 rounded-2xl hover:bg-[#047857]">
+                  className="w-full bg-[#2D7A4F] text-white font-bold py-4 rounded-2xl hover:bg-[#1e5235]">
                   Enquire Now
                 </button>
               </div>
@@ -128,7 +130,7 @@ const SubscriptionPage = () => {
 
             {howItWorks.map((s, i) => (
               <div key={i} className="relative z-10 flex flex-col items-center">
-                <div className="w-16 h-16 bg-[#064e3b] text-white rounded-full flex items-center justify-center text-xl font-bold mb-6 shadow-md">
+                <div className="w-16 h-16 bg-[#2D7A4F] text-white rounded-full flex items-center justify-center text-xl font-bold mb-6 shadow-md">
                   {s.n}
                 </div>
                 <h4 className="font-bold text-sm text-gray-900 mb-2">{s.t}</h4>

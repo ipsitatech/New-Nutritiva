@@ -1,0 +1,32 @@
+{
+  "brand": {
+    "name": "Nutritva",
+    "tagline": "India's most trusted premium dry fruits and superfoods brand. Sourced with care, delivered with love.",
+    "socials": [
+      { "name": "Instagram", "url": "https://instagram.com/nutritva" },
+      { "name": "Facebook", "url": "https://facebook.com/nutritva" },
+      { "name": "WhatsApp", "url": "https://wa.me/917262866254" }
+    ]
+  },
+  "productLinks": [
+    { "name": "Dry Fruits", "url": "/products" },
+    { "name": "Exotic Nuts", "url": "/products" },
+    { "name": "Berries", "url": "/products" },
+    { "name": "Seeds & Superfoods", "url": "/products" }
+  ],
+  "companyLinks": [
+    { "name": "About Us", "url": "/" },
+    { "name": "Subscriptions", "url": "/" },
+    { "name": "Corporate", "url": "/" },
+    { "name": "FAQs", "url": "/" }
+  ],
+  "contact": {
+    "phone": "+91 72628 66254",
+    "phoneUrl": "tel:+917262866254",
+    "email": "hello@nutritva.in",
+    "emailUrl": "mailto:hello@nutritva.in",
+    "address": "Mumbai, India",
+    "addressUrl": "https://maps.google.com"
+  },
+  "copyright": "© 2025 Nutritva. All rights reserved."
+}

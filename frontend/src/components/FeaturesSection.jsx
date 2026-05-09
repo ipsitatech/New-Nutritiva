@@ -24,10 +24,10 @@ const FeaturesSection = () => {
               className="flex flex-col items-center text-center p-8 rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md bg-white"
             >
               {/* Icon Container */}
-              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-emerald-50 mb-6">
+              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-[#eff7f2] mb-6">
                 {(() => {
                   const Icon = ICON_MAP[feature.icon];
-                  return Icon ? <Icon className="w-6 h-6 text-emerald-800" /> : null;
+                  return Icon ? <Icon className="w-6 h-6 text-[#2D7A4F]" /> : null;
                 })()}
               </div>
               

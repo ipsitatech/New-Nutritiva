@@ -208,8 +208,8 @@ export default function TopBar() {
                 border: "2px solid #2D7A4F",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#3EA66A";
-                e.currentTarget.style.borderColor = "#3EA66A";
+                e.currentTarget.style.background = "#2D7A4F";
+                e.currentTarget.style.borderColor = "#2D7A4F";
                 e.currentTarget.style.boxShadow =
                   "0 4px 14px rgba(45,122,79,0.22)";
               }}

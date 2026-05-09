@@ -1,0 +1,49 @@
+{
+  "tag": "B2B SOLUTIONS",
+  "title": "Corporate Bulk Orders",
+  "description": "Premium dry fruits and healthy snacks for your corporate gifting, employee wellness programs, and festive celebrations across India.",
+  "features": [
+    {
+      "icon": "PackageOpen",
+      "title": "Bulk Discounts",
+      "description": "Special pricing for orders above 50kg"
+    },
+    {
+      "icon": "Users",
+      "title": "Employee Wellness",
+      "description": "Monthly snack subscriptions for offices"
+    },
+    {
+      "icon": "Gift",
+      "title": "Custom Packaging",
+      "description": "Branded gift boxes with your logo"
+    },
+    {
+      "icon": "Phone",
+      "title": "Dedicated Support",
+      "description": "Account manager for your account"
+    }
+  ],
+  "pricing": [
+    {
+      "title": "Starter Pack",
+      "range": "10 – 50 kg",
+      "discount": "10% OFF"
+    },
+    {
+      "title": "Business Pack",
+      "range": "50 – 100 kg",
+      "discount": "20% OFF"
+    },
+    {
+      "title": "Enterprise Pack",
+      "range": "100 kg+",
+      "discount": "30% OFF + Free Shipping",
+      "highlight": true
+    }
+  ],
+  "whatsappNumber": "917262866254",
+  "whatsappText": "Interested in Corporate Bulk Orders",
+  "badgeTitle": "Trusted by 500+",
+  "badgeSub": "Companies across India"
+}

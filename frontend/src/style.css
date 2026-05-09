@@ -27,8 +27,8 @@ body {
 }
 
 .badge {
-    background: #e6f4ea;
-    color: #2e7d32;
+    background: #eff7f2;
+    color: #2d7a4f;
     padding: 8px 14px;
     border-radius: 20px;
     font-size: 14px;
@@ -41,7 +41,7 @@ body {
 }
 
 .hero-left h1 span {
-    color: #2e7d32;
+    color: #2d7a4f;
 }
 
 .hero-left p {
@@ -57,7 +57,7 @@ body {
 }
 
 .primary {
-    background: #2e7d32;
+    background: #2d7a4f;
     color: white;
     padding: 12px 22px;
     border: none;
@@ -107,6 +107,23 @@ body {
     animation: marquee 15s linear infinite;
 }
 
+@keyframes testimonial-marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-testimonial-marquee {
+    animation: testimonial-marquee 40s linear infinite;
+}
+
+.mask-gradient {
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
 /* FAQ SECTION */
 .faq {
     background: #ffffff;
@@ -151,8 +168,8 @@ body {
   }
   
   .faq-item.open {
-    border: 1px solid #1f7a5a;
-    background: #f3fbf7;
+    border: 1px solid #2d7a4f;
+    background: #eff7f2;
   }
   
   .faq-header {
@@ -169,7 +186,7 @@ body {
   
   .faq-icon {
     font-size: 20px;
-    color: #1f7a5a;
+    color: #2d7a4f;
   }
   
   .faq-body {
@@ -208,8 +225,8 @@ body {
   }
   
   .cbo-tag {
-    background: #fde9dc;
-    color: #e67e22;
+    background: #eff7f2;
+    color: #2d7a4f;
     padding: 6px 14px;
     font-size: 12px;
     border-radius: 20px;
@@ -225,7 +242,7 @@ body {
   }
   
   .cbo-title span {
-    color: #e67e22;
+    color: #2d7a4f;
   }
   
   .cbo-desc {
@@ -261,7 +278,7 @@ body {
   }
   
   .cbo-orange {
-    color: #e67e22;
+    color: #2d7a4f;
   }
   
   .cbo-purple {
@@ -296,17 +313,17 @@ body {
   }
   
   .cbo-row span {
-    color: #e67e22;
+    color: #2d7a4f;
     font-weight: 600;
   }
   
   .cbo-highlight {
-    background: #fde9dc;
+    background: #eff7f2;
   }
   
   .cbo-btn {
     width: 100%;
-    background: #1f7a5a;
+    background: #2d7a4f;
     color: white;
     padding: 14px;
     border: none;
@@ -321,7 +338,7 @@ body {
   }
   
   .cbo-btn:hover {
-    background: #176347;
+    background: #1e5235;
   }
   
   .cbo-right {

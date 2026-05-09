@@ -75,7 +75,7 @@ export default function HamperCard({
           href={waLink}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-1.75 w-full px-4 py-2.5 bg-[#25D366] hover:bg-[#1da851] hover:shadow-[0_4px_16px_rgba(37,211,102,0.35)] text-white text-[13px] font-semibold rounded-lg transition-all duration-200"
+          className="inline-flex items-center justify-center gap-1.75 w-full px-4 py-2.5 bg-[#2D7A4F] hover:bg-[#1e5235] hover:shadow-[0_4px_16px_rgba(45,122,79,0.35)] text-white text-[13px] font-semibold rounded-lg transition-all duration-200"
         >
           <WhatsAppIcon size={14} />
           Enquire Now

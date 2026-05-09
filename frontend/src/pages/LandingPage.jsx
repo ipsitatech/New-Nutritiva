@@ -1,7 +1,5 @@
 import HeroSection from "../components/HeroSection.jsx";
 import FeaturesSection from "../components/FeaturesSection.jsx"; 
-import Footer from "../components/Footer.jsx";
-import TopBar from "../components/TopBar.jsx";
 import BottomStrip from "../components/BottomStrip.jsx";
 import HotDealsSection from "../components/HotDealsSection.jsx";
 import SubscriptionPage from "../components/SubscriptionPage.jsx";
@@ -10,7 +8,6 @@ import CorporateBulkOrders from "../components/CorporateBulkOrders.jsx";
 import FAQ from "../components/FAQ.jsx";
 import Categories from "../components/Categories.jsx";
 import Testimonials from "../components/Testimonials.jsx";
-import WhatsAppButton from "../components/WhatsAppButton.jsx";
 import DiscountSlider from "../components/DiscountSlider.jsx";
 import HamperData from "../data/HamperData.json";
 import landingConfig from "../data/landingConfig.json"; 
@@ -21,7 +18,6 @@ function LandingPage() {
 
   return (
     <>
-      <TopBar />
       <HeroSection />
       <BottomStrip />
       <DiscountSlider />
@@ -47,8 +43,6 @@ function LandingPage() {
       <div id="faq">
         <FAQ />
       </div>
-      <Footer />
-      <WhatsAppButton />
     </>
   );
 }

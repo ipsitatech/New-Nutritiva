@@ -9,16 +9,16 @@
     ]
   },
   "productLinks": [
-    { "name": "Dry Fruits", "url": "#categories" },
-    { "name": "Exotic Nuts", "url": "#categories" },
-    { "name": "Berries", "url": "#categories" },
-    { "name": "Seeds & Superfoods", "url": "#categories" }
+    { "name": "Dry Fruits", "url": "/categories" },
+    { "name": "Exotic Nuts", "url": "/categories" },
+    { "name": "Berries", "url": "/categories" },
+    { "name": "Seeds & Superfoods", "url": "/categories" }
   ],
   "companyLinks": [
-    { "name": "About Us", "url": "#" },
-    { "name": "Subscriptions", "url": "#subscription" },
-    { "name": "Corporate", "url": "#corporate" },
-    { "name": "FAQs", "url": "#faq" }
+    { "name": "About Us", "url": "/about" },
+    { "name": "Subscriptions", "url": "/#subscription" },
+    { "name": "Corporate", "url": "/#corporate" },
+    { "name": "FAQs", "url": "/#faq" }
   ],
   "contact": {
     "phone": "+91 72628 66254",

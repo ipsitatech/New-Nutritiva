@@ -6,7 +6,7 @@ import navData from "../data/navigation.json";
 const { locations: LOCATIONS, roles } = navData;
 
 
-export default function TopBar() {
+export default function TopBar({ variant = "default" }) {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [locationOpen, setLocationOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -53,11 +53,15 @@ export default function TopBar() {
     l.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const isLanding = variant === "landing";
+
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-1000 bg-white/97 backdrop-blur-md border-b border-[#EAEAEA] transition-shadow duration-200 ${
-        scrolled ? "shadow-md" : "shadow-sm"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-1000 transition-all duration-300 ${
+        scrolled || !isLanding 
+          ? "bg-white/97 backdrop-blur-md border-b border-[#EAEAEA] shadow-sm" 
+          : "bg-transparent border-transparent"
+      } ${scrolled ? "shadow-md" : ""}`}
       style={{ fontFamily: "'DM Sans', sans-serif" }}
     >
       {/* ── Main nav inner ── */}

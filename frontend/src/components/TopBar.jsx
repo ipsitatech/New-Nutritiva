@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, CheckCircle2, AlertCircle, X } from "lucide-react";
 
 import navData from "../data/navigation.json";
 
@@ -15,6 +15,9 @@ export default function TopBar() {
   const [signUpRoleOpen, setSignUpRoleOpen] = useState(false);
   const [selectedSignInRole, setSelectedSignInRole] = useState("");
   const [selectedSignUpRole, setSelectedSignUpRole] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [serviceableModal, setServiceableModal] = useState(false);
+  const [notServiceableModal, setNotServiceableModal] = useState(false);
 
   const locationRef = useRef(null);
   const signInRef = useRef(null);
@@ -45,6 +48,10 @@ export default function TopBar() {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const filteredLocations = LOCATIONS.filter((l) =>
+    l.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <nav
@@ -78,17 +85,20 @@ export default function TopBar() {
             Deliver to
           </span>
 
-          {/* Input field that acts as trigger */}
+          {/* Input field that acts as search trigger */}
           <div className="relative flex items-center">
             <input
               type="text"
-              readOnly
-              value={selectedLocation}
-              placeholder="Select location"
-              onClick={() => setLocationOpen((o) => !o)}
-              className="w-full border-none outline-none bg-white text-[13px] font-semibold cursor-pointer pr-6 py-0 pl-0 caret-transparent"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                if (!locationOpen) setLocationOpen(true);
+              }}
+              onFocus={() => setLocationOpen(true)}
+              placeholder={selectedLocation || "Select location"}
+              className="w-full border-none outline-none bg-white text-[13px] font-semibold pr-6 py-0 pl-0"
               style={{
-                color: selectedLocation ? "#141414" : "#BBBBBB",
+                color: searchTerm || selectedLocation ? "#141414" : "#BBBBBB",
                 fontFamily: "'DM Sans', sans-serif",
               }}
             />
@@ -104,30 +114,43 @@ export default function TopBar() {
           {/* Dropdown list */}
           {locationOpen && (
             <ul
-              className="absolute top-full left-0 mt-2 bg-white border border-[#EAEAEA] rounded-[10px] shadow-lg z-1100 overflow-hidden py-1 min-w-40"
+              className="absolute top-full left-0 mt-2 bg-white border border-[#EAEAEA] rounded-[10px] shadow-lg z-1100 overflow-hidden py-1 min-w-48"
               style={{ boxShadow: "0 8px 28px rgba(0,0,0,0.09)" }}
             >
-              {LOCATIONS.map((city) => (
-                <li key={city}>
-                  <button
-                    onClick={() => {
-                      setSelectedLocation(city);
-                      setLocationOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 text-[13px] font-medium transition-colors duration-150 ${
-                      selectedLocation === city
-                        ? "bg-[#EFF7F2] text-[#2D7A4F] font-semibold"
-                        : "text-[#383838] hover:bg-[#EFF7F2] hover:text-[#2D7A4F]"
-                    }`}
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    {selectedLocation === city && (
-                      <span className="mr-2 text-[#2D7A4F]">✓</span>
-                    )}
-                    {city}
-                  </button>
+              {filteredLocations.length > 0 ? (
+                filteredLocations.map((city) => (
+                  <li key={city}>
+                    <button
+                      onClick={() => {
+                        setSelectedLocation(city);
+                        setSearchTerm("");
+                        setLocationOpen(false);
+                        setServiceableModal(true);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-[13px] font-medium transition-colors duration-150 ${
+                        selectedLocation === city
+                          ? "bg-[#EFF7F2] text-[#2D7A4F] font-semibold"
+                          : "text-[#383838] hover:bg-[#EFF7F2] hover:text-[#2D7A4F]"
+                      }`}
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      {selectedLocation === city && (
+                        <span className="mr-2 text-[#2D7A4F]">✓</span>
+                      )}
+                      {city}
+                    </button>
+                  </li>
+                ))
+              ) : (
+                <li className="px-4 py-6 text-center">
+                  <div className="flex justify-center mb-2">
+                    <AlertCircle size={22} className="text-[#D72C2C]" />
+                  </div>
+                  <p className="text-[13px] font-bold text-[#141414] leading-tight">
+                    We are not serviceable at this location
+                  </p>
                 </li>
-              ))}
+              )}
             </ul>
           )}
         </div>
@@ -401,7 +424,103 @@ export default function TopBar() {
           </div>
         )}
       </div>
+
+      {/* Modals */}
+      <StatusModal
+        isOpen={serviceableModal}
+        onClose={() => setServiceableModal(false)}
+        type="serviceable"
+        location={selectedLocation}
+        onSignIn={() => {
+          setServiceableModal(false);
+          setSignInRoleOpen(true);
+        }}
+      />
+      <StatusModal
+        isOpen={notServiceableModal}
+        onClose={() => setNotServiceableModal(false)}
+        type="not-serviceable"
+      />
     </nav>
+  );
+}
+
+function StatusModal({ isOpen, onClose, type, location, onSignIn }) {
+  // Auto-close after 20 seconds
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 20000);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+  const isServiceable = type === "serviceable";
+
+  return (
+    <div className="fixed inset-0 w-screen h-screen z-[10000] flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-[#141414]/60 backdrop-blur-[8px] transition-opacity duration-300"
+        onClick={onClose}
+      />
+      <div
+        className="relative bg-white rounded-3xl shadow-[0_32px_80px_rgba(0,0,0,0.3)] p-10 max-w-[400px] w-full text-center animate-in fade-in zoom-in slide-in-from-bottom-8 duration-500 ease-out"
+        style={{ fontFamily: "'DM Sans', sans-serif" }}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2.5 text-[#787878] hover:bg-[#F5F5F5] hover:text-[#141414] rounded-full transition-all duration-200"
+          aria-label="Close modal"
+        >
+          <X size={20} />
+        </button>
+
+        <div
+          className={`mx-auto w-20 h-20 rounded-full flex items-center justify-center mb-8 ${
+            isServiceable ? "bg-[#EFF7F2]" : "bg-[#FFF2F2]"
+          }`}
+        >
+          {isServiceable ? (
+            <CheckCircle2 size={40} className="text-[#2D7A4F]" />
+          ) : (
+            <AlertCircle size={40} className="text-[#D72C2C]" />
+          )}
+        </div>
+
+        <h3 className="text-2xl font-black text-[#141414] mb-3 tracking-tight">
+          {isServiceable ? "Serviceable!" : "Not Serviceable"}
+        </h3>
+
+        <p className="text-[#555] text-[15px] leading-relaxed mb-10">
+          {isServiceable ? (
+            <>
+              Great news! We deliver to <span className="font-bold text-[#141414]">{location}</span>. 
+              You're all set to experience premium nutrition.
+            </>
+          ) : (
+            "We're sorry, but we don't deliver to this location yet. We're expanding rapidly – stay tuned for updates!"
+          )}
+        </p>
+
+        {isServiceable ? (
+          <button
+            onClick={onSignIn}
+            className="w-full bg-[#2D7A4F] text-white py-4 rounded-2xl font-bold text-[16px] hover:bg-[#256641] hover:translate-y-[-2px] shadow-[0_8px_20px_rgba(45,122,79,0.3)] transition-all active:scale-[0.98]"
+          >
+            Proceed to Sign In
+          </button>
+        ) : (
+          <button
+            onClick={onClose}
+            className="w-full bg-[#141414] text-white py-4 rounded-2xl font-bold text-[16px] hover:bg-black hover:translate-y-[-2px] shadow-[0_8px_20px_rgba(0,0,0,0.2)] transition-all active:scale-[0.98]"
+          >
+            Got it, thanks
+          </button>
+        )}
+      </div>
+    </div>
   );
 }
 

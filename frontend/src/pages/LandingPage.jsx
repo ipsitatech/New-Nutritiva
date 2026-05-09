@@ -10,6 +10,8 @@ import CorporateBulkOrders from "../components/CorporateBulkOrders.jsx";
 import FAQ from "../components/FAQ.jsx";
 import Categories from "../components/Categories.jsx";
 import Testimonials from "../components/Testimonials.jsx";
+import WhatsAppButton from "../components/WhatsAppButton.jsx";
+import DiscountSlider from "../components/DiscountSlider.jsx";
 import HamperData from "../data/HamperData.json";
 import landingConfig from "../data/landingConfig.json"; 
 
@@ -22,20 +24,31 @@ function LandingPage() {
       <TopBar />
       <HeroSection />
       <BottomStrip />
+      <DiscountSlider />
       <FeaturesSection />
-      <Categories />
-      <HotDealsSection />
+      <div id="categories">
+        <Categories />
+      </div>
+      <div id="hot-deals">
+        <HotDealsSection />
+      </div>
       <HamperSection 
         tabs={hamperTabs} 
         hampers={HamperData} 
         customCta={customHamperCta}
       />
       <Testimonials />
-      <CorporateBulkOrders />
-      <SubscriptionPage />
-      <FAQ />
+      <div id="corporate">
+        <CorporateBulkOrders />
+      </div>
+      <div id="subscription">
+        <SubscriptionPage />
+      </div>
+      <div id="faq">
+        <FAQ />
+      </div>
       <Footer />
-      
+      <WhatsAppButton />
     </>
   );
 }

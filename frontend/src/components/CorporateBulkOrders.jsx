@@ -1,5 +1,6 @@
 import React from "react";
-import { PackageOpen, Users, Gift, Phone, MessageCircle } from "lucide-react";
+import { PackageOpen, Users, Gift, Phone } from "lucide-react";
+import WhatsAppIcon from "./WhatsAppIcon.jsx";
 import myImage from "../assets/product_imgs/mixed_dryfruit.png";
 
 import corporateData from "../data/corporate.json";
@@ -65,7 +66,7 @@ const CorporateBulkOrders = () => {
             className="cbo-btn"
             onClick={() => window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`, "_blank")}
           >
-            <MessageCircle className="cbo-whatsapp-icon" />
+            <WhatsAppIcon size={20} color="white" />
             Get a Custom Quote
           </button>
         </div>

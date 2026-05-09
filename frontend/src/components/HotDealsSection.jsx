@@ -3,107 +3,115 @@ import walnuts from "../assets/product_imgs/walnuts.png";
 import pistachios from "../assets/product_imgs/pistachios.png";
 import goji from "../assets/product_imgs/goji_berries.png";
 
-import hotDealsData from "../data/hotDeals.json";
-
-const IMAGE_MAP = {
-  almonds,
-  walnuts,
-  pistachios,
-  goji,
-};
-
 function HotDealsSection() {
+  const products = [
+    {
+      image: almonds,
+      name: "Premium California Almonds",
+      weight: "500g",
+      price: "₹899",
+      oldPrice: "₹1,199",
+      discount: "25% OFF",
+    },
+    {
+      image: walnuts,
+      name: "Kashmiri Walnut Kernels",
+      weight: "500g",
+      price: "₹1,299",
+      oldPrice: "₹1,599",
+      discount: "19% OFF",
+    },
+    {
+      image: pistachios,
+      name: "Premium Iranian Pistachios",
+      weight: "500g",
+      price: "₹1,499",
+      oldPrice: "₹1,899",
+      discount: "21% OFF",
+    },
+    {
+      image: goji,
+      name: "Organic Goji Berries",
+      weight: "250g",
+      price: "₹799",
+      oldPrice: "₹999",
+      discount: "20% OFF",
+    },
+  ];
 
-  const products = hotDealsData.map((p) => ({
-    ...p,
-    image: IMAGE_MAP[p.imageKey],
-  }));
-
-
-  // 📱 WhatsApp redirect function
   const handleWhatsApp = (productName) => {
-    const phoneNumber = "916371844736";
-
+    const phoneNumber = "9679005896";
     const message = `Hello, I want to enquire about ${productName}`;
-
     const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-
     window.open(whatsappURL, "_blank");
   };
 
   return (
-    <section className="bg-[#f8f9f7] py-24">
+    <section className="bg-[#f8f9f7] py-12">
 
-      {/* TOP TITLE */}
-      <div className="text-center">
-
-        <span className="bg-green-100 text-green-700 px-5 py-2 rounded-full text-sm font-medium">
+      {/* HEADER */}
+      <div className="text-center px-4">
+        <span className="bg-green-100 text-green-700 px-4 py-1 rounded-full text-xs font-medium">
           🔥 LIMITED TIME
         </span>
 
-        <h2 className="text-6xl font-bold mt-6">
+        <h2 className="text-4xl font-bold mt-4">
           Hot <span className="text-green-700">Deals</span>
         </h2>
 
-        <p className="text-gray-500 text-xl mt-5">
+        <p className="text-gray-500 text-base mt-3 max-w-xl mx-auto">
           Handpicked bestsellers at special prices — prices shown in this section only.
         </p>
-
       </div>
 
-      {/* PRODUCT CARDS */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-16 px-6">
+      {/* PRODUCTS */}
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-10 px-4">
 
         {products.map((product, index) => (
           <div
             key={index}
-            className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition duration-300 border border-gray-100"
+            className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition border border-gray-100 flex flex-col h-full"
           >
 
             {/* IMAGE */}
             <div className="relative">
-
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-full h-64 object-cover"
+                className="w-full h-48 object-cover"
               />
 
-              {/* DISCOUNT BADGE */}
-              <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-semibold px-4 py-1 rounded-full">
+              <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
                 {product.discount}
               </div>
-
             </div>
 
             {/* CONTENT */}
-            <div className="p-6">
+            <div className="p-4 flex flex-col flex-grow">
 
-              <h3 className="text-2xl font-bold text-gray-900">
+              {/* TITLE FIXED HEIGHT */}
+              <h3 className="text-lg font-semibold text-gray-900 min-h-[48px]">
                 {product.name}
               </h3>
 
-              <p className="text-gray-500 mt-2 text-lg">
+              <p className="text-gray-500 mt-1 text-sm">
                 {product.weight}
               </p>
 
               {/* PRICE */}
-              <div className="flex items-center gap-3 mt-5">
-
-                <span className="text-4xl font-bold text-green-700">
+              <div className="flex items-center gap-2 mt-3">
+                <span className="text-2xl font-bold text-green-700">
                   {product.price}
                 </span>
-
-                <span className="text-gray-400 line-through text-xl">
+                <span className="text-gray-400 line-through text-sm">
                   {product.oldPrice}
                 </span>
-
               </div>
 
-              {/* BUTTON */}
+              {/* BUTTON FIX */}
               <button
                 onClick={() => handleWhatsApp(product.name)}
-                className="w-full bg-green-500 hover:bg-green-600 transition text-white font-semibold py-4 rounded-2xl mt-6 text-lg"
+                className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 rounded-xl mt-auto text-sm"
               >
                 💬 Enquire Now
               </button>

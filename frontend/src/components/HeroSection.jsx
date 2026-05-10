@@ -48,7 +48,7 @@ function HeroSection() {
 
       <div
         className="
-          max-w-7xl
+          max-w-10xl
           mx-auto
           w-full
           px-6
@@ -63,56 +63,62 @@ function HeroSection() {
       >
 
         {/* LEFT CONTENT */}
-        <div className="max-w-2xl text-center lg:text-left">
+        <div className="max-w-[620px] text-center lg:text-left">
 
           {/* Badge */}
-          <span
+          <div
             className="
-              bg-green-100
-              text-green-700
-              px-5
-              py-2
-              rounded-full
-              text-sm
-              font-medium
-              inline-block
+              inline-flex
+              items-center
+              gap-1.5
+              bg-[#2D7A4F]
+              text-white
+              px-3
+              py-1
+              rounded-lg
+              text-[11px]
+              font-bold
+              uppercase
+              tracking-wider
+              mb-6
             "
           >
-            🌿 100% Premium Quality
-          </span>
+            <span>🌱</span>
+            <span>100% Premium Quality</span>
+          </div>
 
           {/* Heading */}
           <h1
             className="
               text-5xl
               sm:text-6xl
-              lg:text-[72px]
-              font-bold
-              leading-tight
-              mt-6
-              text-gray-900
+              lg:text-[64px]
+              font-black
+              leading-[1.1]
+              text-[#141414]
+              tracking-[-0.04em]
             "
           >
             India's Most{" "}
-            <span className="text-green-700">
+            <span className="text-[#2D7A4F]">
               Trusted
             </span>
             <br />
-            Dry Fruits &
-            <br />
+            Dry Fruits &<br />
             Superfoods Brand
           </h1>
 
           {/* Paragraph */}
           <p
             className="
-              text-gray-500
+              text-[#666]
               mt-6
-              text-lg
+              text-[16px]
               leading-relaxed
-              max-w-xl
+              max-w-md
               mx-auto
               lg:mx-0
+              font-medium
             "
           >
             Premium grade products with transparent sourcing,
@@ -124,10 +130,9 @@ function HeroSection() {
           <div
             className="
               flex
-              flex-col
-              sm:flex-row
+              items-center
               gap-4
-              mt-8
+              mt-10
               justify-center
               lg:justify-start
             "
@@ -137,14 +142,16 @@ function HeroSection() {
             <button
               onClick={scrollToDeals}
               className="
-                bg-green-700
+                bg-[#2D7A4F]
                 text-white
                 px-8
-                py-4
+                py-3
                 rounded-xl
-                text-lg
-                hover:bg-green-800
-                transition
+                text-[15px]
+                font-black
+                hover:bg-[#236340]
+                transition-all
+                shadow-sm
               "
             >
               Shop Now
@@ -154,14 +161,18 @@ function HeroSection() {
             <button
               onClick={() => navigate("/subscriptions")}
               className="
+                bg-white/50
+                backdrop-blur-sm
                 border
-                border-gray-300
-                px-8
+                border-[#E5E5E5]
+                text-[#141414]
+                px-9
                 py-4
                 rounded-xl
-                text-lg
-                hover:bg-gray-100
-                transition
+                text-[15px]
+                font-black
+                hover:bg-white
+                transition-all
               "
             >
               View Subscriptions
@@ -175,78 +186,101 @@ function HeroSection() {
           className="
             relative
             w-full
-            max-w-[500px]
-            h-[280px]
-            sm:h-[300px]
-            lg:h-[350px]
-            rounded-3xl
+            max-w-[540px]
+            h-[300px]
+            sm:h-[360px]
+            lg:h-[400px]
+            rounded-[32px]
             overflow-hidden
-            shadow-xl
+            shadow-[0_20px_50px_rgba(0,0,0,0.08)]
+            group
           "
         >
 
           {/* SLIDER */}
           <div
-            className="flex transition-transform duration-700"
+            className="flex h-full transition-transform duration-700 ease-out"
             style={{
               transform: `translateX(-${current * 100}%)`,
             }}
           >
             {images.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt="Dry Fruits"
-                className="
-                  w-full
-                  max-w-[500px]
-                  h-[220px]
-                  sm:h-[300px]
-                  lg:h-[350px]
-                  object-cover
-                  flex-shrink-0
-                "
-              />
+              <div key={index} className="w-full h-full flex-shrink-0">
+                <img
+                  src={img}
+                  alt="Dry Fruits"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             ))}
           </div>
 
-          {/* LEFT ARROW */}
-          <button
-            onClick={prevSlide}
-            className="
-              absolute
-              left-3
-              top-1/2
-              -translate-y-1/2
-              bg-white/70
-              backdrop-blur-md
-              rounded-full
-              p-2
-              shadow
-              hover:bg-white
-            "
-          >
-            ‹
-          </button>
+          {/* NAVIGATION OVERLAY */}
+          <div className="absolute inset-0 flex items-center justify-between px-4 pointer-events-none">
+            {/* LEFT ARROW */}
+            <button
+              onClick={prevSlide}
+              className="
+                w-8
+                h-8
+                flex
+                items-center
+                justify-center
+                bg-white/80
+                backdrop-blur-md
+                rounded-full
+                shadow-sm
+                hover:bg-white
+                transition-all
+                pointer-events-auto
+                opacity-0
+                group-hover:opacity-100
+              "
+            >
+              <span className="text-[14px] font-bold text-[#141414]">‹</span>
+            </button>
 
-          {/* RIGHT ARROW */}
-          <button
-            onClick={nextSlide}
-            className="
-              absolute
-              right-3
-              top-1/2
-              -translate-y-1/2
-              bg-white/70
-              backdrop-blur-md
-              rounded-full
-              p-2
-              shadow
-              hover:bg-white
-            "
-          >
-            ›
-          </button>
+            {/* RIGHT ARROW */}
+            <button
+              onClick={nextSlide}
+              className="
+                w-8
+                h-8
+                flex
+                items-center
+                justify-center
+                bg-white/80
+                backdrop-blur-md
+                rounded-full
+                shadow-sm
+                hover:bg-white
+                transition-all
+                pointer-events-auto
+                opacity-0
+                group-hover:opacity-100
+              "
+            >
+              <span className="text-[14px] font-bold text-[#141414]">›</span>
+            </button>
+          </div>
+
+          {/* DOTS INDICATOR */}
+          <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrent(index)}
+                className={`
+                  w-2
+                  h-2
+                  rounded-full
+                  transition-all
+                  duration-300
+                  ${current === index ? "bg-white w-4" : "bg-white/50"}
+                `}
+              />
+            ))}
+          </div>
 
         </div>
 

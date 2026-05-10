@@ -3,7 +3,7 @@ import LandingPage from "./pages/LandingPage.jsx";
 import ProductsPage from "./pages/ProductsPage.jsx";
 import CorporateBulkOrders from "./components/CorporateBulkOrders.jsx";
 import FAQ from "./components/FAQ.jsx";
-// import AboutUs from "./pages/AboutUs.jsx";
+import AboutUs from "./pages/AboutUs.jsx";
 import Layout from "./components/Layout.jsx";
 
 import Signup from "./pages/Signup.jsx";
@@ -29,14 +29,14 @@ function App() {
             </Layout>
           } 
         />
-        {/* <Route 
+        <Route 
           path="/about" 
           element={
             <Layout>
               <AboutUs />
             </Layout>
           } 
-        /> */}
+        />
         <Route 
           path="/corporate" 
           element={

@@ -9,10 +9,10 @@
     ]
   },
   "productLinks": [
-    { "name": "Dry Fruits", "url": "/categories" },
-    { "name": "Exotic Nuts", "url": "/categories" },
-    { "name": "Berries", "url": "/categories" },
-    { "name": "Seeds & Superfoods", "url": "/categories" }
+    { "name": "Dry Fruits", "url": "/#categories" },
+    { "name": "Exotic Nuts", "url": "/#categories" },
+    { "name": "Berries", "url": "/#categories" },
+    { "name": "Seeds & Superfoods", "url": "/#categories" }
   ],
   "companyLinks": [
     { "name": "About Us", "url": "/about" },

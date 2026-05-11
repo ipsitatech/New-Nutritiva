@@ -117,7 +117,7 @@ body {
 }
 
 .animate-testimonial-marquee {
-    animation: testimonial-marquee 40s linear infinite;
+    animation: testimonial-marquee 60s linear infinite;
 }
 
 .mask-gradient {

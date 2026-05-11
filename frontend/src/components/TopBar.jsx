@@ -187,7 +187,7 @@ export default function TopBar({ variant = "default" }) {
                 borderColor: "#2D7A4F",
               }}
             >
-              Sign in {selectedSignInRole && `(${selectedSignInRole})`}
+              Sign in
 
               <ChevronDown
                 size={16}
@@ -236,7 +236,7 @@ export default function TopBar({ variant = "default" }) {
                 background: "#2D7A4F",
               }}
             >
-              Sign up {selectedSignUpRole && `(${selectedSignUpRole})`}
+              Sign up
 
               <ChevronDown
                 size={16}

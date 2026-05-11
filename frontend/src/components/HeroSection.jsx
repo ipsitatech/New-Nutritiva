@@ -42,7 +42,13 @@ function HeroSection() {
       behavior: "smooth",
     });
   };
+const scrollToSubscription=()=>{
+const section = document.getElementById("subscription");
 
+    section?.scrollIntoView({
+      behavior: "smooth",
+    });
+}
   return (
     <div className="bg-[#f8f9f7] min-h-screen flex items-center">
 
@@ -159,7 +165,7 @@ function HeroSection() {
 
             {/* VIEW SUBSCRIPTIONS */}
             <button
-              onClick={() => navigate("/subscriptions")}
+              onClick={scrollToSubscription}
               className="
                 bg-white/50
                 backdrop-blur-sm

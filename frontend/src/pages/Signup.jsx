@@ -17,7 +17,9 @@ import {
   FileCheck,
   Trophy,
   Users,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import TopBar from "../components/TopBar";
 import TermsModal from "../components/TermsModal";
@@ -37,6 +39,10 @@ function FieldLabel({ children, required }) {
 }
 
 function FormInput({ label, name, type = "text", placeholder, required, onChange, icon: Icon }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = type === "password";
+  const inputType = isPassword ? (showPassword ? "text" : "password") : type;
+
   return (
     <div className="flex flex-col flex-1">
       <FieldLabel required={required}>{label}</FieldLabel>
@@ -48,7 +54,7 @@ function FormInput({ label, name, type = "text", placeholder, required, onChange
         )}
         <input
           name={name}
-          type={type}
+          type={inputType}
           placeholder={placeholder}
           required={required}
           onChange={onChange}
@@ -57,9 +63,18 @@ function FormInput({ label, name, type = "text", placeholder, required, onChange
             "text-[14px] font-medium text-gray-900 placeholder:text-gray-300",
             "focus:outline-none focus:border-[#2D7A4F] focus:bg-white focus:ring-2 focus:ring-[#2D7A4F]/5",
             "transition-all duration-200 py-3",
-            Icon ? "pl-10 pr-4" : "px-4",
+            Icon ? "pl-10 pr-12" : "px-4 pr-12",
           ].join(" ")}
         />
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors"
+          >
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -302,6 +317,33 @@ export default function Signup() {
   const [captchaCode, setCaptchaCode] = useState("");
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+
+  useEffect(() => {
+    setFormData({
+      fullName: "",
+      email: "",
+      phone: "",
+      password: "",
+      confirmPassword: "",
+      address: "",
+      captchaInput: "",
+      acceptTerms: false,
+      promoEmails: false,
+      firstName: "",
+      lastName: "",
+      businessName: "",
+      businessType: "",
+      primaryCategory: "",
+      gstNumber: "",
+      bankAccount: "",
+      ifscCode: "",
+      tanCard: null,
+      certifyAccuracy: false,
+      adhereQuality: false
+    });
+    setTermsAccepted(false);
+    generateCaptcha();
+  }, [currentRole]);
 
   const generateCaptcha = () => {
     setCaptchaCode(Math.random().toString(36).substring(2, 8).toUpperCase());

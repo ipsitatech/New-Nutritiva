@@ -208,7 +208,7 @@ export default function TopBar({ variant = "default" }) {
                         setSelectedSignInRole(role);
                         setSignInRoleOpen(false);
 
-                        navigate(`/signup/${role.toLowerCase()}`);
+                        navigate(`/signin/${role.toLowerCase()}`);
                       }}
                       className="w-full text-left px-4 py-2.5 text-[13px] hover:bg-[#EFF7F2] hover:text-[#2D7A4F]"
                     >
@@ -311,7 +311,7 @@ export default function TopBar({ variant = "default" }) {
                   onClick={() => {
                     setSelectedSignInRole(role);
 
-                    navigate(`/signup/${role.toLowerCase()}`);
+                    navigate(`/signin/${role.toLowerCase()}`);
                   }}
                   className="w-full text-left px-4 py-2 mb-2 rounded-lg bg-[#F5F5F5]"
                 >

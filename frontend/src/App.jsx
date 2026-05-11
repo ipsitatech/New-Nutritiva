@@ -7,6 +7,7 @@ import AboutUs from "./pages/AboutUs.jsx";
 import Layout from "./components/Layout.jsx";
 
 import Signup from "./pages/Signup.jsx";
+import SignIn from "./pages/SignIn.jsx";
 
 function App() {
   return (
@@ -20,7 +21,9 @@ function App() {
             </Layout>
           } 
         />
-         <Route path="/signup/:role" element={<Signup />} />
+        <Route path="/signup/:role" element={<Signup />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signin/:role" element={<SignIn />} />
         <Route 
           path="/products" 
           element={

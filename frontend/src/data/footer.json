@@ -15,6 +15,7 @@
     { "name": "Seeds & Superfoods", "url": "/#categories" }
   ],
   "companyLinks": [
+    { "name": "Home", "url": "/" },
     { "name": "About Us", "url": "/about" },
     { "name": "Subscriptions", "url": "/#subscription" },
     { "name": "Corporate", "url": "/#corporate" },

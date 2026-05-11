@@ -42,13 +42,13 @@ function HeroSection() {
       behavior: "smooth",
     });
   };
-const scrollToSubscription=()=>{
-const section = document.getElementById("subscription");
+  const scrollToSubscription = () => {
+    const section = document.getElementById("subscription");
 
     section?.scrollIntoView({
       behavior: "smooth",
     });
-}
+  }
   return (
     <div className="bg-[#f8f9f7] min-h-screen flex items-center">
 

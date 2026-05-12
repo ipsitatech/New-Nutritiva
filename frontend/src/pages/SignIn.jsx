@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { signin, saveSession } from "../services/authService";
 import {
   ArrowRight,
   Mail,
@@ -118,8 +119,10 @@ export default function SignIn() {
 
   const currentRole = urlRole?.toLowerCase() || "buyer";
 
-  const [view, setView] = useState("signin"); // 'signin', 'forgot-password', 'otp'
+  const [view, setView] = useState("signin");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
   const [formData, setFormData] = useState({
     emailOrPhone: "",
     password: "",
@@ -165,10 +168,24 @@ export default function SignIn() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSignInSubmit = (e) => {
+  const handleSignInSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sign In:", { role: currentRole, ...formData });
-    // Handle actual login logic here
+    setApiError("");
+    setIsLoading(true);
+    try {
+      const data = await signin(formData.emailOrPhone, formData.password);
+      saveSession(data.token, data.role);
+      // Navigate based on role
+      if (data.role === "seller") {
+        navigate("/seller/dashboard");
+      } else {
+        navigate("/");
+      }
+    } catch (err) {
+      setApiError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleForgotSubmit = (e) => {
@@ -254,9 +271,31 @@ export default function SignIn() {
                     </div>
                   </div>
 
-                  <button type="submit" className="w-full flex items-center justify-center gap-2 bg-[#2D7A4F] hover:bg-[#236340] text-white text-[15px] font-bold py-4 rounded-xl transition-all duration-300 shadow-[0_8px_20px_rgba(45,122,79,0.15)] mt-2">
-                    Sign In
-                    <ArrowRight size={18} />
+                  {apiError && (
+                    <div className="bg-red-50 border border-red-200 text-red-600 text-[13px] font-medium px-4 py-3 rounded-xl">
+                      {apiError}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full flex items-center justify-center gap-2 bg-[#2D7A4F] hover:bg-[#236340] disabled:opacity-60 disabled:cursor-not-allowed text-white text-[15px] font-bold py-4 rounded-xl transition-all duration-300 shadow-[0_8px_20px_rgba(45,122,79,0.15)] mt-2"
+                  >
+                    {isLoading ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                        </svg>
+                        Signing in...
+                      </span>
+                    ) : (
+                      <>
+                        Sign In
+                        <ArrowRight size={18} />
+                      </>
+                    )}
                   </button>
                 </form>
               )}

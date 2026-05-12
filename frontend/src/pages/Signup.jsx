@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { buyerSignup, sellerSignup, saveSession } from "../services/authService";
 import {
   ArrowRight,
   Mail,
@@ -314,6 +315,9 @@ export default function Signup() {
     adhereQuality: false
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
+
   const [captchaCode, setCaptchaCode] = useState("");
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -363,26 +367,44 @@ export default function Signup() {
   };
 
   const handleFileChange = (e) => {
-    setFormData((prev) => ({ ...prev, tanCard: e.target.files[0] }));
+    // Store the actual File object for multipart upload
+    const file = e.target.files[0] || null;
+    setFormData((prev) => ({ ...prev, tanCard: file }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setApiError("");
+
     if (!isGuest && formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      setApiError("Passwords do not match.");
       return;
     }
     if (!termsAccepted) {
-      alert("Please accept the Terms & Conditions first.");
       setShowTermsModal(true);
       return;
     }
-    if (formData.captchaInput !== captchaCode) {
-      alert("Invalid Captcha!");
+    if (formData.captchaInput.toUpperCase() !== captchaCode) {
+      setApiError("Invalid captcha. Please try again.");
       generateCaptcha();
       return;
     }
-    console.log("Form Submitted:", { role: currentRole, ...formData });
+
+    setIsLoading(true);
+    try {
+      if (isBuyer) {
+        const data = await buyerSignup(formData);
+        saveSession(data.token, "buyer");
+      } else if (isSeller) {
+        const data = await sellerSignup(formData, formData.tanCard);
+        saveSession(data.token, "seller");
+      }
+      navigate("/");
+    } catch (err) {
+      setApiError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -501,12 +523,34 @@ export default function Signup() {
                 {isBuyer && <Checkbox label="Subscribe to promotional emails & updates" name="promoEmails" onChange={handleInputChange} />}
               </div>
 
-              <div className="pt-4">
-                <button type="submit" className="w-full flex items-center justify-center gap-2 bg-[#2D7A4F] hover:bg-[#256040] active:bg-[#1e4f35] text-white text-[15px] font-bold py-4 rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(45,122,79,0.22)] hover:shadow-[0_6px_20px_rgba(45,122,79,0.32)]">
-                  {isBuyer && "Create Account"}
-                  {isSeller && "Submit Seller Application"}
-                  {isGuest && "Continue as Guest"}
-                  <ArrowRight size={18} />
+              {apiError && (
+                <div className="bg-red-50 border border-red-200 text-red-600 text-[13px] font-medium px-4 py-3 rounded-xl">
+                  {apiError}
+                </div>
+              )}
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full flex items-center justify-center gap-2 bg-[#2D7A4F] hover:bg-[#256040] active:bg-[#1e4f35] disabled:opacity-60 disabled:cursor-not-allowed text-white text-[15px] font-bold py-4 rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(45,122,79,0.22)] hover:shadow-[0_6px_20px_rgba(45,122,79,0.32)]"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                      </svg>
+                      Processing...
+                    </span>
+                  ) : (
+                    <>
+                      {isBuyer && "Create Account"}
+                      {isSeller && "Submit Seller Application"}
+                      {isGuest && "Continue as Guest"}
+                      <ArrowRight size={18} />
+                    </>
+                  )}
                 </button>
                 {isSeller && <p className="text-center text-[12px] text-gray-400 mt-4">Your application will be reviewed within 2-3 business days.</p>}
               </div>

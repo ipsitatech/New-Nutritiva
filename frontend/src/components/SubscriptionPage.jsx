@@ -24,7 +24,6 @@ const SubscriptionPage = () => {
 
   const { topBenefits, packs, howItWorks } = subscriptionData;
 
-
   return (
     <div className="bg-white py-16 ">
       <div className="max-w-7xl mx-auto px-4">
@@ -60,11 +59,9 @@ const SubscriptionPage = () => {
         </div>
 
         {/* Pricing Grid */}
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12 items-stretch">
           {packs.map((p, i) => {
             // Check if THIS specific card is the one selected
-
             const isSelected = selectedPack === p.title;
 
             return (
@@ -80,7 +77,6 @@ const SubscriptionPage = () => {
                 }`}
               >
                 {/* Badge shows if this pack is the popular one */}
-
                 {p.isPopular && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#2D7A4F] text-white px-4 py-1 rounded-full text-[10px] font-bold whitespace-nowrap">
                     MOST POPULAR

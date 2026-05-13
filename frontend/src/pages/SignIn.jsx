@@ -5,7 +5,7 @@ import {
   ArrowRight,
   Mail,
   Lock,
-  Phone,
+  // Phone,
   ShieldCheck,
   RefreshCw,
   Trophy,
@@ -126,7 +126,7 @@ export default function SignIn() {
   const [formData, setFormData] = useState({
     emailOrPhone: "",
     password: "",
-    forgotPhone: "",
+    forgotEmail: "",
     otp: ""
   });
 
@@ -134,7 +134,7 @@ export default function SignIn() {
     setFormData({
       emailOrPhone: "",
       password: "",
-      forgotPhone: "",
+      forgotEmail: "",
       otp: ""
     });
     setView("signin");
@@ -188,19 +188,70 @@ export default function SignIn() {
     }
   };
 
-  const handleForgotSubmit = (e) => {
-    e.preventDefault();
+const handleForgotSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:5000/api/auth/forgot-password", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: formData.forgotEmail,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to send OTP");
+    }
+
+    alert("OTP sent successfully to your email");
+
     setView("otp");
     setTimer(300);
     setTimerActive(true);
-    console.log("Sending OTP to:", formData.forgotPhone);
-  };
 
-  const handleOtpSubmit = (e) => {
-    e.preventDefault();
-    console.log("Verifying OTP:", formData.otp);
-    // Reset or navigate to reset password page
-  };
+  } catch (error) {
+    alert(error.message);
+  }
+};
+
+const handleOtpSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:5000/api/auth/verify-otp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: formData.forgotEmail,
+        otp: formData.otp,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Invalid OTP");
+    }
+
+    alert("OTP verified successfully");
+
+    navigate("/reset-password", {
+      state: {
+        email: formData.forgotEmail,
+      },
+    });
+
+  } catch (error) {
+    alert(error.message);
+  }
+};
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-white font-['DM_Sans',sans-serif]">
@@ -221,8 +272,8 @@ export default function SignIn() {
               </h1>
               <p className="text-[15px] text-gray-400 max-w-sm mx-auto lg:mx-0">
                 {view === 'signin' && `Sign in to your ${currentRole} account.`}
-                {view === 'forgot-password' && "Enter your phone to receive an OTP."}
-                {view === 'otp' && `Enter the code sent to your phone.`}
+                {view === 'forgot-password' && "Enter your email to receive an OTP."}
+                {view === 'otp' && `Enter the code sent to your email.`}
               </p>
             </div>
 
@@ -303,12 +354,13 @@ export default function SignIn() {
               {view === 'forgot-password' && (
                 <form onSubmit={handleForgotSubmit} className="flex flex-col gap-6">
                   <FormInput 
-                    label="Registered Phone Number" 
-                    name="forgotPhone" 
-                    placeholder="+91 00000 00000" 
+                    label="Registered Email Address" 
+                    name="forgotEmail" 
+                    type="email"
+                    placeholder="Enter your email address" 
                     required 
                     onChange={handleInputChange} 
-                    icon={Phone} 
+                    icon={Mail} 
                   />
                   <button type="submit" className="w-full flex items-center justify-center gap-2 bg-[#2D7A4F] hover:bg-[#256040] text-white text-[15px] font-bold py-4 rounded-xl transition-all duration-200">
                     Send OTP

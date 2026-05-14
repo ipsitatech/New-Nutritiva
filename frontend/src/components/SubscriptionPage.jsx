@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box, Truck, Gift, CheckSquare, Check } from "lucide-react";
 
 import subscriptionData from "../data/subscription.json";
@@ -11,7 +11,6 @@ const ICON_MAP = {
 };
 
 const SubscriptionPage = () => {
-  const [selectedPack, setSelectedPack] = useState("Family Pack");
   const WHATSAPP_NUMBER = "917262866254";
 
   const handleWhatsAppRedirect = (planTitle) => {
@@ -59,44 +58,38 @@ const SubscriptionPage = () => {
         </div>
 
         {/* Pricing Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
           {packs.map((p, i) => {
-            // Check if THIS specific card is the one selected
-            const isSelected = selectedPack === p.title;
-
             return (
               <div
                 key={i}
-                onClick={() => setSelectedPack(p.title)} // Updates state on click
-                className={`relative flex flex-col p-8 rounded-[1.2rem] border transition-all duration-300 cursor-pointer ${
-                  isSelected
-                    ? "border-[#2D7A4F] shadow-xl scale-[1.02] opacity-100"
-                    : p.isPopular 
-                      ? "border-gray-200 shadow-sm opacity-100" 
-                      : "border-gray-200 shadow-sm opacity-80"
+                className={`relative flex flex-col p-6 rounded-[1.2rem] bg-white transition-all duration-300 h-full w-full aspect-[4/5] ${
+                  p.isPopular
+                    ? "border-2 border-[#2D7A4F] shadow-xl scale-[1.02] z-10"
+                    : "border border-gray-200 shadow-sm"
                 }`}
               >
                 {/* Badge shows if this pack is the popular one */}
                 {p.isPopular && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#2D7A4F] text-white px-4 py-1 rounded-full text-[10px] font-bold whitespace-nowrap">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#2D7A4F] text-white px-3 py-1 rounded-full text-[9px] tracking-wide font-bold whitespace-nowrap shadow-sm">
                     MOST POPULAR
                   </span>
                 )}
 
-                <div className="mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900">
+                <div className="mb-5">
+                  <h3 className="text-xl font-bold text-gray-900 leading-tight">
                     {p.title}
                   </h3>
-                  <p className="text-gray-400 text-xs mt-1">Every 30 days</p>
+                  <p className="text-gray-400 text-[11px] mt-1">Every 30 days</p>
                 </div>
 
-                <ul className="space-y-4 mb-10 flex-grow">
+                <ul className="space-y-3 mb-6 flex-grow">
                   {p.features.map((f, j) => (
                     <li
                       key={j}
-                      className="flex items-center text-gray-700 text-sm font-medium">
-                      <span className="bg-[#2D7A4F] p-0.5 rounded-md mr-3 shadow-sm">
-                        <Check className="w-3 h-3 text-white" strokeWidth={4} />
+                      className="flex items-start text-gray-700 text-xs font-medium leading-relaxed">
+                      <span className="bg-[#2D7A4F] p-0.5 rounded-md mr-2.5 mt-0.5 shadow-sm shrink-0">
+                        <Check className="w-2.5 h-2.5 text-white" strokeWidth={4} />
                       </span>
                       {f}
                     </li>
@@ -104,11 +97,8 @@ const SubscriptionPage = () => {
                 </ul>
 
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevents the card click from firing when clicking the button
-                    handleWhatsAppRedirect(p.title);
-                  }}
-                  className="w-full bg-[#2D7A4F] text-white font-bold py-4 rounded-2xl hover:bg-[#1e5235]">
+                  onClick={() => handleWhatsAppRedirect(p.title)}
+                  className="w-full bg-[#2D7A4F] text-white text-sm font-bold py-3.5 rounded-xl hover:bg-[#1e5235] transition-colors mt-auto">
                   Enquire Now
                 </button>
               </div>

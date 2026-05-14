@@ -138,32 +138,79 @@ function Checkbox({ label, name, required, checked, onChange, onLabelClick, disa
   );
 }
 
+// ✅ UPDATED FileUpload component with validation
 function FileUpload({ label, required, onChange }) {
   const [fileName, setFileName] = useState("");
+  const [error, setError] = useState("");
+
+  const validateFile = (file) => {
+    if (!file) return true;
+
+    // Check file type
+    const allowedTypes = [
+      "application/pdf",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "text/csv"
+    ];
+    const allowedExtensions = [".pdf", ".xls", ".xlsx", ".csv"];
+    const fileExtension = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
+    
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+      setError("Invalid file type. Please upload PDF, Excel, or CSV files only.");
+      return false;
+    }
+
+    // Check file size (max 2MB = 2 * 1024 * 1024 bytes)
+    if (file.size > 2 * 1024 * 1024) {
+      setError("File size exceeds 2MB limit. Please upload a smaller file.");
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && validateFile(file)) {
+      setFileName(file.name);
+      onChange(e);
+    } else if (file) {
+      // Reset the input value so the same invalid file can be selected again
+      e.target.value = "";
+      setFileName("");
+      onChange({ target: { name: e.target.name, value: null } });
+    }
+  };
 
   return (
     <div className="flex flex-col">
       <FieldLabel required={required}>{label}</FieldLabel>
-      <label className="
+      <label className={`
         relative flex items-center gap-3 px-4 py-3
-        bg-gray-50 border border-dashed border-gray-200 rounded-xl
+        bg-gray-50 border border-dashed rounded-xl
         cursor-pointer hover:border-[#2D7A4F] hover:bg-[#2D7A4F]/[0.02]
         transition-all duration-200 group
-      ">
-        <Upload size={15} className="text-gray-300 group-hover:text-[#2D7A4F] transition-colors flex-shrink-0" />
-        <span className="text-[14px] font-medium text-gray-300 group-hover:text-gray-500 transition-colors truncate">
-          {fileName || "Click to upload file"}
+        ${error ? "border-red-400 bg-red-50/30" : "border-gray-200"}
+      `}>
+        <Upload size={15} className={`${error ? "text-red-400" : "text-gray-300 group-hover:text-[#2D7A4F]"} transition-colors flex-shrink-0`} />
+        <span className={`text-[14px] font-medium truncate ${error ? "text-red-500" : "text-gray-300 group-hover:text-gray-500"} transition-colors`}>
+          {fileName || "Click to upload file (PDF, Excel, CSV, max 2MB)"}
         </span>
         <input
           type="file"
           required={required}
-          onChange={(e) => {
-            setFileName(e.target.files[0]?.name || "");
-            onChange(e);
-          }}
+          accept=".pdf,.xls,.xlsx,.csv,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
+          onChange={handleFileChange}
           className="absolute inset-0 opacity-0 cursor-pointer"
         />
       </label>
+      {error && (
+        <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1">
+          <span>⚠️</span> {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -498,6 +545,7 @@ export default function Signup() {
                     <FormInput label="Password" name="password" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
                     <FormInput label="Confirm Password" name="confirmPassword" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
                   </div>
+                  {/* UPDATED: Using the enhanced FileUpload component */}
                   <FileUpload label="Upload TAN Card Scanned Copy" required onChange={handleFileChange} />
                 </>
               )}

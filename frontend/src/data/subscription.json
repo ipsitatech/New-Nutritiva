@@ -55,6 +55,19 @@
         "Health Guide Book"
       ],
       "isPopular": false
+    },
+    {
+      "title": "Bulk Pantry Pack",
+      "features": [
+        "15kg Premium Almonds",
+        "10kg Cashews",
+        "5kg Walnuts",
+        "5kg Pistachios",
+        "2kg Premium Dates",
+        "Bulk Storage Jars"
+        
+      ],
+      "isPopular": false
     }
   ],
   "howItWorks": [

@@ -8,10 +8,13 @@
   --color-text-muted: #787878;
 }
 
+html,
 body {
   font-family: 'DM Sans', sans-serif;
   margin: 0;
   background: #f8f9f7;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .hero {

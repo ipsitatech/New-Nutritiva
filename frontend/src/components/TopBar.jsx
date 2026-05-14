@@ -72,7 +72,7 @@ export default function TopBar({ variant = "default" }) {
         style={{ fontFamily: "'DM Sans', sans-serif" }}
       >
         {/* Main nav */}
-        <div className="flex items-center justify-start h-16 max-w-7xl mx-auto px-6 gap-1">
+        <div className="flex items-center justify-between h-16 max-w-[1440px] mx-auto px-6">
 
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 shrink-0 no-underline">
@@ -89,7 +89,7 @@ export default function TopBar({ variant = "default" }) {
           {/* Location */}
           <div
             ref={locationRef}
-            className="relative flex flex-col justify-center shrink-0 pl-4 min-w-40 h-full ml-3"
+            className="relative flex flex-col justify-center flex-1 max-w-[240px] px-3 h-full"
           >
             <span
               className="text-[10px] font-semibold uppercase leading-none mb-1"

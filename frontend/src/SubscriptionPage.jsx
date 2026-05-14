@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Box, Truck, Gift, CheckSquare, Check } from "lucide-react";
 
+import WhatsAppIcon from "./components/WhatsAppIcon";
+
 const SubscriptionPage = () => {
   const [selectedPack, setSelectedPack] = useState("Wellness Box");
   const WHATSAPP_NUMBER = "917262866254";
@@ -152,7 +154,8 @@ const SubscriptionPage = () => {
                     e.stopPropagation(); // Prevents the card click from firing when clicking the button
                     handleWhatsAppRedirect(p.title);
                   }}
-                  className="w-full bg-[#2D7A4F] text-white font-bold py-4 rounded-2xl hover:bg-[#1e5235]">
+                  className="w-full flex items-center justify-center gap-2 bg-[#2D7A4F] text-white font-bold py-4 rounded-2xl hover:bg-[#1e5235]">
+                  <WhatsAppIcon size={18} />
                   Enquire Now
                 </button>
               </div>

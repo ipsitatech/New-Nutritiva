@@ -141,7 +141,8 @@ export default function SignIn() {
     setShowPassword(false);
   }, [currentRole]);
 
-  const [timer, setTimer] = useState(300); // 5 minutes in seconds
+  const [timer, setTimer] = useState(180); // 3 minutes in seconds
+  const [resendTimer, setResendTimer] = useState(30);
   const [timerActive, setTimerActive] = useState(false);
 
   useEffect(() => {
@@ -149,6 +150,7 @@ export default function SignIn() {
     if (timerActive && timer > 0) {
       interval = setInterval(() => {
         setTimer((prev) => prev - 1);
+        setResendTimer((prev) => (prev > 0 ? prev - 1 : 0));
       }, 1000);
     } else if (timer === 0) {
       setTimerActive(false);
@@ -189,7 +191,7 @@ export default function SignIn() {
   };
 
 const handleForgotSubmit = async (e) => {
-  e.preventDefault();
+  if (e) e.preventDefault();
 
   try {
     const response = await fetch("http://localhost:5000/api/auth/forgot-password", {
@@ -211,7 +213,8 @@ const handleForgotSubmit = async (e) => {
     alert("OTP sent successfully to your email");
 
     setView("otp");
-    setTimer(300);
+    setTimer(180);
+    setResendTimer(30);
     setTimerActive(true);
 
   } catch (error) {
@@ -394,14 +397,11 @@ const handleOtpSubmit = async (e) => {
                     </div>
                     <button 
                       type="button"
-                      disabled={timer > 0}
-                      onClick={() => {
-                        setTimer(300);
-                        setTimerActive(true);
-                      }}
-                      className={`text-[12px] font-bold uppercase tracking-wider ${timer > 0 ? "text-gray-300 cursor-not-allowed" : "text-[#2D7A4F] hover:underline"}`}
+                      disabled={resendTimer > 0}
+                      onClick={() => handleForgotSubmit()}
+                      className={`text-[12px] font-bold uppercase tracking-wider ${resendTimer > 0 ? "text-gray-300 cursor-not-allowed" : "text-[#2D7A4F] hover:underline"}`}
                     >
-                      Resend OTP
+                      {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : "Resend OTP"}
                     </button>
                   </div>
 

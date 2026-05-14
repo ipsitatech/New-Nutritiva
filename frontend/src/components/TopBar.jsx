@@ -6,7 +6,9 @@ import navData from "../data/navigation.json";
 const { locations: LOCATIONS, roles } = navData;
 
 export default function TopBar({ variant = "default" }) {
-  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState(() => {
+    return localStorage.getItem("nutritva_location") || "";
+  });
   const [locationOpen, setLocationOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -138,6 +140,7 @@ export default function TopBar({ variant = "default" }) {
                     <button
                       onClick={() => {
                         setSelectedLocation(city);
+                        localStorage.setItem("nutritva_location", city);
                         setSearchTerm("");
                         setLocationOpen(false);
                         setServiceableModal(true);
@@ -352,7 +355,7 @@ export default function TopBar({ variant = "default" }) {
       location={selectedLocation}
       onSignIn={() => {
         setServiceableModal(false);
-        setSignInRoleOpen(true);
+        navigate("/signup/buyer");
       }}
     />
 
@@ -430,7 +433,7 @@ function StatusModal({ isOpen, onClose, type, location, onSignIn }) {
             onClick={onSignIn}
             className="w-full bg-[#2D7A4F] hover:bg-[#236340] text-white py-5 rounded-2xl font-bold text-lg shadow-[0_12px_24px_rgba(45,122,79,0.25)] transition-all flex items-center justify-center gap-2"
           >
-            Proceed to Sign In
+            Proceed to Sign Up
             <ArrowRight size={20} />
           </button>
         ) : (

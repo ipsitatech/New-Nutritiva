@@ -8,6 +8,8 @@
 //   waLink      – string   full WhatsApp URL for custom quote enquiry
 //   buttonLabel – string   button text (default "Request Custom Quote")
 
+import WhatsAppIcon from "./WhatsAppIcon";
+
 export default function HamperCustomCTA({
   title,
   description,
@@ -27,8 +29,9 @@ export default function HamperCustomCTA({
         href={waLink}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-6 py-2.75 bg-[#2D7A4F] hover:bg-[#1e5235] hover:shadow-[0_6px_20px_rgba(45,122,79,0.25)] text-white text-[14px] font-semibold rounded-lg border-2 border-[#2D7A4F] hover:border-[#1e5235] transition-all duration-200"
+        className="inline-flex items-center justify-center gap-2 px-6 py-2.75 bg-[#2D7A4F] hover:bg-[#1e5235] hover:shadow-[0_6px_20px_rgba(45,122,79,0.25)] text-white text-[14px] font-semibold rounded-lg border-2 border-[#2D7A4F] hover:border-[#1e5235] transition-all duration-200"
       >
+        <WhatsAppIcon size={16} />
         {buttonLabel}
       </a>
     </div>

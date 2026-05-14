@@ -10,6 +10,8 @@ const ICON_MAP = {
   CheckSquare: CheckSquare,
 };
 
+import WhatsAppIcon from "./WhatsAppIcon";
+
 const SubscriptionPage = () => {
   const WHATSAPP_NUMBER = "917262866254";
 
@@ -98,7 +100,8 @@ const SubscriptionPage = () => {
 
                 <button
                   onClick={() => handleWhatsAppRedirect(p.title)}
-                  className="w-full bg-[#2D7A4F] text-white text-sm font-bold py-3.5 rounded-xl hover:bg-[#1e5235] transition-colors mt-auto">
+                  className="w-full flex items-center justify-center gap-2 bg-[#2D7A4F] text-white text-sm font-bold py-3.5 rounded-xl hover:bg-[#1e5235] transition-colors mt-auto">
+                  <WhatsAppIcon size={16} />
                   Enquire Now
                 </button>
               </div>

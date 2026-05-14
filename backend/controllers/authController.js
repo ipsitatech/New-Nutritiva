@@ -162,9 +162,9 @@ exports.forgotPassword = async (req, res) => {
             100000 + Math.random() * 900000
         ).toString();
 
-        // Expiry Time (5 minutes)
+        // Expiry Time (3 minutes)
         const expiry = new Date(
-            Date.now() + 5 * 60 * 1000
+            Date.now() + 3 * 60 * 1000
         );
 
         // Save OTP in DB

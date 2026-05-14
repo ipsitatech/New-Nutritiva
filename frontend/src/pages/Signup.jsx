@@ -19,6 +19,7 @@ import {
   Trophy,
   Users,
   CheckCircle2,
+  Check,
   Eye,
   EyeOff
 } from "lucide-react";
@@ -29,6 +30,31 @@ import signupBg from "../assets/product_imgs/dryfruits_falling.png";
 /* ─────────────────────────────────────────────
    REUSABLE FIELD COMPONENTS
 ───────────────────────────────────────────── */
+
+function PasswordRules({ password }) {
+  if (password === undefined) return null;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[\W_]/.test(password);
+
+  return (
+    <div className="mt-2 space-y-1 text-[12px]">
+      <div className={`flex items-center gap-2 ${hasUppercase ? 'text-[#2D7A4F]' : 'text-gray-400'}`}>
+        {hasUppercase ? <Check size={14} /> : <X size={14} />} <span>One uppercase letter</span>
+      </div>
+      <div className={`flex items-center gap-2 ${hasLowercase ? 'text-[#2D7A4F]' : 'text-gray-400'}`}>
+        {hasLowercase ? <Check size={14} /> : <X size={14} />} <span>One lowercase letter</span>
+      </div>
+      <div className={`flex items-center gap-2 ${hasNumber ? 'text-[#2D7A4F]' : 'text-gray-400'}`}>
+        {hasNumber ? <Check size={14} /> : <X size={14} />} <span>One number</span>
+      </div>
+      <div className={`flex items-center gap-2 ${hasSpecial ? 'text-[#2D7A4F]' : 'text-gray-400'}`}>
+        {hasSpecial ? <Check size={14} /> : <X size={14} />} <span>One special character</span>
+      </div>
+    </div>
+  );
+}
 
 function FieldLabel({ children, required }) {
   return (
@@ -557,8 +583,11 @@ export default function Signup() {
                     <FormInput label="Phone" name="phone" placeholder="+91 00000 00000" required onChange={handleInputChange} icon={Phone} maxLength={10} />
                     <FormInput label="Email" name="email" type="email" placeholder="you@example.com" required onChange={handleInputChange} icon={Mail} />
                   </div>
-                  <div className="grid grid-cols-2 gap-5">
-                    <FormInput label="Password" name="password" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
+                  <div className="grid grid-cols-2 gap-5 items-start">
+                    <div className="flex flex-col">
+                      <FormInput label="Password" name="password" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
+                      <PasswordRules password={formData.password} />
+                    </div>
                     <FormInput label="Confirm Password" name="confirmPassword" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
                   </div>
                   <FormInput label="Full Address" name="address" placeholder="Flat, Street, Area, City" required onChange={handleInputChange} icon={MapPin} />
@@ -587,8 +616,11 @@ export default function Signup() {
                     <FormInput label="Bank Account Number" name="bankAccount" placeholder="000000000000" required onChange={handleInputChange} icon={Landmark} maxLength={18} />
                     <FormInput label="IFSC Code" name="ifscCode" placeholder="SBIN0001234" required onChange={handleInputChange} maxLength={11} />
                   </div>
-                  <div className="grid grid-cols-2 gap-5">
-                    <FormInput label="Password" name="password" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
+                  <div className="grid grid-cols-2 gap-5 items-start">
+                    <div className="flex flex-col">
+                      <FormInput label="Password" name="password" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
+                      <PasswordRules password={formData.password} />
+                    </div>
                     <FormInput label="Confirm Password" name="confirmPassword" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
                   </div>
                   {/* UPDATED: Using the enhanced FileUpload component */}

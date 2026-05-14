@@ -1,5 +1,6 @@
 import HeroSection from "../components/HeroSection.jsx";
-import FeaturesSection from "../components/FeaturesSection.jsx"; 
+import FeaturesSection from "../components/FeaturesSection.jsx";
+import StatsDashboard from "../components/StatsDashboard.jsx"; 
 import BottomStrip from "../components/BottomStrip.jsx";
 import HotDealsSection from "../components/HotDealsSection.jsx";
 import SubscriptionPage from "../components/SubscriptionPage.jsx";
@@ -21,10 +22,14 @@ function LandingPage() {
       <HeroSection />
       <BottomStrip />
       <DiscountSlider />
+        <div id="stats">
+        <StatsDashboard />
+      </div>
       <FeaturesSection />
       <div id="categories">
         <Categories />
       </div>
+    
       <div id="hot-deals">
         <HotDealsSection />
       </div>

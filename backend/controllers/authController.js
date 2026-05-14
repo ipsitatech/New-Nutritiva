@@ -13,9 +13,12 @@ exports.signup = async (req, res) => {
     try {
         await connection.beginTransaction();
 
-        // Hash Password
-        const salt = await bcrypt.genSalt(10);
-        const passwordHash = await bcrypt.hash(password, salt);
+        // Hash Password (Guests don't have passwords)
+        let passwordHash = null;
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            passwordHash = await bcrypt.hash(password, salt);
+        }
 
         // Insert into users table
         const [userResult] = await connection.execute(
@@ -76,14 +79,14 @@ exports.signup = async (req, res) => {
 // ========================= SIGNIN =========================
 
 exports.signin = async (req, res) => {
-    const { emailOrPhone, password } = req.body;
+    const { email, password } = req.body;
 
     try {
 
-        // Search by Email OR Phone
+        // Search by Email ONLY
         const [users] = await pool.execute(
-            'SELECT * FROM users WHERE email = ? OR phone = ?',
-            [emailOrPhone, emailOrPhone]
+            'SELECT * FROM users WHERE email = ?',
+            [email]
         );
 
         if (users.length === 0) {

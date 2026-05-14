@@ -60,14 +60,37 @@ export async function sellerSignup(formData, tanCardFile) {
 }
 
 /**
+ * Guest Signup — sends JSON body.
+ */
+export async function guestSignup(formData) {
+  const body = {
+    role: "guest",
+    email: formData.email,
+    phone: formData.phone,
+    fullName: formData.fullName,
+    address: formData.address,
+  };
+
+  const res = await fetch(`${BASE_URL}/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || data.message || "Signup failed");
+  return data;
+}
+
+/**
  * Sign In — both buyer and seller use same endpoint.
  * Returns { token, role, status }
  */
-export async function signin(emailOrPhone, password) {
+export async function signin(email, password) {
   const res = await fetch(`${BASE_URL}/signin`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ emailOrPhone, password }),
+    body: JSON.stringify({ email, password }),
   });
 
   const data = await res.json();

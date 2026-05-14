@@ -124,7 +124,7 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState("");
   const [formData, setFormData] = useState({
-    emailOrPhone: "",
+    email: "",
     password: "",
     forgotEmail: "",
     otp: ""
@@ -132,7 +132,7 @@ export default function SignIn() {
 
   useEffect(() => {
     setFormData({
-      emailOrPhone: "",
+      email: "",
       password: "",
       forgotEmail: "",
       otp: ""
@@ -173,7 +173,7 @@ export default function SignIn() {
     setApiError("");
     setIsLoading(true);
     try {
-      const data = await signin(formData.emailOrPhone, formData.password);
+      const data = await signin(formData.email, formData.password);
       saveSession(data.token, data.role);
       // Navigate based on role
       if (data.role === "seller") {
@@ -282,9 +282,10 @@ const handleOtpSubmit = async (e) => {
               {view === 'signin' && (
                 <form onSubmit={handleSignInSubmit} className="flex flex-col gap-5">
                   <FormInput 
-                    label="Email or Phone" 
-                    name="emailOrPhone" 
-                    placeholder="Enter your credentials" 
+                    label="Email Address" 
+                    name="email" 
+                    type="email"
+                    placeholder="Enter your email address" 
                     required 
                     onChange={handleInputChange} 
                     icon={Mail} 

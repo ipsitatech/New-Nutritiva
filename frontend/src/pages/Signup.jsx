@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { buyerSignup, sellerSignup, saveSession } from "../services/authService";
+import { buyerSignup, sellerSignup, guestSignup, saveSession } from "../services/authService";
 import {
   ArrowRight,
   Mail,
@@ -39,7 +39,7 @@ function FieldLabel({ children, required }) {
   );
 }
 
-function FormInput({ label, name, type = "text", placeholder, required, onChange, icon: Icon }) {
+function FormInput({ label, name, type = "text", placeholder, required, onChange, icon: Icon, maxLength }) {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === "password";
   const inputType = isPassword ? (showPassword ? "text" : "password") : type;
@@ -59,6 +59,7 @@ function FormInput({ label, name, type = "text", placeholder, required, onChange
           placeholder={placeholder}
           required={required}
           onChange={onChange}
+          maxLength={maxLength}
           className={[
             "w-full bg-gray-50 border border-gray-200 rounded-xl",
             "text-[14px] font-medium text-gray-900 placeholder:text-gray-300",
@@ -423,10 +424,52 @@ export default function Signup() {
     e.preventDefault();
     setApiError("");
 
-    if (!isGuest && formData.password !== formData.confirmPassword) {
-      setApiError("Passwords do not match.");
-      return;
+    // --- FORM VALIDATION ---
+    const nameRegex = /^[A-Za-z\s]+$/;
+    const phoneRegex = /^\d{10}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/;
+    const gstRegex = /^[A-Za-z0-9]{15}$/;
+    const ifscRegex = /^[A-Za-z0-9]{11}$/;
+    const bankAccountRegex = /^\d{9,18}$/;
+
+    if (formData.fullName && !nameRegex.test(formData.fullName)) {
+      return setApiError("Full Name should contain only characters.");
     }
+    if (formData.firstName && !nameRegex.test(formData.firstName)) {
+      return setApiError("First Name should contain only characters.");
+    }
+    if (formData.lastName && !nameRegex.test(formData.lastName)) {
+      return setApiError("Last Name should contain only characters.");
+    }
+    if (formData.phone && !phoneRegex.test(formData.phone)) {
+      return setApiError("Phone number must be exactly 10 digits.");
+    }
+    if (formData.email && !emailRegex.test(formData.email)) {
+      return setApiError("Please enter a valid email address.");
+    }
+
+    if (!isGuest) {
+      if (formData.password && !passwordRegex.test(formData.password)) {
+        return setApiError("Password must contain at least one uppercase, one lowercase, one number, and one special character.");
+      }
+      if (formData.password !== formData.confirmPassword) {
+        return setApiError("Passwords do not match.");
+      }
+    }
+
+    if (isSeller) {
+      if (formData.gstNumber && !gstRegex.test(formData.gstNumber)) {
+        return setApiError("GST Number must be exactly 15 alphanumeric characters.");
+      }
+      if (formData.ifscCode && !ifscRegex.test(formData.ifscCode)) {
+        return setApiError("IFSC Code must be exactly 11 alphanumeric characters.");
+      }
+      if (formData.bankAccount && !bankAccountRegex.test(formData.bankAccount)) {
+        return setApiError("Bank Account must be between 9 and 18 digits.");
+      }
+    }
+
     if (!termsAccepted) {
       setShowTermsModal(true);
       return;
@@ -441,10 +484,13 @@ export default function Signup() {
     try {
       if (isBuyer) {
         const data = await buyerSignup(formData);
-        saveSession(data.token, "buyer");
+        if(data.token) saveSession(data.token, "buyer");
       } else if (isSeller) {
         const data = await sellerSignup(formData, formData.tanCard);
-        saveSession(data.token, "seller");
+        if(data.token) saveSession(data.token, "seller");
+      } else if (isGuest) {
+        const data = await guestSignup(formData);
+        if(data.token) saveSession(data.token, "guest");
       }
       navigate("/");
     } catch (err) {
@@ -484,7 +530,7 @@ export default function Signup() {
                 <>
                   <FormInput label="Full Name" name="fullName" placeholder="John Doe" required onChange={handleInputChange} icon={User} />
                   <div className="grid grid-cols-2 gap-5">
-                    <FormInput label="Phone" name="phone" placeholder="+91 00000 00000" required onChange={handleInputChange} icon={Phone} />
+                    <FormInput label="Phone" name="phone" placeholder="+91 00000 00000" required onChange={handleInputChange} icon={Phone} maxLength={10} />
                     <FormInput label="Email" name="email" type="email" placeholder="you@example.com" required onChange={handleInputChange} icon={Mail} />
                   </div>
                   <FormInput label="Full Address" name="address" placeholder="Flat, Street, Area, City" required onChange={handleInputChange} icon={MapPin} />
@@ -508,7 +554,7 @@ export default function Signup() {
                 <>
                   <FormInput label="Full Name" name="fullName" placeholder="John Doe" required onChange={handleInputChange} icon={User} />
                   <div className="grid grid-cols-2 gap-5">
-                    <FormInput label="Phone" name="phone" placeholder="+91 00000 00000" required onChange={handleInputChange} icon={Phone} />
+                    <FormInput label="Phone" name="phone" placeholder="+91 00000 00000" required onChange={handleInputChange} icon={Phone} maxLength={10} />
                     <FormInput label="Email" name="email" type="email" placeholder="you@example.com" required onChange={handleInputChange} icon={Mail} />
                   </div>
                   <div className="grid grid-cols-2 gap-5">
@@ -529,17 +575,17 @@ export default function Signup() {
                   <FormInput label="Business / Brand Name" name="businessName" placeholder="Green Valley Farms" required onChange={handleInputChange} icon={Building} />
                   <div className="grid grid-cols-2 gap-5">
                     <FormInput label="Business Email" name="email" type="email" placeholder="contact@business.com" required onChange={handleInputChange} icon={Mail} />
-                    <FormInput label="Business Phone" name="phone" placeholder="+91 00000 00000" required onChange={handleInputChange} icon={Phone} />
+                    <FormInput label="Business Phone" name="phone" placeholder="+91 00000 00000" required onChange={handleInputChange} icon={Phone} maxLength={10} />
                   </div>
                   <div className="grid grid-cols-2 gap-5">
                     <FormSelect label="Business Type" name="businessType" required onChange={handleInputChange} options={[{ label: "Manufacturer", value: "man" }, { label: "Wholesaler", value: "whole" }]} />
                     <FormSelect label="Primary Category" name="primaryCategory" required onChange={handleInputChange} options={[{ label: "Dry Fruits", value: "df" }]} />
                   </div>
-                  <FormInput label="GST Number" name="gstNumber" placeholder="22AAAAA0000A1Z5" required onChange={handleInputChange} icon={FileText} />
+                  <FormInput label="GST Number" name="gstNumber" placeholder="22AAAAA0000A1Z5" required onChange={handleInputChange} icon={FileText} maxLength={15} />
                   <FormInput label="Business Address" name="address" placeholder="Full Registered Address" required onChange={handleInputChange} icon={MapPin} />
                   <div className="grid grid-cols-2 gap-5">
-                    <FormInput label="Bank Account Number" name="bankAccount" placeholder="000000000000" required onChange={handleInputChange} icon={Landmark} />
-                    <FormInput label="IFSC Code" name="ifscCode" placeholder="SBIN0001234" required onChange={handleInputChange} />
+                    <FormInput label="Bank Account Number" name="bankAccount" placeholder="000000000000" required onChange={handleInputChange} icon={Landmark} maxLength={18} />
+                    <FormInput label="IFSC Code" name="ifscCode" placeholder="SBIN0001234" required onChange={handleInputChange} maxLength={11} />
                   </div>
                   <div className="grid grid-cols-2 gap-5">
                     <FormInput label="Password" name="password" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />

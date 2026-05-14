@@ -588,7 +588,14 @@ export default function Signup() {
                       <FormInput label="Password" name="password" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
                       <PasswordRules password={formData.password} />
                     </div>
-                    <FormInput label="Confirm Password" name="confirmPassword" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
+                    <div className="flex flex-col">
+                      <FormInput label="Confirm Password" name="confirmPassword" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
+                      {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                        <p className="mt-2 text-[12px] text-red-500 flex items-center gap-1">
+                          <X size={14} /> Passwords do not match
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <FormInput label="Full Address" name="address" placeholder="Flat, Street, Area, City" required onChange={handleInputChange} icon={MapPin} />
                 </>
@@ -621,7 +628,14 @@ export default function Signup() {
                       <FormInput label="Password" name="password" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
                       <PasswordRules password={formData.password} />
                     </div>
-                    <FormInput label="Confirm Password" name="confirmPassword" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
+                    <div className="flex flex-col">
+                      <FormInput label="Confirm Password" name="confirmPassword" type="password" placeholder="••••••••" required onChange={handleInputChange} icon={Lock} />
+                      {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                        <p className="mt-2 text-[12px] text-red-500 flex items-center gap-1">
+                          <X size={14} /> Passwords do not match
+                        </p>
+                      )}
+                    </div>
                   </div>
                   {/* UPDATED: Using the enhanced FileUpload component */}
                   <FileUpload label="Upload TAN Card Scanned Copy" required onChange={handleFileChange} />

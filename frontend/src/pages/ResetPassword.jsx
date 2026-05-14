@@ -140,7 +140,7 @@ export default function ResetPassword() {
               name="confirmPassword"
               onChange={handleChange}
               required
-              className="w-full border rounded-xl px-4 py-3 pr-12"
+              className={`w-full border rounded-xl px-4 py-3 pr-12 ${formData.confirmPassword && formData.newPassword !== formData.confirmPassword ? 'border-red-500' : 'border-gray-200'}`}
             />
             <button
               type="button"
@@ -150,6 +150,11 @@ export default function ResetPassword() {
               {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
+          {formData.confirmPassword && formData.newPassword !== formData.confirmPassword && (
+            <p className="mt-2 text-[12px] text-red-500 flex items-center gap-1">
+              <X size={14} /> Passwords do not match
+            </p>
+          )}
         </div>
 
         <button

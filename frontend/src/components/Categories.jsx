@@ -38,7 +38,7 @@ const Categories = () => {
 
         {/* Carousel / Flex container */}
         <div className="flex overflow-x-auto gap-4 sm:gap-5 md:gap-6 pb-6 px-6 md:px-10 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          
+
           {categories.map((cat, index) => (
             <div key={index} className="flex flex-col items-center shrink-0 group cursor-pointer w-[80px] sm:w-[100px] md:w-[110px] lg:w-[120px]">
               <div className="w-[80px] h-[80px] sm:w-[100px] sm:h-[100px] md:w-[110px] md:h-[110px] lg:w-[120px] lg:h-[120px] rounded-[18px] sm:rounded-[24px] overflow-hidden mb-3 shadow-[0_4px_10px_rgba(0,0,0,0.08)] transition-transform duration-300 group-hover:-translate-y-1">
@@ -51,7 +51,10 @@ const Categories = () => {
           ))}
 
           {/* View All Tile */}
-          <div className="flex flex-col items-center shrink-0 group cursor-pointer w-[80px] sm:w-[100px] md:w-[110px] lg:w-[120px]">
+          <div
+            onClick={() => window.location.href = "/signup/buyer"}
+            className="flex flex-col items-center shrink-0 group cursor-pointer w-[80px] sm:w-[100px] md:w-[110px] lg:w-[120px]"
+          >
             <div className="w-[80px] h-[80px] sm:w-[100px] sm:h-[100px] md:w-[110px] md:h-[110px] lg:w-[120px] lg:h-[120px] rounded-[18px] sm:rounded-[24px] bg-[#9CA69E] border border-[#8B968D] flex flex-col items-center justify-center mb-3 shadow-[0_4px_10px_rgba(0,0,0,0.08)] transition-transform duration-300 group-hover:-translate-y-1">
               <span className="text-xl sm:text-2xl lg:text-3xl mb-1 drop-shadow-md transition-transform duration-300 group-hover:scale-110">📦</span>
               <span className="text-[8px] sm:text-[9px] md:text-[10px] font-bold text-[#1A3D28] tracking-wide">All Products</span>

@@ -19,8 +19,8 @@ const FeaturesSection = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className="flex flex-col items-center text-center p-8 rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md bg-white"
             >
               {/* Icon Container */}
@@ -30,7 +30,7 @@ const FeaturesSection = () => {
                   return Icon ? <Icon className="w-6 h-6 text-[#2D7A4F]" /> : null;
                 })()}
               </div>
-              
+
               {/* Content */}
               <h3 className="text-gray-900 font-bold text-lg mb-3">
                 {feature.title}

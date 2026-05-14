@@ -122,9 +122,8 @@ function CounterCard({ target }) {
     >
       <div className="flex flex-col items-center justify-center flex-1 text-center min-w-0 w-full -my-1">
         <span
-          className={`stat-counter-num tabular-nums font-extrabold text-nut leading-none block w-full max-w-full ${
-            popping ? "animate-counter-pop" : ""
-          }`}
+          className={`stat-counter-num tabular-nums font-extrabold text-nut leading-none block w-full max-w-full ${popping ? "animate-counter-pop" : ""
+            }`}
           onAnimationEnd={() => setPopping(false)}
         >
           {display}
@@ -234,11 +233,10 @@ function CurrencyToggle({ currency, onChange }) {
             type="button"
             aria-pressed={active}
             onClick={() => onChange(c)}
-            className={`px-3 py-1.5 text-[11px] font-bold rounded-full transition-colors ${
-              active
+            className={`px-3 py-1.5 text-[11px] font-bold rounded-full transition-colors ${active
                 ? "bg-nut text-white shadow-sm"
                 : "text-nut/55"
-            }`}
+              }`}
           >
             {c}
           </button>
@@ -273,9 +271,8 @@ function OrdersTable({ orders, currency }) {
               {["Product", "Location", "Total", "Qty"].map((h, i) => (
                 <th
                   key={h}
-                  className={`px-3 py-2.5 font-bold border-b border-nut/10 ${
-                    i === 0 ? "rounded-tl-2xl" : ""
-                  } ${i === 3 ? "rounded-tr-2xl" : ""}`}
+                  className={`px-3 py-2.5 font-bold border-b border-nut/10 ${i === 0 ? "rounded-tl-2xl" : ""
+                    } ${i === 3 ? "rounded-tr-2xl" : ""}`}
                 >
                   {h}
                 </th>
@@ -412,9 +409,8 @@ export default function StatsDashboard() {
                       {["Product", "Location", "Total", "Qty"].map((h, i) => (
                         <th
                           key={h}
-                          className={`px-3 py-2.5 font-bold border-b ${
-                            i === 0 ? "rounded-tl-2xl" : ""
-                          } ${i === 3 ? "rounded-tr-2xl" : ""}`}
+                          className={`px-3 py-2.5 font-bold border-b ${i === 0 ? "rounded-tl-2xl" : ""
+                            } ${i === 3 ? "rounded-tr-2xl" : ""}`}
                           style={{ borderColor: "rgba(26,107,60,0.1)" }}
                         >
                           {h}

@@ -54,7 +54,7 @@ function HeroSection() {
 
       <div
         className="
-          max-w-10xl
+          max-w-7xl
           mx-auto
           w-full
           px-6

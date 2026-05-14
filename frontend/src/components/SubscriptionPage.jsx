@@ -65,11 +65,10 @@ const SubscriptionPage = () => {
             return (
               <div
                 key={i}
-                className={`relative flex flex-col p-6 rounded-[1.2rem] bg-white transition-all duration-300 h-full w-full aspect-[4/5] ${
-                  p.isPopular
+                className={`relative flex flex-col p-6 rounded-[1.2rem] bg-white transition-all duration-300 h-full w-full aspect-[4/5] ${p.isPopular
                     ? "border-2 border-[#2D7A4F] shadow-xl scale-[1.02] z-10"
                     : "border border-gray-200 shadow-sm"
-                }`}
+                  }`}
               >
                 {/* Badge shows if this pack is the popular one */}
                 {p.isPopular && (

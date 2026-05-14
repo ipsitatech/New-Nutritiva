@@ -4,7 +4,7 @@ const Testimonials = () => {
   return (
     <section className="py-20 bg-[#eff7f2] relative overflow-hidden" id="reviews">
       <div className="container mx-auto px-6 max-w-[1280px] relative z-10">
-        
+
         {/* Header */}
         <div className="text-center mb-16">
           <span className="block text-[11px] font-bold tracking-[0.3em] uppercase text-[#2D7A4F] mb-3">
@@ -20,8 +20,8 @@ const Testimonials = () => {
           <div className="flex animate-testimonial-marquee hover:[animation-play-state:paused] gap-6 whitespace-nowrap">
             {/* Double the reviews for seamless loop */}
             {[...reviews, ...reviews].map((review, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="inline-block w-[350px] bg-white rounded-[32px] p-8 transition-all duration-300 border border-[#2D7A4F]/5 shadow-[0_10px_40px_-15px_rgba(45,122,79,0.1)] whitespace-normal shrink-0"
               >
                 <div className="text-[#D49E24] text-xl mb-4 tracking-[3px]">★★★★★</div>

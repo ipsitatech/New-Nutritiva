@@ -129,6 +129,7 @@ export default function SignIn() {
     forgotEmail: "",
     otp: ""
   });
+  const [isOtpLoading, setIsOtpLoading] = useState(false);
 
   useEffect(() => {
     setFormData({
@@ -192,7 +193,9 @@ export default function SignIn() {
 
 const handleForgotSubmit = async (e) => {
   if (e) e.preventDefault();
+  if (isOtpLoading) return;
 
+  setIsOtpLoading(true);
   try {
     const response = await fetch("http://localhost:5000/api/auth/forgot-password", {
       method: "POST",
@@ -219,6 +222,8 @@ const handleForgotSubmit = async (e) => {
 
   } catch (error) {
     alert(error.message);
+  } finally {
+    setIsOtpLoading(false);
   }
 };
 
@@ -366,9 +371,25 @@ const handleOtpSubmit = async (e) => {
                     onChange={handleInputChange} 
                     icon={Mail} 
                   />
-                  <button type="submit" className="w-full flex items-center justify-center gap-2 bg-[#2D7A4F] hover:bg-[#256040] text-white text-[15px] font-bold py-4 rounded-xl transition-all duration-200">
-                    Send OTP
-                    <KeyRound size={18} />
+                  <button 
+                    type="submit" 
+                    disabled={isOtpLoading}
+                    className="w-full flex items-center justify-center gap-2 bg-[#2D7A4F] hover:bg-[#256040] disabled:opacity-60 disabled:cursor-not-allowed text-white text-[15px] font-bold py-4 rounded-xl transition-all duration-200"
+                  >
+                    {isOtpLoading ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                        </svg>
+                        Sending...
+                      </span>
+                    ) : (
+                      <>
+                        Send OTP
+                        <KeyRound size={18} />
+                      </>
+                    )}
                   </button>
                 </form>
               )}

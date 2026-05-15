@@ -72,7 +72,7 @@ export default function TopBar({ variant = "default" }) {
         style={{ fontFamily: "'DM Sans', sans-serif" }}
       >
         {/* Main nav */}
-        <div className="flex items-center justify-between h-16 max-w-[1440px] mx-auto px-6">
+        <div className="flex items-center justify-start h-16 max-w-290 mx-auto px-6 gap-1">
 
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 shrink-0 no-underline">

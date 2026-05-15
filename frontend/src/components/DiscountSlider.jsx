@@ -43,7 +43,7 @@ export default function DiscountSlider() {
 
   return (
     <section className="w-full bg-[#F9F9F9] h-24 border-b border-[#EAEAEA] flex items-center relative overflow-hidden">
-      <div className="max-w-[1440px] mx-auto px-6 w-full relative z-10">
+      <div className="max-w-290 mx-auto px-6 w-full relative z-10">
         <div 
           key={index}
           className="flex items-center justify-between animate-in fade-in slide-in-from-right-4 duration-1000"

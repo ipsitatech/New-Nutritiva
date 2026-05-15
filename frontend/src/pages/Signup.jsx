@@ -21,7 +21,8 @@ import {
   CheckCircle2,
   Check,
   Eye,
-  EyeOff
+  EyeOff,
+  ChevronDown
 } from "lucide-react";
 import TopBar from "../components/TopBar";
 import TermsModal from "../components/TermsModal";
@@ -108,28 +109,39 @@ function FormInput({ label, name, type = "text", placeholder, required, onChange
   );
 }
 
-function FormSelect({ label, name, required, onChange, options }) {
+function FormSelect({ label, name, required, onChange, options, icon: Icon }) {
   return (
     <div className="flex flex-col flex-1">
       <FieldLabel required={required}>{label}</FieldLabel>
-      <select
-        name={name}
-        required={required}
-        onChange={onChange}
-        className="
-          w-full bg-gray-50 border border-gray-200 rounded-xl
-          px-4 py-3 text-[14px] font-medium text-gray-900
-          focus:outline-none focus:border-[#2D7A4F] focus:bg-white focus:ring-2 focus:ring-[#2D7A4F]/5
-          transition-all duration-200 appearance-none cursor-pointer
-        "
-      >
-        <option value="">Select option</option>
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        {Icon && (
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none">
+            <Icon size={15} />
+          </span>
+        )}
+        <select
+          name={name}
+          required={required}
+          onChange={onChange}
+          className={[
+            "w-full bg-gray-50 border border-gray-200 rounded-xl",
+            "py-3 text-[14px] font-medium text-gray-900",
+            "focus:outline-none focus:border-[#2D7A4F] focus:bg-white focus:ring-2 focus:ring-[#2D7A4F]/5",
+            "transition-all duration-200 appearance-none cursor-pointer pr-10",
+            Icon ? "pl-10" : "px-4"
+          ].join(" ")}
+        >
+          <option value="">Select option</option>
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+          <ChevronDown size={16} />
+        </div>
+      </div>
     </div>
   );
 }
@@ -526,6 +538,7 @@ export default function Signup() {
     }
   };
 
+
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-white">
       <TopBar />
@@ -561,17 +574,6 @@ export default function Signup() {
                   </div>
                   <FormInput label="Full Address" name="address" placeholder="Flat, Street, Area, City" required onChange={handleInputChange} icon={MapPin} />
                   
-                  <div className="py-2">
-                    <div className="relative flex items-center py-4">
-                      <div className="flex-1 border-t border-gray-100"></div>
-                      <span className="px-4 text-[11px] font-bold text-gray-300 uppercase tracking-widest">Or continue with</span>
-                      <div className="flex-1 border-t border-gray-100"></div>
-                    </div>
-                    <button type="button" className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 hover:border-[#2D7A4F] hover:bg-gray-50 text-gray-700 font-bold py-3.5 rounded-xl transition-all">
-                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" className="w-5 h-5" />
-                      Google Account
-                    </button>
-                  </div>
                 </>
               )}
 
@@ -614,8 +616,8 @@ export default function Signup() {
                     <FormInput label="Business Phone" name="phone" placeholder="+91 00000 00000" required onChange={handleInputChange} icon={Phone} maxLength={10} />
                   </div>
                   <div className="grid grid-cols-2 gap-5">
-                    <FormSelect label="Business Type" name="businessType" required onChange={handleInputChange} options={[{ label: "Manufacturer", value: "man" }, { label: "Wholesaler", value: "whole" }]} />
-                    <FormSelect label="Primary Category" name="primaryCategory" required onChange={handleInputChange} options={[{ label: "Dry Fruits", value: "df" }]} />
+                    <FormSelect label="Business Type" name="businessType" required onChange={handleInputChange} icon={Building} options={[{ label: "Manufacturer", value: "man" }, { label: "Wholesaler", value: "whole" }]} />
+                    <FormSelect label="Primary Category" name="primaryCategory" required onChange={handleInputChange} icon={FileCheck} options={[{ label: "Dry Fruits", value: "df" }]} />
                   </div>
                   <FormInput label="GST Number" name="gstNumber" placeholder="22AAAAA0000A1Z5" required onChange={handleInputChange} icon={FileText} maxLength={15} />
                   <FormInput label="Business Address" name="address" placeholder="Full Registered Address" required onChange={handleInputChange} icon={MapPin} />

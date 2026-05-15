@@ -140,11 +140,9 @@ exports.signin = async (req, res) => {
 // ========================= FORGOT PASSWORD =========================
 
 exports.forgotPassword = async (req, res) => {
-
     const { email } = req.body;
 
     try {
-
         // Check user exists
         const [users] = await pool.execute(
             'SELECT * FROM users WHERE email = ?',
@@ -157,7 +155,27 @@ exports.forgotPassword = async (req, res) => {
             });
         }
 
-        // Generate OTP
+        const user = users[0];
+
+        // Check if OTP was recently sent and count resends
+        // Limit to 3 resends (Total 4 OTPs including the first one)
+        if (user.otp_resend_count >= 3) {
+            // Check if we should reset the count (e.g., if more than 1 hour has passed since last attempt)
+            const lastUpdate = new Date(user.updated_at);
+            const now = new Date();
+            const hoursSinceLastUpdate = (now - lastUpdate) / (1000 * 60 * 60);
+
+            if (hoursSinceLastUpdate < 1) {
+                return res.status(429).json({
+                    message: 'Too many OTP requests. Please try again after 1 hour.'
+                });
+            } else {
+                // Reset count after 1 hour
+                await pool.execute('UPDATE users SET otp_resend_count = 0 WHERE email = ?', [email]);
+            }
+        }
+
+        // Generate NEW OTP every time
         const otp = Math.floor(
             100000 + Math.random() * 900000
         ).toString();
@@ -167,9 +185,9 @@ exports.forgotPassword = async (req, res) => {
             Date.now() + 3 * 60 * 1000
         );
 
-        // Save OTP in DB
+        // Save OTP in DB and increment resend count
         await pool.execute(
-            'UPDATE users SET otp = ?, otp_expiry = ? WHERE email = ?',
+            'UPDATE users SET otp = ?, otp_expiry = ?, otp_resend_count = otp_resend_count + 1 WHERE email = ?',
             [otp, expiry, email]
         );
 
@@ -187,21 +205,20 @@ exports.forgotPassword = async (req, res) => {
             from: process.env.EMAIL_USER,
             to: email,
             subject: 'Nutritva Password Reset OTP',
-            text: `Your OTP is: ${otp}`
+            text: `Your new OTP is: ${otp}. It will expire in 3 minutes.`
         });
 
         res.json({
-            message: 'OTP sent successfully'
+            message: 'A new OTP has been sent to your email.'
         });
 
     } catch (error) {
-
         res.status(500).json({
             error: error.message
         });
-
     }
 };
+
 
 
 // ========================= VERIFY OTP =========================
@@ -264,9 +281,9 @@ exports.resetPassword = async (req, res) => {
             salt
         );
 
-        // Update Password
+        // Update Password and reset resend count
         await pool.execute(
-            'UPDATE users SET password_hash = ?, otp = NULL, otp_expiry = NULL WHERE email = ?',
+            'UPDATE users SET password_hash = ?, otp = NULL, otp_expiry = NULL, otp_resend_count = 0 WHERE email = ?',
             [hashedPassword, email]
         );
 
@@ -282,3 +299,4 @@ exports.resetPassword = async (req, res) => {
 
     }
 };
+

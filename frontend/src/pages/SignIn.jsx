@@ -210,10 +210,13 @@ const handleForgotSubmit = async (e) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Failed to send OTP");
+      setApiError(data.message || "Failed to send OTP");
+      return;
     }
 
-    alert("OTP sent successfully to your email");
+    setApiError(""); // Clear any previous errors
+    // Instead of alert, we could show a success message in the UI, but for now let's just proceed
+    // alert("OTP sent successfully to your email");
 
     setView("otp");
     setTimer(180);
@@ -221,7 +224,7 @@ const handleForgotSubmit = async (e) => {
     setTimerActive(true);
 
   } catch (error) {
-    alert(error.message);
+    setApiError(error.message);
   } finally {
     setIsOtpLoading(false);
   }
@@ -229,6 +232,7 @@ const handleForgotSubmit = async (e) => {
 
 const handleOtpSubmit = async (e) => {
   e.preventDefault();
+  setApiError("");
 
   try {
     const response = await fetch("http://localhost:5000/api/auth/verify-otp", {
@@ -245,10 +249,11 @@ const handleOtpSubmit = async (e) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Invalid OTP");
+      setApiError(data.message || "Invalid OTP");
+      return;
     }
 
-    alert("OTP verified successfully");
+    // alert("OTP verified successfully");
 
     navigate("/reset-password", {
       state: {
@@ -257,7 +262,7 @@ const handleOtpSubmit = async (e) => {
     });
 
   } catch (error) {
-    alert(error.message);
+    setApiError(error.message);
   }
 };
 
@@ -426,13 +431,19 @@ const handleOtpSubmit = async (e) => {
                     </button>
                   </div>
 
-                  <button type="submit" className="w-full flex items-center justify-center gap-2 bg-[#2D7A4F] hover:bg-[#256040] text-white text-[15px] font-bold py-4 rounded-xl transition-all duration-200">
-                    Verify & Proceed
-                    <ShieldCheck size={18} />
-                  </button>
-                </form>
-              )}
-            </div>
+                    <button type="submit" className="w-full flex items-center justify-center gap-2 bg-[#2D7A4F] hover:bg-[#256040] text-white text-[15px] font-bold py-4 rounded-xl transition-all duration-200">
+                      Verify & Proceed
+                      <ShieldCheck size={18} />
+                    </button>
+                  </form>
+                )}
+
+                {view !== 'signin' && apiError && (
+                  <div className="mt-6 bg-red-50 border border-red-200 text-red-600 text-[13px] font-medium px-4 py-3 rounded-xl">
+                    {apiError}
+                  </div>
+                )}
+              </div>
 
             <p className="text-center text-[14px] text-gray-400 mt-10">
               {view === 'signin' ? (

@@ -30,16 +30,24 @@ const DISCOUNTS = [
 
 export default function DiscountSlider() {
   const [index, setIndex] = useState(0);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % DISCOUNTS.length);
+      setCopied(false); // Reset copied state when slide changes
     }, 10000);
     return () => clearInterval(timer);
   }, []);
 
   const current = DISCOUNTS[index];
   const Icon = current.icon;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(current.code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <section className="w-full bg-[#F9F9F9] h-24 border-b border-[#EAEAEA] flex items-center relative overflow-hidden">
@@ -67,12 +75,12 @@ export default function DiscountSlider() {
               <span className="text-[#141414] text-lg font-black font-mono tracking-tight">{current.code}</span>
             </div>
             <button 
-              className="bg-[#2D7A4F] text-white px-6 py-2 rounded-xl font-bold text-xs tracking-wide hover:bg-[#256641] transition-all active:scale-95"
-              onClick={() => {
-                navigator.clipboard.writeText(current.code);
-              }}
+              className={`${
+                copied ? "bg-[#141414]" : "bg-[#2D7A4F]"
+              } text-white px-6 py-2 rounded-xl font-bold text-xs tracking-wide hover:opacity-90 transition-all active:scale-95 min-w-[85px]`}
+              onClick={handleCopy}
             >
-              COPY
+              {copied ? "COPIED!" : "COPY"}
             </button>
           </div>
         </div>

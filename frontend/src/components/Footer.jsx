@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import logo from "../assets/official assests/Nutritiva-logo.png";
 import footerData from "../data/footer.json";
 
 function Footer() {
@@ -10,7 +11,7 @@ function Footer() {
 
         {/* LEFT */}
         <div>
-          <h2 className="text-white text-xl font-bold mb-3">🌿 {brand.name}</h2>
+          <img src={logo} alt="Nutritva Logo" className="h-28 w-auto object-contain mb-4 invert" />
           <p className="text-sm">
             {brand.tagline}
           </p>

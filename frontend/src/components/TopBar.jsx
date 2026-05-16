@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { ChevronDown, CheckCircle2, AlertCircle, X, ArrowRight, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import navData from "../data/navigation.json";
+import logo from "../assets/official assests/Nutritiva-logo.png";
 
 const { locations: LOCATIONS, roles } = navData;
 
@@ -72,18 +73,11 @@ export default function TopBar({ variant = "default" }) {
         style={{ fontFamily: "'DM Sans', sans-serif" }}
       >
         {/* Main nav */}
-        <div className="flex items-center justify-start h-16 max-w-290 mx-auto px-6 gap-1">
+        <div className="flex items-center justify-around h-22 max-w-290 mx-auto px-6 gap-1">
 
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 shrink-0 no-underline">
-            <span className="text-xl">🌿</span>
-
-            <span
-              className="text-xl font-black tracking-tight"
-              style={{ color: "#141414", letterSpacing: "-0.3px" }}
-            >
-              Nutri<span style={{ color: "#2D7A4F" }}>tva</span>
-            </span>
+            <img src={logo} alt="Nutritva Logo" className="h-20 w-20 object-contain" />
           </a>
 
           {/* Location */}

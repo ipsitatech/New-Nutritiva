@@ -7,6 +7,7 @@ import {
   ResponsiveContainer,
   LabelList,
   Cell,
+  CartesianGrid,
 } from "recharts";
 
 // Import product images
@@ -97,25 +98,27 @@ function NutBarChart() {
             margin={{ top: 32, right: 20, left: 20, bottom: 8 }}
             barCategoryGap="12%"
           >
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(45,122,79,0.08)" />
             <XAxis
               dataKey="name"
-              tickLine={false}
+              tickLine={{ stroke: "rgba(45,122,79,0.2)" }}
               axisLine={{ stroke: "rgba(45,122,79,0.15)" }}
-              tick={{ fill: "#141414", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}
+              tick={{ fill: "#141414", fontSize: 14, fontWeight: 600 }}
               interval={0}
             />
             <YAxis
               tickLine={false}
-              axisLine={false}
-              tick={false}
-              width={32}
+              axisLine={{ stroke: "rgba(45,122,79,0.15)" }}
+              tick={{ fill: "rgba(20,20,20,0.5)", fontSize: 11, fontWeight: 600 }}
+              width={40}
               label={{
                 value: "Orders Placed",
                 angle: -90,
                 position: "insideLeft",
+                offset: -5,
                 style: {
                   fill: "rgba(20,20,20,0.4)",
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: 700,
                   fontFamily: "inherit",
                   textAnchor: "middle",

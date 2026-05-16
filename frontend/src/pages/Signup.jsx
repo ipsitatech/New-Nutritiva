@@ -39,8 +39,13 @@ function PasswordRules({ password }) {
   const hasNumber = /[0-9]/.test(password);
   const hasSpecial = /[\W_]/.test(password);
 
+  const hasMinLength = password.length >= 8;
+
   return (
     <div className="mt-2 space-y-1 text-[12px]">
+      <div className={`flex items-center gap-2 ${hasMinLength ? 'text-[#2D7A4F]' : 'text-gray-400'}`}>
+        {hasMinLength ? <Check size={14} /> : <X size={14} />} <span>Minimum 8 characters</span>
+      </div>
       <div className={`flex items-center gap-2 ${hasUppercase ? 'text-[#2D7A4F]' : 'text-gray-400'}`}>
         {hasUppercase ? <Check size={14} /> : <X size={14} />} <span>One uppercase letter</span>
       </div>
@@ -105,6 +110,69 @@ function FormInput({ label, name, type = "text", placeholder, required, onChange
           </button>
         )}
       </div>
+    </div>
+  );
+}
+
+function PhoneInput({ label, name, placeholder, required, value, countryCode, onCountryCodeChange, onChange, icon: Icon, maxLength }) {
+  const handlePhoneChange = (e) => {
+    const val = e.target.value.replace(/\D/g, ""); // Numbers only
+    onChange({ target: { name, value: val } });
+  };
+
+  return (
+    <div className="flex flex-col flex-1">
+      <FieldLabel required={required}>{label}</FieldLabel>
+      <div className="relative flex gap-2">
+        <div className="relative min-w-[85px]">
+          <select
+            value={countryCode}
+            onChange={(e) => onCountryCodeChange(e.target.value)}
+            className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-3 pr-8 text-[14px] font-medium text-gray-900 focus:outline-none focus:border-[#2D7A4F] appearance-none cursor-pointer"
+          >
+            <option value="+91">+91 (IN)</option>
+            <option value="+1">+1 (US)</option>
+            <option value="+44">+44 (UK)</option>
+            <option value="+971">+971 (UAE)</option>
+            <option value="+84">+84 (VN)</option>
+            <option value="+55">+55 (BR)</option>
+            <option value="+54">+54 (AR)</option>
+            <option value="+57">+57 (CO)</option>
+            <option value="+56">+56 (CL)</option>
+            <option value="+51">+51 (PE)</option>
+          </select>
+          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+            <ChevronDown size={14} />
+          </div>
+        </div>
+        <div className="relative flex-1">
+          {Icon && (
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none">
+              <Icon size={15} />
+            </span>
+          )}
+          <input
+            name={name}
+            type="text"
+            value={value}
+            placeholder={placeholder}
+            required={required}
+            onChange={handlePhoneChange}
+            maxLength={maxLength}
+            className={[
+              "w-full bg-gray-50 border border-gray-200 rounded-xl",
+              "text-[14px] font-medium text-gray-900 placeholder:text-gray-300",
+              "focus:outline-none focus:border-[#2D7A4F] focus:bg-white focus:ring-2 focus:ring-[#2D7A4F]/5",
+              "transition-all duration-200 py-3",
+              Icon ? "pl-10 pr-4" : "px-4",
+            ].join(" ")}
+          />
+        </div>
+      </div>
+      <p className="text-[11px] text-gray-400 mt-2 flex items-center gap-1.5 ml-1">
+        <CheckCircle2 size={12} className="text-[#2D7A4F]/50" />
+        Add numbers only without any spaces
+      </p>
     </div>
   );
 }
@@ -379,6 +447,7 @@ export default function Signup() {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
+    countryCode: "+91",
     phone: "",
     password: "",
     confirmPassword: "",
@@ -412,6 +481,7 @@ export default function Signup() {
     setFormData({
       fullName: "",
       email: "",
+      countryCode: "+91",
       phone: "",
       password: "",
       confirmPassword: "",
@@ -465,21 +535,73 @@ export default function Signup() {
     // --- FORM VALIDATION ---
     const nameRegex = /^[A-Za-z\s]+$/;
     const phoneRegex = /^\d{10}$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
     const gstRegex = /^[A-Za-z0-9]{15}$/;
     const ifscRegex = /^[A-Za-z0-9]{11}$/;
     const bankAccountRegex = /^\d{9,18}$/;
+    const addressRegex = /^[A-Za-z0-9\s,.-/#()]+$/;
+    const captchaRegex = /^[A-Za-z0-9]+$/;
 
-    if (formData.fullName && !nameRegex.test(formData.fullName)) {
-      return setApiError("Full Name should contain only characters.");
+    // Full Name Validation (Buyer & Guest)
+    if (isBuyer || isGuest) {
+      const trimmedFullName = (formData.fullName || "").trim();
+      if (!trimmedFullName) {
+        return setApiError("Full Name is required.");
+      }
+      if (!nameRegex.test(trimmedFullName)) {
+        return setApiError("Full Name should contain only characters.");
+      }
     }
-    if (formData.firstName && !nameRegex.test(formData.firstName)) {
-      return setApiError("First Name should contain only characters.");
+
+    // Seller Specific Validations
+    if (isSeller) {
+      const trimmedFirst = (formData.firstName || "").trim();
+      const trimmedLast = (formData.lastName || "").trim();
+      const trimmedBiz = (formData.businessName || "").trim();
+      
+      if (!trimmedFirst) return setApiError("First Name is required.");
+      if (!nameRegex.test(trimmedFirst)) return setApiError("First Name should contain only characters.");
+      
+      if (!trimmedLast) return setApiError("Last Name is required.");
+      if (!nameRegex.test(trimmedLast)) return setApiError("Last Name should contain only characters.");
+
+      if (!trimmedBiz) return setApiError("Business/Brand Name is required.");
+      // Note: Business names can sometimes have special chars like '&' or '.', 
+      // but TC 19 implies "Validation error" for special chars only.
+      // We'll use a slightly more permissive regex for business name or stick to nameRegex if strict.
+      // TC 19 says "Enter special chars only" -> "@@@" -> Validation error.
+      // TC 16 says "Green Valley Farms" -> Accepted.
+      if (!nameRegex.test(trimmedBiz)) return setApiError("Business Name should contain only characters and spaces.");
+
+      if (!formData.businessType) return setApiError("Please select a Business Type.");
+      if (!formData.primaryCategory) return setApiError("Please select a Primary Category.");
+
+      if (formData.gstNumber && !gstRegex.test(formData.gstNumber)) {
+        return setApiError("GST Number must be exactly 15 alphanumeric characters.");
+      }
+      
+      if (formData.bankAccount && !bankAccountRegex.test(formData.bankAccount)) {
+        return setApiError("Bank Account must be between 9 and 18 digits.");
+      }
+      
+      if (formData.ifscCode && !ifscRegex.test(formData.ifscCode)) {
+        return setApiError("IFSC Code must be exactly 11 alphanumeric characters.");
+      }
+
+      if (!formData.tanCard) {
+        return setApiError("TAN Card Scanned Copy is required.");
+      }
+
+      if (!formData.certifyAccuracy) {
+        return setApiError("Please certify that all business information is accurate.");
+      }
+      
+      if (!formData.adhereQuality) {
+        return setApiError("Please agree to Nutritva's quality standards and seller code of conduct.");
+      }
     }
-    if (formData.lastName && !nameRegex.test(formData.lastName)) {
-      return setApiError("Last Name should contain only characters.");
-    }
+
     if (formData.phone && !phoneRegex.test(formData.phone)) {
       return setApiError("Phone number must be exactly 10 digits.");
     }
@@ -488,31 +610,46 @@ export default function Signup() {
     }
 
     if (!isGuest) {
+      if (!formData.password) {
+        return setApiError("Password is required.");
+      }
       if (formData.password && !passwordRegex.test(formData.password)) {
-        return setApiError("Password must contain at least one uppercase, one lowercase, one number, and one special character.");
+        return setApiError("Password must be at least 8 characters and contain at least one uppercase, one lowercase, one number, and one special character.");
+      }
+      if (!formData.confirmPassword) {
+        return setApiError("Please confirm your password.");
       }
       if (formData.password !== formData.confirmPassword) {
         return setApiError("Passwords do not match.");
       }
     }
 
-    if (isSeller) {
-      if (formData.gstNumber && !gstRegex.test(formData.gstNumber)) {
-        return setApiError("GST Number must be exactly 15 alphanumeric characters.");
-      }
-      if (formData.ifscCode && !ifscRegex.test(formData.ifscCode)) {
-        return setApiError("IFSC Code must be exactly 11 alphanumeric characters.");
-      }
-      if (formData.bankAccount && !bankAccountRegex.test(formData.bankAccount)) {
-        return setApiError("Bank Account must be between 9 and 18 digits.");
-      }
+    // Address Validation
+    const trimmedAddress = (formData.address || "").trim();
+    if (!trimmedAddress) {
+      return setApiError("Address is required.");
+    }
+    if (trimmedAddress.length > 500) {
+      return setApiError("Address is too long (max 500 characters).");
+    }
+    if (!addressRegex.test(trimmedAddress)) {
+      return setApiError("Address contains invalid special characters.");
     }
 
     if (!termsAccepted) {
+      setApiError("Please accept the Terms & Conditions to continue.");
       setShowTermsModal(true);
       return;
     }
-    if (formData.captchaInput.toUpperCase() !== captchaCode) {
+    
+    const trimmedCaptcha = (formData.captchaInput || "").trim();
+    if (!trimmedCaptcha) {
+      return setApiError("Captcha is required.");
+    }
+    if (!captchaRegex.test(trimmedCaptcha)) {
+      return setApiError("Captcha should contain only letters and numbers.");
+    }
+    if (trimmedCaptcha.toUpperCase() !== captchaCode) {
       setApiError("Invalid captcha. Please try again.");
       generateCaptcha();
       return;
@@ -567,9 +704,20 @@ export default function Signup() {
               {/* ── GUEST FIELDS ── */}
               {isGuest && (
                 <>
-                  <FormInput label="Full Name" name="fullName" placeholder="John Doe" required onChange={handleInputChange} icon={User} />
+                  <FormInput label="Full Name" name="fullName" placeholder="John Doe" required onChange={handleInputChange} icon={User} maxLength={60} />
                   <div className="grid grid-cols-2 gap-5">
-                    <FormInput label="Phone" name="phone" placeholder="+91 00000 00000" required onChange={handleInputChange} icon={Phone} maxLength={10} />
+                    <PhoneInput 
+                      label="Phone" 
+                      name="phone" 
+                      placeholder="00000 00000" 
+                      required 
+                      value={formData.phone}
+                      countryCode={formData.countryCode}
+                      onCountryCodeChange={(val) => setFormData(prev => ({ ...prev, countryCode: val }))}
+                      onChange={handleInputChange} 
+                      icon={Phone} 
+                      maxLength={10} 
+                    />
                     <FormInput label="Email" name="email" type="email" placeholder="you@example.com" required onChange={handleInputChange} icon={Mail} />
                   </div>
                   <FormInput label="Full Address" name="address" placeholder="Flat, Street, Area, City" required onChange={handleInputChange} icon={MapPin} />
@@ -580,9 +728,20 @@ export default function Signup() {
               {/* ── BUYER FIELDS ── */}
               {isBuyer && (
                 <>
-                  <FormInput label="Full Name" name="fullName" placeholder="John Doe" required onChange={handleInputChange} icon={User} />
+                  <FormInput label="Full Name" name="fullName" placeholder="John Doe" required onChange={handleInputChange} icon={User} maxLength={60} />
                   <div className="grid grid-cols-2 gap-5">
-                    <FormInput label="Phone" name="phone" placeholder="+91 00000 00000" required onChange={handleInputChange} icon={Phone} maxLength={10} />
+                    <PhoneInput 
+                      label="Phone" 
+                      name="phone" 
+                      placeholder="00000 00000" 
+                      required 
+                      value={formData.phone}
+                      countryCode={formData.countryCode}
+                      onCountryCodeChange={(val) => setFormData(prev => ({ ...prev, countryCode: val }))}
+                      onChange={handleInputChange} 
+                      icon={Phone} 
+                      maxLength={10} 
+                    />
                     <FormInput label="Email" name="email" type="email" placeholder="you@example.com" required onChange={handleInputChange} icon={Mail} />
                   </div>
                   <div className="grid grid-cols-2 gap-5 items-start">
@@ -607,13 +766,24 @@ export default function Signup() {
               {isSeller && (
                 <>
                   <div className="grid grid-cols-2 gap-5">
-                    <FormInput label="First Name" name="firstName" placeholder="John" required onChange={handleInputChange} />
-                    <FormInput label="Last Name" name="lastName" placeholder="Doe" required onChange={handleInputChange} />
+                    <FormInput label="First Name" name="firstName" placeholder="John" required onChange={handleInputChange} maxLength={60} />
+                    <FormInput label="Last Name" name="lastName" placeholder="Doe" required onChange={handleInputChange} maxLength={60} />
                   </div>
-                  <FormInput label="Business / Brand Name" name="businessName" placeholder="Green Valley Farms" required onChange={handleInputChange} icon={Building} />
+                  <FormInput label="Business / Brand Name" name="businessName" placeholder="Green Valley Farms" required onChange={handleInputChange} icon={Building} maxLength={60} />
                   <div className="grid grid-cols-2 gap-5">
                     <FormInput label="Business Email" name="email" type="email" placeholder="contact@business.com" required onChange={handleInputChange} icon={Mail} />
-                    <FormInput label="Business Phone" name="phone" placeholder="+91 00000 00000" required onChange={handleInputChange} icon={Phone} maxLength={10} />
+                    <PhoneInput 
+                      label="Business Phone" 
+                      name="phone" 
+                      placeholder="00000 00000" 
+                      required 
+                      value={formData.phone}
+                      countryCode={formData.countryCode}
+                      onCountryCodeChange={(val) => setFormData(prev => ({ ...prev, countryCode: val }))}
+                      onChange={handleInputChange} 
+                      icon={Phone} 
+                      maxLength={10} 
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-5">
                     <FormSelect label="Business Type" name="businessType" required onChange={handleInputChange} icon={Building} options={[{ label: "Manufacturer", value: "man" }, { label: "Wholesaler", value: "whole" }]} />

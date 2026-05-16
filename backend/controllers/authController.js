@@ -13,6 +13,22 @@ exports.signup = async (req, res) => {
     try {
         await connection.beginTransaction();
 
+        // Check if email or phone already exists
+        const [existing] = await connection.execute(
+            'SELECT email, phone FROM users WHERE email = ? OR phone = ?',
+            [email, phone]
+        );
+
+        if (existing.length > 0) {
+            const match = existing[0];
+            if (match.email === email) {
+                return res.status(400).json({ message: "Email already in use." });
+            }
+            if (match.phone === phone) {
+                return res.status(400).json({ message: "Phone number already in use." });
+            }
+        }
+
         // Hash Password (Guests don't have passwords)
         let passwordHash = null;
         if (password) {
@@ -63,11 +79,10 @@ exports.signup = async (req, res) => {
         });
 
     } catch (error) {
-
         await connection.rollback();
-
+        console.error("Signup Error Details:", error);
         res.status(500).json({
-            error: error.message
+            message: "Registration failed. Please try again later."
         });
 
     } finally {
@@ -129,8 +144,9 @@ exports.signin = async (req, res) => {
 
     } catch (error) {
 
+        console.error("Signin Error Details:", error);
         res.status(500).json({
-            error: error.message
+            message: "Sign-in failed. Please try again later."
         });
 
     }
@@ -213,8 +229,9 @@ exports.forgotPassword = async (req, res) => {
         });
 
     } catch (error) {
+        console.error("Forgot Password Error Details:", error);
         res.status(500).json({
-            error: error.message
+            message: "Failed to send OTP. Please try again later."
         });
     }
 };
@@ -257,8 +274,9 @@ exports.verifyOtp = async (req, res) => {
 
     } catch (error) {
 
+        console.error("Verify OTP Error Details:", error);
         res.status(500).json({
-            error: error.message
+            message: "Verification failed. Please try again later."
         });
 
     }
@@ -293,8 +311,9 @@ exports.resetPassword = async (req, res) => {
 
     } catch (error) {
 
+        console.error("Reset Password Error Details:", error);
         res.status(500).json({
-            error: error.message
+            message: "Password reset failed. Please try again later."
         });
 
     }

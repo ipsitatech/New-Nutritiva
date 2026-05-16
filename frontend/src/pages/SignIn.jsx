@@ -130,6 +130,8 @@ export default function SignIn() {
     otp: ""
   });
   const [isOtpLoading, setIsOtpLoading] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [resendCount, setResendCount] = useState(0);
 
   useEffect(() => {
     setFormData({
@@ -140,6 +142,7 @@ export default function SignIn() {
     });
     setView("signin");
     setShowPassword(false);
+    setResendCount(0);
   }, [currentRole]);
 
   const [timer, setTimer] = useState(180); // 3 minutes in seconds
@@ -191,9 +194,14 @@ export default function SignIn() {
     }
   };
 
-const handleForgotSubmit = async (e) => {
+const handleForgotSubmit = async (e, isResend = false) => {
   if (e) e.preventDefault();
   if (isOtpLoading) return;
+
+  if (isResend && resendCount >= 3) {
+    setApiError("Maximum resend limit reached (3 times).");
+    return;
+  }
 
   setIsOtpLoading(true);
   try {
@@ -214,9 +222,10 @@ const handleForgotSubmit = async (e) => {
       return;
     }
 
-    setApiError(""); // Clear any previous errors
-    // Instead of alert, we could show a success message in the UI, but for now let's just proceed
-    // alert("OTP sent successfully to your email");
+    setApiError(""); 
+    if (isResend) {
+      setResendCount(prev => prev + 1);
+    }
 
     setView("otp");
     setTimer(180);
@@ -232,7 +241,10 @@ const handleForgotSubmit = async (e) => {
 
 const handleOtpSubmit = async (e) => {
   e.preventDefault();
+  if (isVerifyingOtp) return;
+  
   setApiError("");
+  setIsVerifyingOtp(true);
 
   try {
     const response = await fetch("http://localhost:5000/api/auth/verify-otp", {
@@ -253,8 +265,6 @@ const handleOtpSubmit = async (e) => {
       return;
     }
 
-    // alert("OTP verified successfully");
-
     navigate("/reset-password", {
       state: {
         email: formData.forgotEmail,
@@ -263,6 +273,8 @@ const handleOtpSubmit = async (e) => {
 
   } catch (error) {
     setApiError(error.message);
+  } finally {
+    setIsVerifyingOtp(false);
   }
 };
 
@@ -423,17 +435,39 @@ const handleOtpSubmit = async (e) => {
                     </div>
                     <button 
                       type="button"
-                      disabled={resendTimer > 0}
-                      onClick={() => handleForgotSubmit()}
-                      className={`text-[12px] font-bold uppercase tracking-wider ${resendTimer > 0 ? "text-gray-300 cursor-not-allowed" : "text-[#2D7A4F] hover:underline"}`}
+                      disabled={resendTimer > 0 || resendCount >= 3 || isOtpLoading}
+                      onClick={() => handleForgotSubmit(null, true)}
+                      className={`text-[12px] font-bold uppercase tracking-wider ${
+                        (resendTimer > 0 || resendCount >= 3 || isOtpLoading) 
+                        ? "text-gray-300 cursor-not-allowed" 
+                        : "text-[#2D7A4F] hover:underline"
+                      }`}
                     >
-                      {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : "Resend OTP"}
+                      {resendCount >= 3 
+                        ? "Limit reached" 
+                        : (resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : (isOtpLoading ? "Sending..." : "Resend OTP"))}
                     </button>
                   </div>
 
-                    <button type="submit" className="w-full flex items-center justify-center gap-2 bg-[#2D7A4F] hover:bg-[#256040] text-white text-[15px] font-bold py-4 rounded-xl transition-all duration-200">
-                      Verify & Proceed
-                      <ShieldCheck size={18} />
+                    <button 
+                      type="submit" 
+                      disabled={isVerifyingOtp}
+                      className="w-full flex items-center justify-center gap-2 bg-[#2D7A4F] hover:bg-[#256040] disabled:opacity-60 disabled:cursor-not-allowed text-white text-[15px] font-bold py-4 rounded-xl transition-all duration-200"
+                    >
+                      {isVerifyingOtp ? (
+                        <span className="flex items-center gap-2">
+                          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                          </svg>
+                          Verifying...
+                        </span>
+                      ) : (
+                        <>
+                          Verify & Proceed
+                          <ShieldCheck size={18} />
+                        </>
+                      )}
                     </button>
                   </form>
                 )}

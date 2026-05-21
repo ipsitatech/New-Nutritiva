@@ -1,155 +1,273 @@
-import { useState } from "react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  LabelList,
-  Cell,
-  CartesianGrid,
+  LineChart, Line, XAxis, YAxis, Tooltip,
+  ResponsiveContainer, CartesianGrid,
 } from "recharts";
-
-// Import product images
-import almonds from "../assets/product_imgs/almonds.png";
-import walnuts from "../assets/product_imgs/walnuts.png";
-import cashews from "../assets/product_imgs/mixed_dryfruit.png"; // Using mixed for cashews as proxy
-import pistachios from "../assets/product_imgs/pistachios.png";
+import almondImg from "../assets/product_imgs/almonds.png";
+import walnutImg from "../assets/product_imgs/walnuts.png";
+import cashewImg from "../assets/product_imgs/cashews_bowl.png";
+import pistachioImg from "../assets/product_imgs/pistachios.png";
 
 /* ─────────────────────────────────────────────
    DATA
 ───────────────────────────────────────────── */
 
-const NUT_DATA = [
-  { name: "Pista",   orders: 36, kg: 210, color: "#355533" },
-  { name: "Cashews", orders: 30, kg: 280, color: "#233F28" },
-  { name: "Walnuts", orders: 20, kg: 320,  color: "#815F35" },
-  { name: "Almond",  orders: 40, kg: 500, color: "#5B3E31" },
+const today = new Date();
+const fmt = (d) =>
+  d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+const TODAY_STR = fmt(today);
+
+const ORDERS_DATA = (() => {
+  const base = [124, 98, 152, 116, 178, 143, 195];
+  return base.map((v, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - (6 - i));
+    return { day: d.toLocaleDateString("en-GB", { weekday: "short" }), orders: v };
+  });
+})();
+
+const ACTIVE_ORDERS = 142;
+const TOTAL_PRODUCTS = 38;
+
+const LOCATION_DATA = [
+  { city: "Mumbai",    orders: 154 },
+  { city: "Delhi",     orders: 138 },
+  { city: "Bangalore", orders: 127 },
+  { city: "Hyderabad", orders: 112 },
+  { city: "Chennai",   orders: 98  },
+  { city: "Pune",      orders: 84  },
+  { city: "Ahmedabad", orders: 67  },
+  { city: "Kolkata",   orders: 54  },
 ];
 
 const TOP_PRODUCTS = [
-  { name: "Premium Almonds",  qty: "500 kg", img: almonds },
-  { name: "Kashmiri Walnuts", qty: "320 kg", img: walnuts },
-  { name: "Roasted Cashews",  qty: "280 kg", img: cashews },
-  { name: "Pistachios",       qty: "210 kg", img: pistachios },
+  { name: "Premium Almonds",  qty: "500 kg", img: almondImg },
+  { name: "Kashmiri Walnuts", qty: "320 kg", img: walnutImg },
+  { name: "Roasted Cashews",  qty: "280 kg", img: cashewImg },
+  { name: "Pistachios",       qty: "210 kg", img: pistachioImg },
 ];
 
 /* ─────────────────────────────────────────────
-   SOLID ROUNDED BAR
+   DATE BADGE
 ───────────────────────────────────────────── */
 
-function SolidBar(props) {
-  const { x, y, width, height, color } = props;
-  if (!height || height <= 0) return null;
-  const r = Math.min(10, width / 2);
+function DateBadge({ light }) {
   return (
-    <rect
-      x={x} y={y} width={width} height={height}
-      rx={r} ry={r}
-      fill={color}
-    />
+    <span
+      className={`inline-block text-[10px] font-semibold px-2.5 py-[3px] rounded-full tracking-wide self-start shrink-0 ${
+        light ? "bg-[#eef6f1] text-[#2d7a4f]" : "bg-white/10 text-white/55"
+      }`}
+    >
+      {TODAY_STR}
+    </span>
   );
 }
 
 /* ─────────────────────────────────────────────
-   TOP SELLING PRODUCTS CARD
+   TOOLTIP
 ───────────────────────────────────────────── */
 
-function TopProductCard() {
+function SalesTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null;
   return (
-    <div className="sd-card sd-top-card">
-      <div className="sd-top-header">
-        <h2 className="sd-top-title">Top Selling Products</h2>
+    <div className="bg-white border border-gray-100 rounded-lg py-1.5 px-2.5 shadow-lg">
+      <p className="text-[9px] text-gray-400 font-semibold mb-0.5">{label}</p>
+      <p className="text-[11px] font-extrabold text-[#2d7a4f]">{payload[0].value} orders</p>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   CARD SHELL — shared wrapper
+───────────────────────────────────────────── */
+
+function Card({ bg, children, className = "", square = false }) {
+  return (
+    <div
+      className={`rounded-2xl p-4 flex flex-col min-h-0 overflow-hidden w-full ${square ? 'aspect-square' : 'h-full'} ${bg} ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   COL 1 — ACTIVE ORDERS
+───────────────────────────────────────────── */
+
+function ActiveOrdersCard() {
+  return (
+    <Card bg="bg-[#233C27]" square>
+      <div className="flex flex-col items-start w-full shrink-0">
+        <p className="text-[11px] font-medium text-white/60">{TODAY_STR}</p>
+        <p className="text-[15px] font-bold text-white mt-0.5">Active Orders</p>
       </div>
-      <ul className="sd-product-list">
+      <div className="flex-1 flex items-end justify-start min-h-0 w-full mt-2">
+        <p className="text-[80px] lg:text-[100px] font-extrabold text-white leading-none  -mb-2">
+          {ACTIVE_ORDERS}
+        </p>
+      </div>
+    </Card>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   COL 2 — TOTAL PRODUCTS LISTED
+───────────────────────────────────────────── */
+
+function TotalProductsCard() {
+  return (
+    <Card bg="bg-[#325530]" square>
+      <div className="flex flex-col items-start w-full shrink-0">
+        <p className="text-[11px] font-medium text-white/60">{TODAY_STR}</p>
+        <p className="text-md font-bold text-white mt-0.5">Total Products</p>
+      </div>
+      <div className="flex-1 flex items-end justify-start min-h-0 w-full mt-2">
+        <p className="text-6xl lg:text-[100px] font-extrabold text-white leading-none  -mb-2">
+          {TOTAL_PRODUCTS}
+        </p>
+      </div>
+    </Card>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   COL 3 — TOP SELLING PRODUCTS
+───────────────────────────────────────────── */
+
+function TopSellingCard() {
+  return (
+    <Card bg="bg-[#2F502D]" square>
+      {/* Header */}
+      <div className="shrink-0 mb-2">
+        <p className="text-[13px] font-bold text-white mt-2 mb-2">
+          Top Selling Products
+        </p>
+        <div className="h-px bg-white/10" />
+      </div>
+
+      {/* Product list — evenly fills remaining space */}
+      <ul className="flex flex-col flex-1 min-h-0 justify-around list-none">
         {TOP_PRODUCTS.map((p) => (
-          <li key={p.name} className="sd-product-row">
-            <div className="sd-product-icon">
-              <img src={p.img} alt={p.name} className="w-10 h-10 object-cover rounded-md" />
-            </div>
-            <span className="sd-product-row-name">{p.name}</span>
-            <span className="sd-product-row-qty">{p.qty}</span>
+          <li
+            key={p.name}
+            className="flex items-center gap-2.5 px-1.5 py-1 rounded-xl hover:bg-white/8 transition-colors cursor-default"
+          >
+            {/* Image tile — covers fully */}
+            {/* <div className="w-9 h-9 shrink-0 rounded-xl overflow-hidden bg-white/10">
+              <img
+                src={p.img}
+                alt={p.name}
+                className="w-full h-full object-cover"
+              />
+            </div> */}
+            <p className="flex-1 text-[12px] font-semibold text-white/85 truncate min-w-0 leading-tight">
+              {p.name}
+            </p>
+            <span className="text-[11.5px] font-extrabold text-white/60 shrink-0 tabular-nums">
+              {p.qty}
+            </span>
           </li>
         ))}
       </ul>
-    </div>
+    </Card>
   );
 }
 
 /* ─────────────────────────────────────────────
-   BAR CHART CARD
+   COL 4 — ORDERS FULFILLED (Line Chart)
 ───────────────────────────────────────────── */
 
-function NutBarChart() {
-  const today = new Date();
-  const dateStr = today.toLocaleDateString("en-GB", {
-    day: "numeric", month: "short", year: "numeric",
-  });
-
+function QuickSalesCard() {
   return (
-    <div className="sd-card sd-chart-card">
-      <div className="sd-chart-header">
-        <span className="sd-date-label">{dateStr}</span>
+    <Card bg="bg-white border border-gray-100 shadow-sm" square>
+      {/* Header */}
+      <div className="flex items-start justify-between shrink-0 mb-3">
+        <div>
+          <p className="text-[13px] font-extrabold text-gray-900 tracking-tight leading-tight">
+            Orders Fulfilled
+          </p>
+          <p className="text-[10px] text-gray-400 font-medium mt-0.5">Last 7 days</p>
+        </div>
+        <DateBadge light />
       </div>
-      <div className="sd-chart-wrap">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={NUT_DATA}
-            margin={{ top: 32, right: 20, left: 20, bottom: 8 }}
-            barCategoryGap="12%"
-          >
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(45,122,79,0.08)" />
+
+      {/* Chart — takes remaining height */}
+      <div className="flex-1 min-h-0 w-full">
+        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+          <LineChart data={ORDERS_DATA} margin={{ top: 4, right: 4, left: -22, bottom: 0 }}>
+            <CartesianGrid vertical={false} stroke="#f3f4f6" strokeDasharray="4 4" />
             <XAxis
-              dataKey="name"
-              tickLine={{ stroke: "rgba(45,122,79,0.2)" }}
-              axisLine={{ stroke: "rgba(45,122,79,0.15)" }}
-              tick={{ fill: "#141414", fontSize: 14, fontWeight: 600 }}
-              interval={0}
+              dataKey="day"
+              tickLine={false}
+              axisLine={false}
+              tick={{ fill: "#9ca3af", fontSize: 9.5, fontFamily: "inherit", fontWeight: 600 }}
             />
             <YAxis
               tickLine={false}
-              axisLine={{ stroke: "rgba(45,122,79,0.15)" }}
-              tick={{ fill: "rgba(20,20,20,0.5)", fontSize: 11, fontWeight: 600 }}
-              width={40}
-              label={{
-                value: "Orders Placed",
-                angle: -90,
-                position: "insideLeft",
-                offset: -5,
-                style: {
-                  fill: "rgba(20,20,20,0.4)",
-                  fontSize: 10,
-                  fontWeight: 700,
-                  fontFamily: "inherit",
-                  textAnchor: "middle",
-                },
-              }}
+              axisLine={false}
+              tick={{ fill: "#d1d5db", fontSize: 9, fontFamily: "inherit" }}
+              width={26}
             />
-            <Bar
+            <Tooltip
+              content={<SalesTooltip />}
+              cursor={{ stroke: "#2d7a4f", strokeWidth: 1, strokeDasharray: "4 2" }}
+            />
+            <Line
+              type="monotone"
               dataKey="orders"
-              shape={(props) => (
-                <SolidBar {...props} color={NUT_DATA[props.index]?.color ?? "#2D7A4F"} />
-              )}
-              isAnimationActive={true}
-            >
-              {NUT_DATA.map((_, i) => <Cell key={i} />)}
-              <LabelList
-                dataKey="orders"
-                position="top"
-                style={{ fill: "#141414", fontSize: 13, fontWeight: 800, fontFamily: "inherit" }}
-              />
-              <LabelList
-                dataKey="kg"
-                position="insideBottom"
-                offset={14}
-                formatter={(v) => `${v} kg`}
-                style={{ fill: "rgba(255,255,255,0.92)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}
-              />
-            </Bar>
-          </BarChart>
+              stroke="#2d7a4f"
+              strokeWidth={2.5}
+              dot={{ r: 3, fill: "#2d7a4f", strokeWidth: 0 }}
+              activeDot={{ r: 5, fill: "#1e5235", strokeWidth: 0 }}
+            />
+          </LineChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </Card>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   COL 5 — ORDERS BY LOCATION
+───────────────────────────────────────────── */
+
+function LocationCard() {
+  return (
+    <Card bg="bg-[#5B3F2F]" square>
+      {/* Header */}
+      <div className="shrink-0 mb-2">
+        <DateBadge />
+        <p className="text-[9.5px] font-bold tracking-[0.1em] uppercase text-white/40 mt-2 mb-2">
+          Orders by Location
+        </p>
+        <div className="h-px bg-white/10" />
+      </div>
+
+      {/* Table — flex-1 with overflow hidden so it never escapes card */}
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <table className="w-full text-left border-collapse h-full">
+          <thead className="shrink-0">
+            <tr>
+              <th className="pb-1.5 text-[10px] font-semibold text-white/35">Location</th>
+              <th className="pb-1.5 text-[10px] font-semibold text-white/35 text-right">Orders</th>
+            </tr>
+          </thead>
+          <tbody>
+            {LOCATION_DATA.map((l, idx) => (
+              <tr
+                key={l.city}
+                className={idx !== LOCATION_DATA.length - 1 ? "border-b border-white/[0.06]" : ""}
+              >
+                <td className="py-[5px] text-[11.5px] font-semibold text-white/80">{l.city}</td>
+                <td className="py-[5px] text-[11.5px] font-extrabold text-white text-right tabular-nums">
+                  {l.orders}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
   );
 }
 
@@ -159,165 +277,15 @@ function NutBarChart() {
 
 export default function StatsDashboard() {
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap');
-
-        .sd-root {
-          width: 100%;
-          background: #eff7f2;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 40px 16px;
-          font-family: 'DM Sans', sans-serif;
-        }
-
-        .sd-shell {
-          width: 100%;
-          max-width: 290; /* Tailwind max-w-290 equivalent or handled by className */
-        }
-
-        .sd-top-row {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr);
-          gap: 20px;
-          align-items: stretch;
-        }
-
-        @media (max-width: 900px) {
-          .sd-top-row { grid-template-columns: 1fr; }
-        }
-
-        /* ── Card base ── */
-        .sd-card {
-          background: #ffffff;
-          border: 1px solid rgba(45,122,79,0.1);
-          border-radius: 24px;
-          overflow: hidden;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-          min-width: 0;
-        }
-
-        /* ── Top Selling Card ── */
-        .sd-top-card {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .sd-top-header {
-          padding: 20px 24px 16px;
-          border-bottom: 1px solid rgba(45,122,79,0.08);
-          flex-shrink: 0;
-        }
-
-        .sd-top-title {
-          font-size: 16px;
-          font-weight: 800;
-          color: #141414;
-          letter-spacing: -0.02em;
-        }
-
-        .sd-product-list {
-          list-style: none;
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-        }
-
-        .sd-product-row {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          padding: 14px 24px;
-          border-bottom: 1px solid rgba(45,122,79,0.05);
-          transition: background 0.2s;
-          min-width: 0;
-        }
-
-        .sd-product-row:last-child {
-          border-bottom: none;
-        }
-
-        .sd-product-row:hover {
-          background: #eff7f2;
-        }
-
-        .sd-product-icon {
-          width: 52px;
-          height: 52px;
-          flex-shrink: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #f8f9f7;
-          border-radius: 14px;
-          border: 1px solid rgba(45,122,79,0.1);
-          overflow: hidden;
-        }
-
-        .sd-product-row-name {
-          flex: 1;
-          font-size: 14px;
-          font-weight: 600;
-          color: #141414;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          min-width: 0;
-        }
-
-        .sd-product-row-qty {
-          font-size: 13px;
-          font-weight: 700;
-          color: #2D7A4F;
-          font-variant-numeric: tabular-nums;
-          flex-shrink: 0;
-        }
-
-        /* ── Bar Chart Card ── */
-        .sd-chart-card {
-          display: flex;
-          flex-direction: column;
-          padding: 20px 12px 12px;
-        }
-
-        .sd-chart-header {
-          display: flex;
-          justify-content: center;
-          margin-bottom: 8px;
-          flex-shrink: 0;
-        }
-
-        .sd-date-label {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 14px;
-          font-weight: 700;
-          color: #2D7A4F;
-          background: #eff7f2;
-          padding: 4px 12px;
-          border-radius: 20px;
-        }
-
-        .sd-chart-wrap {
-          flex: 1;
-          height: 200px; /* Reduced height */
-          min-width: 0;
-        }
-
-        @media (max-width: 600px) {
-          .sd-chart-wrap { height: 180px; }
-        }
-      `}</style>
-
-      <div className="sd-root">
-        <div className="sd-shell max-w-290 mx-auto px-6">
-          <div className="sd-top-row">
-            <TopProductCard />
-            <NutBarChart />
-          </div>
-        </div>
+    <div className="min-h-1/2 w-full bg-[#f0f2ef] flex items-center justify-center px-4 md:px-8 lg:px-10 py-10 font-['DM_Sans',sans-serif]">
+      {/* All cards in one row as squares */}
+      <div className="w-full max-w-[1400px] grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-5 items-stretch">
+        <ActiveOrdersCard />
+        <TotalProductsCard />
+        <TopSellingCard />
+        <QuickSalesCard />
+        <LocationCard />
       </div>
-    </>
+    </div>
   );
 }

@@ -11,7 +11,7 @@
 //   waLink      – string            full WhatsApp enquiry URL
 //   featured    – boolean           if true, applies green border highlight (default false)
 
-import WhatsAppIcon from "./WhatsAppIcon";
+import WhatsAppIcon from "../ui/WhatsAppIcon";
 
 export default function HamperCard({
   imageSrc,

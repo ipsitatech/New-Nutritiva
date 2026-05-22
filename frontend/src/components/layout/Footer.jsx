@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import logo from "../assets/official assests/Nutritiva-logo.png";
-import footerData from "../data/footer.json";
+import logo from "../../assets/official assests/Nutritiva-logo.png";
+import footerData from "../../data/footer.json";
 
 function Footer() {
   const { brand, productLinks, companyLinks, contact, copyright } = footerData;

@@ -1,20 +1,19 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage.jsx";
 import ProductsPage from "./pages/ProductsPage.jsx";
-import CorporateBulkOrders from "./components/CorporateBulkOrders.jsx";
-import FAQ from "./components/FAQ.jsx";
+import CorporateBulkOrders from "./components/marketing/CorporateBulkOrders.jsx";
+import FAQ from "./components/marketing/FAQ.jsx";
 import AboutUs from "./pages/AboutUs.jsx";
-import Layout from "./components/Layout.jsx";
+import Layout from "./components/layout/Layout.jsx";
 
-import Signup from "./pages/Signup.jsx";
-import SignIn from "./pages/SignIn.jsx";
-import ResetPassword from "./pages/ResetPassword";
+import Signup from "./pages/auth/Signup.jsx";
+import SignIn from "./pages/auth/SignIn.jsx";
+import ResetPassword from "./pages/auth/ResetPassword.jsx";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route
           path="/"
           element={
@@ -67,7 +66,6 @@ function App() {
             </Layout>
           }
         />
-
       </Routes>
     </BrowserRouter>
   );

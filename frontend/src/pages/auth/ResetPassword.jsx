@@ -56,7 +56,7 @@ export default function ResetPassword() {
             email,
             newPassword: formData.newPassword,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -66,9 +66,7 @@ export default function ResetPassword() {
       }
 
       alert("Password reset successful");
-
       navigate("/signin/buyer");
-
     } catch (error) {
       alert(error.message);
     } finally {
@@ -82,14 +80,10 @@ export default function ResetPassword() {
         onSubmit={handleResetPassword}
         className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md"
       >
-        <h2 className="text-3xl font-bold mb-6 text-center">
-          Reset Password
-        </h2>
+        <h2 className="text-3xl font-bold mb-6 text-center">Reset Password</h2>
 
         <div className="mb-4">
-          <label className="block mb-2 text-sm font-semibold">
-            Email
-          </label>
+          <label className="block mb-2 text-sm font-semibold">Email</label>
           <input
             type="email"
             value={email}
@@ -118,20 +112,31 @@ export default function ResetPassword() {
               {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          
-          {/* Password Rules */}
+
           <div className="mt-3 space-y-1 text-[13px]">
-            <div className={`flex items-center gap-2 ${hasUppercase ? 'text-green-600' : 'text-gray-500'}`}>
-              {hasUppercase ? <Check size={14} /> : <X size={14} />} <span>One uppercase letter</span>
+            <div
+              className={`flex items-center gap-2 ${hasUppercase ? "text-green-600" : "text-gray-500"}`}
+            >
+              {hasUppercase ? <Check size={14} /> : <X size={14} />}{" "}
+              <span>One uppercase letter</span>
             </div>
-            <div className={`flex items-center gap-2 ${hasLowercase ? 'text-green-600' : 'text-gray-500'}`}>
-              {hasLowercase ? <Check size={14} /> : <X size={14} />} <span>One lowercase letter</span>
+            <div
+              className={`flex items-center gap-2 ${hasLowercase ? "text-green-600" : "text-gray-500"}`}
+            >
+              {hasLowercase ? <Check size={14} /> : <X size={14} />}{" "}
+              <span>One lowercase letter</span>
             </div>
-            <div className={`flex items-center gap-2 ${hasNumber ? 'text-green-600' : 'text-gray-500'}`}>
-              {hasNumber ? <Check size={14} /> : <X size={14} />} <span>One number</span>
+            <div
+              className={`flex items-center gap-2 ${hasNumber ? "text-green-600" : "text-gray-500"}`}
+            >
+              {hasNumber ? <Check size={14} /> : <X size={14} />}{" "}
+              <span>One number</span>
             </div>
-            <div className={`flex items-center gap-2 ${hasSpecial ? 'text-green-600' : 'text-gray-500'}`}>
-              {hasSpecial ? <Check size={14} /> : <X size={14} />} <span>One special character</span>
+            <div
+              className={`flex items-center gap-2 ${hasSpecial ? "text-green-600" : "text-gray-500"}`}
+            >
+              {hasSpecial ? <Check size={14} /> : <X size={14} />}{" "}
+              <span>One special character</span>
             </div>
           </div>
         </div>
@@ -146,7 +151,12 @@ export default function ResetPassword() {
               name="confirmPassword"
               onChange={handleChange}
               required
-              className={`w-full border rounded-xl px-4 py-3 pr-12 ${formData.confirmPassword && formData.newPassword !== formData.confirmPassword ? 'border-red-500' : 'border-gray-200'}`}
+              className={`w-full border rounded-xl px-4 py-3 pr-12 ${
+                formData.confirmPassword &&
+                formData.newPassword !== formData.confirmPassword
+                  ? "border-red-500"
+                  : "border-gray-200"
+              }`}
             />
             <button
               type="button"
@@ -156,11 +166,12 @@ export default function ResetPassword() {
               {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          {formData.confirmPassword && formData.newPassword !== formData.confirmPassword && (
-            <p className="mt-2 text-[12px] text-red-500 flex items-center gap-1">
-              <X size={14} /> Passwords do not match
-            </p>
-          )}
+          {formData.confirmPassword &&
+            formData.newPassword !== formData.confirmPassword && (
+              <p className="mt-2 text-[12px] text-red-500 flex items-center gap-1">
+                <X size={14} /> Passwords do not match
+              </p>
+            )}
         </div>
 
         <button
@@ -170,9 +181,24 @@ export default function ResetPassword() {
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
-              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              <svg
+                className="animate-spin h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8z"
+                />
               </svg>
               Resetting...
             </span>

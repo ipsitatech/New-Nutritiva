@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Plus, X } from "lucide-react";
 
-import faqData from "../data/faq.json";
+import faqData from "../../data/faq.json";
 
 const FAQ = () => {
   const [activeIndex, setActiveIndex] = useState(0);

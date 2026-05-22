@@ -1,12 +1,12 @@
-import categoriesData from "../data/categories.json";
-import cat_almonds from "../assets/product_imgs/almonds.png";
-import cat_dryfruits from "../assets/product_imgs/mixed_dryfruit.png";
-import cat_berries from "../assets/product_imgs/mixed_berries.png";
-import cat_seeds from "../assets/product_imgs/pumpkin_seeds.png";
-import cat_hampers from "../assets/product_imgs/dryfruits_falling.png";
-import cat_bulk from "../assets/product_imgs/dryfruit bowl.png";
-import cat_pistachios from "../assets/product_imgs/pistachios.png";
-import cat_organic from "../assets/product_imgs/goji_berries.png";
+import categoriesData from "../../data/categories.json";
+import cat_almonds from "../../assets/product_imgs/almonds.png";
+import cat_dryfruits from "../../assets/product_imgs/mixed_dryfruit.png";
+import cat_berries from "../../assets/product_imgs/mixed_berries.png";
+import cat_seeds from "../../assets/product_imgs/pumpkin_seeds.png";
+import cat_hampers from "../../assets/product_imgs/dryfruits_falling.png";
+import cat_bulk from "../../assets/product_imgs/dryfruit bowl.png";
+import cat_pistachios from "../../assets/product_imgs/pistachios.png";
+import cat_organic from "../../assets/product_imgs/goji_berries.png";
 
 const IMAGE_MAP = {
   "almonds": cat_almonds,

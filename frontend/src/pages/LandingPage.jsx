@@ -1,41 +1,40 @@
-import HeroSection from "../components/HeroSection.jsx";
-import FeaturesSection from "../components/FeaturesSection.jsx";
-import StatsDashboard from "../components/StatsDashboard.jsx"; 
-import BottomStrip from "../components/BottomStrip.jsx";
-import HotDealsSection from "../components/HotDealsSection.jsx";
-import SubscriptionPage from "../components/SubscriptionPage.jsx";
-import HamperSection from "../components/HamperSection.jsx";
-import CorporateBulkOrders from "../components/CorporateBulkOrders.jsx";
-import FAQ from "../components/FAQ.jsx";
-import Categories from "../components/Categories.jsx";
-import Testimonials from "../components/Testimonials.jsx";
-import DiscountSlider from "../components/DiscountSlider.jsx";
+import HeroSection from "../components/hero/HeroSection.jsx";
+import FeaturesSection from "../components/marketing/FeaturesSection.jsx";
+import StatsDashboard from "../components/stats/StatsDashboard";
+import BottomStrip from "../components/layout/BottomStrip.jsx";
+import HotDealsSection from "../components/deals/HotDealsSection.jsx";
+import SubscriptionPage from "../components/subscription/SubscriptionSection.jsx";
+import HamperSection from "../components/hampers/HamperSection.jsx";
+import CorporateBulkOrders from "../components/marketing/CorporateBulkOrders.jsx";
+import FAQ from "../components/marketing/FAQ.jsx";
+import Categories from "../components/categories/Categories.jsx";
+import Testimonials from "../components/social-proof/Testimonials.jsx";
+import DiscountSlider from "../components/marketing/DiscountSlider.jsx";
 import HamperData from "../data/HamperData.json";
-import landingConfig from "../data/landingConfig.json"; 
+import landingConfig from "../data/landingConfig.json";
 
 function LandingPage() {
   const { hamperTabs, customHamperCta } = landingConfig;
-
 
   return (
     <>
       <HeroSection />
       <BottomStrip />
       <DiscountSlider />
-        <div id="stats">
+      <div id="stats">
         <StatsDashboard />
       </div>
       <FeaturesSection />
       <div id="categories">
         <Categories />
       </div>
-    
+
       <div id="hot-deals">
         <HotDealsSection />
       </div>
-      <HamperSection 
-        tabs={hamperTabs} 
-        hampers={HamperData} 
+      <HamperSection
+        tabs={hamperTabs}
+        hampers={HamperData}
         customCta={customHamperCta}
       />
       <Testimonials />

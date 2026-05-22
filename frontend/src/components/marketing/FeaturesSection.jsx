@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle2, Truck, ShieldCheck, Star } from 'lucide-react';
 
-import featuresData from "../data/features.json";
+import featuresData from "../../data/features.json";
 
 const ICON_MAP = {
   CheckCircle2: CheckCircle2,

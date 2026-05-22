@@ -1,4 +1,4 @@
-import bottomStripData from "../data/bottomStrip.json";
+import bottomStripData from "../../data/bottomStrip.json";
 
 function BottomStrip() {
   return (

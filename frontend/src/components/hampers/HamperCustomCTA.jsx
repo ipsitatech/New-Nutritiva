@@ -1,4 +1,4 @@
- // HamperCustomCTA.jsx
+// HamperCustomCTA.jsx
 // The dashed green call-to-action box shown below the hamper grid.
 // Prompts users to request a custom / bulk hamper order.
 //
@@ -8,7 +8,7 @@
 //   waLink      – string   full WhatsApp URL for custom quote enquiry
 //   buttonLabel – string   button text (default "Request Custom Quote")
 
-import WhatsAppIcon from "./WhatsAppIcon";
+import WhatsAppIcon from "../ui/WhatsAppIcon";
 
 export default function HamperCustomCTA({
   title,

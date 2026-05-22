@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import almonds from "../assets/product_imgs/almonds.png";
-import berries from "../assets/product_imgs/mixed_berries.png";
-import cashews from "../assets/product_imgs/cashews_bowl.png";
-import walnuts from "../assets/product_imgs/walnuts.png";
+import almonds from "../../assets/product_imgs/almonds.png";
+import berries from "../../assets/product_imgs/mixed_berries.png";
+import cashews from "../../assets/product_imgs/cashews_bowl.png";
+import walnuts from "../../assets/product_imgs/walnuts.png";
 
 function HeroSection() {
   const navigate = useNavigate();

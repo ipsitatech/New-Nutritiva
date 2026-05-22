@@ -1,4 +1,4 @@
-import logo from "../../../assets/official assests/Nutritiva-logo.png";
+import logo from "../../../assets/images/Nutritiva-logo.png";
 
 export default function NavLogo() {
   return (

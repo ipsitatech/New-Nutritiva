@@ -11,40 +11,40 @@ const FAQ = () => {
   };
 
   return (
-    <section className="faq">
-      <div className="faq-container">
-        
-        <p className="faq-label">
+    <section className="w-full bg-white py-16 px-4">
+      <div className="max-w-3xl mx-auto">
+        <p className="text-xs font-semibold tracking-widest uppercase text-[#2D7A4F] mb-3">
           GOT QUESTIONS?
         </p>
-        <h2 className="faq-title">
+        <h2 className="text-3xl font-black text-[#141414] mb-10">
           Frequently Asked Questions
         </h2>
 
-        <div className="faq-list">
+        <div className="flex flex-col gap-3">
           {faqData.map((item, index) => {
             const isOpen = activeIndex === index;
 
             return (
               <div
                 key={index}
-                className={`faq-item ${isOpen ? "open" : ""}`}
-                onClick={() => toggleFAQ(index)}
+                className={`rounded-xl overflow-hidden border ${isOpen ? "border-[#2D7A4F]" : "border-[#EAEAEA]"}`}
               >
-                <div className="faq-header">
-                  <span className="faq-question">
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-between px-6 py-5 text-left"
+                  onClick={() => toggleFAQ(index)}
+                >
+                  <span className="text-[15px] font-semibold text-[#141414]">
                     {item.question}
                   </span>
 
-                  {isOpen ? (
-                    <X className="faq-icon" />
-                  ) : (
-                    <Plus className="faq-icon" />
-                  )}
-                </div>
+                  <span className="ml-4 shrink-0 text-[#2D7A4F]">
+                    {isOpen ? <X /> : <Plus />}
+                  </span>
+                </button>
 
-                <div className={`faq-body ${isOpen ? "open" : ""}`}>
-                  <p>
+                <div className={isOpen ? "px-6 pb-5" : "hidden"}>
+                  <p className="text-[14px] text-gray-500 leading-relaxed">
                     {item.answer}
                   </p>
                 </div>
@@ -52,7 +52,6 @@ const FAQ = () => {
             );
           })}
         </div>
-
       </div>
     </section>
   );

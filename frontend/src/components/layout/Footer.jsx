@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import logo from "../../assets/official assests/Nutritiva-logo.png";
+import logo from "../../assets/images/Nutritiva-logo.png";
 import footerData from "../../data/footer.json";
 
 function Footer() {

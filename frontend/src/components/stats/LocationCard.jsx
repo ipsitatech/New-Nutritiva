@@ -1,5 +1,5 @@
 import Card from "./Card";
-import { LOCATION_DATA } from "./statsData";
+import { LOCATION_DATA, TODAY_STR } from "./statsData";
 import { DateBadge } from "./QuickSalesCard";
 
 export default function LocationCard() {

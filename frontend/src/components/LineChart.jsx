@@ -1,13 +1,66 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useApp } from '../services/AppContext';
 
 const LineChart = () => {
+  const { orders, subscriptions } = useApp();
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   
-  // High-fidelity order and subscription trends matching the second image
-  const ordersData = [120, 250, 150, 350, 240, 280, 420, 220, 300, 150, 320, 260];
-  const subsData = [80, 140, 320, 210, 280, 180, 170, 320, 190, 260, 320, 180];
+  const [filterType, setFilterType] = useState('this_year');
+  const [customYear, setCustomYear] = useState('');
+  const [chartYear, setChartYear] = useState(new Date().getFullYear());
+  const [validationError, setValidationError] = useState('');
 
-  const maxVal = 600;
+  const currentYear = new Date().getFullYear();
+
+  // Keep chartYear updated when standard filter presets are selected
+  useEffect(() => {
+    if (filterType === 'this_year') {
+      setChartYear(currentYear);
+    } else if (filterType === 'last_year') {
+      setChartYear(currentYear - 1);
+    }
+  }, [filterType, currentYear]);
+
+  // Compute dynamic orders data for the selected chartYear
+  const ordersData = Array(12).fill(0);
+  (orders || []).forEach(ord => {
+    const dateSrc = ord.created_at || ord.delivery_date;
+    if (dateSrc) {
+      const d = new Date(dateSrc);
+      if (!isNaN(d.getTime()) && d.getFullYear() === chartYear) {
+        const month = d.getMonth();
+        ordersData[month] += Number(ord.total_amount) || 0;
+      }
+    }
+  });
+
+  // Compute dynamic subscriptions data for the selected chartYear
+  const subsData = Array(12).fill(0);
+  (subscriptions || []).forEach(sub => {
+    const dateSrc = sub.created_at || sub.start_date;
+    if (dateSrc) {
+      const d = new Date(dateSrc);
+      if (!isNaN(d.getTime()) && d.getFullYear() === chartYear) {
+        const month = d.getMonth();
+        const planName = (sub.plan_name || '').toLowerCase();
+        let amount = 0;
+        if (planName.includes('platinum')) {
+          amount = planName.includes('year') ? 2399 : 299;
+        } else if (planName.includes('pro')) {
+          amount = planName.includes('year') ? 1199 : 149;
+        }
+        subsData[month] += amount;
+      }
+    }
+  });
+
+  const maxVal = Math.max(600, ...ordersData, ...subsData);
+  
+  const ticks = [];
+  for (let i = 0; i <= 6; i++) {
+    ticks.push(Math.round((maxVal / 6) * i));
+  }
+
   const chartHeight = 220;
   const chartWidth = 560;
   const paddingLeft = 40;
@@ -22,10 +75,6 @@ const LineChart = () => {
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const containerRef = useRef(null);
 
-  const [filterType, setFilterType] = useState('this_year');
-  const [customYear, setCustomYear] = useState('');
-  const [validationError, setValidationError] = useState('');
-
   const handleCustomYearChange = (e) => {
     const val = e.target.value;
     setCustomYear(val);
@@ -34,11 +83,24 @@ const LineChart = () => {
       setValidationError('Validation: Please enter a valid 4-digit year');
     } else {
       const yearInt = parseInt(val, 10);
-      const currentYear = new Date().getFullYear();
       if (yearInt < 2000 || yearInt > currentYear + 10) {
         setValidationError(`Validation: Year must be between 2000 and ${currentYear + 10}`);
       } else {
         setValidationError('');
+        setChartYear(yearInt); // Update graph dynamically in real-time
+      }
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (/^\d{4}$/.test(customYear)) {
+        const yearInt = parseInt(customYear, 10);
+        if (yearInt >= 2000 && yearInt <= currentYear + 10) {
+          setChartYear(yearInt);
+          setValidationError('');
+        }
       }
     }
   };
@@ -129,6 +191,7 @@ const LineChart = () => {
                   placeholder="e.g. 2025"
                   value={customYear}
                   onChange={handleCustomYearChange}
+                  onKeyDown={handleKeyDown}
                   className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:border-brand-green"
                 />
                 {validationError && (
@@ -153,7 +216,7 @@ const LineChart = () => {
           className="w-full h-auto overflow-visible"
         >
           {/* Horizontal Gridlines */}
-          {[0, 100, 200, 300, 400, 500, 600].map((tick) => (
+          {ticks.map((tick) => (
             <g key={tick}>
               <line 
                 x1={paddingLeft} 
@@ -278,19 +341,19 @@ const LineChart = () => {
             className="absolute z-10 -translate-x-1/2 -translate-y-full bg-slate-900 text-white text-xs rounded-xl p-3 shadow-xl min-w-36 pointer-events-none transition-all duration-75 border border-slate-800"
           >
             <div className="font-semibold border-b border-slate-800 pb-1 mb-1.5 flex justify-between">
-              <span>{months[hoverIndex]} 2025</span>
+              <span>{months[hoverIndex]} {chartYear}</span>
             </div>
             <div className="flex justify-between items-center gap-4 mb-0.5">
               <span className="flex items-center gap-1.5 text-slate-400">
                 <span className="w-2 h-2 bg-green-500 rounded-full"></span> Orders:
               </span>
-              <span className="font-bold text-green-400">₹{(ordersData[hoverIndex] * 120).toLocaleString()}</span>
+              <span className="font-bold text-green-400">₹{ordersData[hoverIndex].toLocaleString()}</span>
             </div>
             <div className="flex justify-between items-center gap-4">
               <span className="flex items-center gap-1.5 text-slate-400">
                 <span className="w-2 h-2 bg-amber-500 rounded-full"></span> Subs:
               </span>
-              <span className="font-bold text-amber-400">₹{(subsData[hoverIndex] * 140).toLocaleString()}</span>
+              <span className="font-bold text-amber-400">₹{subsData[hoverIndex].toLocaleString()}</span>
             </div>
           </div>
         )}

@@ -2717,13 +2717,10 @@ const Dashboard = () => {
                       </span>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const transcript = supportHistory.map(h => `[${h.time} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text}`).join('\n');
-                      const prefilled = `Hi! I would like to continue my support session on WhatsApp. Here is the conversation log:\n\n${transcript}`;
-                      window.open(`https://wa.me/919832627196?text=${encodeURIComponent(prefilled)}`, '_blank');
-                    }}
+                  <a
+                    href={`https://wa.me/919832627196?text=${encodeURIComponent(`Hi! I would like to continue my support session on WhatsApp. Here is the conversation log:\n\n${(supportHistory || []).map(h => `[${h.time || ''} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text || ''}`).join('\n')}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="bg-[#25D366] hover:bg-[#20ba59] text-white font-black text-[10px] px-3 py-1.5 rounded-xl transition-all shadow-xs flex items-center gap-1 shrink-0 hover:scale-105 active:scale-95"
                     title="Export conversation to WhatsApp support"
                   >
@@ -2731,7 +2728,7 @@ const Dashboard = () => {
                       <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.458L0 24zm5.735-3.305c1.62.96 3.238 1.455 4.881 1.456 5.485 0 9.95-4.463 9.953-9.94.002-2.653-1.03-5.148-2.905-7.025C15.845 3.311 13.354 2.28 10.701 2.28c-5.49 0-9.956 4.466-9.96 9.943-.001 1.765.487 3.418 1.417 4.907L1.137 20.89l3.968-.971-1.313 1.306zM18.006 14.86c-.328-.164-1.944-.96-2.247-1.07-.303-.11-.524-.165-.744.165-.22.329-.853 1.07-1.045 1.29-.193.22-.386.247-.714.083-.328-.164-1.385-.51-2.637-1.627-.975-.87-1.632-1.947-1.823-2.275-.192-.329-.02-.507.144-.67.147-.147.329-.384.493-.576.164-.192.219-.329.329-.548.11-.22.055-.411-.027-.575-.082-.164-.744-1.793-1.02-2.457-.27-.648-.544-.56-.744-.57l-.63-.01c-.22 0-.576.082-.88.411-.303.329-1.157 1.13-1.157 2.756 0 1.626 1.184 3.197 1.348 3.417.164.22 2.328 3.555 5.64 4.986.788.34 1.402.544 1.882.697.79.25 1.512.215 2.08.13.635-.094 1.944-.795 2.218-1.564.275-.769.275-1.427.193-1.565-.083-.138-.303-.22-.63-.385z" />
                     </svg>
                     <span>Continue on WhatsApp 💬</span>
-                  </button>
+                  </a>
                 </div>
 
                 {/* Messages Box */}
@@ -2788,20 +2785,17 @@ const Dashboard = () => {
                 {/* WhatsApp bottom helper banner */}
                 <div className="px-4 py-2 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between rounded-b-3xl text-[10px] text-slate-500 font-semibold">
                   <span>Need an immediate human agent?</span>
-                  <button 
-                    type="button"
-                    onClick={() => {
-                      const transcript = supportHistory.map(h => `[${h.time} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text}`).join('\n');
-                      const prefilled = `Hi! I'm contacting Nutritiva support. My name is ${user.name || ''} (${user.email || ''}). Here is our current chat history:\n\n${transcript}`;
-                      window.open(`https://wa.me/919832627196?text=${encodeURIComponent(prefilled)}`, '_blank');
-                    }}
+                  <a 
+                    href={`https://wa.me/919832627196?text=${encodeURIComponent(`Hi! I'm contacting Nutritiva support. My name is ${user?.name || ''} (${user?.email || ''}). Here is our current chat history:\n\n${(supportHistory || []).map(h => `[${h.time || ''} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text || ''}`).join('\n')}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-[#25D366] hover:text-[#20ba59] font-bold flex items-center gap-1 transition-all"
                   >
                     <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                       <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.458L0 24zm5.735-3.305c1.62.96 3.238 1.455 4.881 1.456 5.485 0 9.95-4.463 9.953-9.94.002-2.653-1.03-5.148-2.905-7.025C15.845 3.311 13.354 2.28 10.701 2.28c-5.49 0-9.956 4.466-9.96 9.943-.001 1.765.487 3.418 1.417 4.907L1.137 20.89l3.968-.971-1.313 1.306zM18.006 14.86c-.328-.164-1.944-.96-2.247-1.07-.303-.11-.524-.165-.744.165-.22.329-.853 1.07-1.045 1.29-.193.22-.386.247-.714.083-.328-.164-1.385-.51-2.637-1.627-.975-.87-1.632-1.947-1.823-2.275-.192-.329-.02-.507.144-.67.147-.147.329-.384.493-.576.164-.192.219-.329.329-.548.11-.22.055-.411-.027-.575-.082-.164-.744-1.793-1.02-2.457-.27-.648-.544-.56-.744-.57l-.63-.01c-.22 0-.576.082-.88.411-.303.329-1.157 1.13-1.157 2.756 0 1.626 1.184 3.197 1.348 3.417.164.22 2.328 3.555 5.64 4.986.788.34 1.402.544 1.882.697.79.25 1.512.215 2.08.13.635-.094 1.944-.795 2.218-1.564.275-.769.275-1.427.193-1.565-.083-.138-.303-.22-.63-.385z" />
-                    </svg>
-                    <span>Chat on WhatsApp</span>
-                  </button>
+                      </svg>
+                      <span>Chat on WhatsApp</span>
+                    </a>
                 </div>
 
               </div>
@@ -2825,19 +2819,17 @@ const Dashboard = () => {
                       </p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => {
-                      const transcript = supportHistory.map(h => `[${h.time} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text}`).join('\n');
-                      const prefilled = `Hi! I'm contacting Nutritiva support. My name is ${user.name || ''} (${user.email || ''}). Here is our current chat history:\n\n${transcript}`;
-                      window.open(`https://wa.me/919832627196?text=${encodeURIComponent(prefilled)}`, '_blank');
-                    }}
+                  <a
+                    href={`https://wa.me/919832627196?text=${encodeURIComponent(`Hi! I'm contacting Nutritiva support. My name is ${user?.name || ''} (${user?.email || ''}). Here is our current chat history:\n\n${(supportHistory || []).map(h => `[${h.time || ''} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text || ''}`).join('\n')}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-full py-2.5 rounded-2xl text-[10px] font-black text-white transition-all bg-[#25D366] hover:bg-[#20ba59] active:scale-95 shadow-xs flex items-center justify-center gap-1.5"
                   >
                     <svg className="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24">
                       <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.458L0 24zm5.735-3.305c1.62.96 3.238 1.455 4.881 1.456 5.485 0 9.95-4.463 9.953-9.94.002-2.653-1.03-5.148-2.905-7.025C15.845 3.311 13.354 2.28 10.701 2.28c-5.49 0-9.956 4.466-9.96 9.943-.001 1.765.487 3.418 1.417 4.907L1.137 20.89l3.968-.971-1.313 1.306zM18.006 14.86c-.328-.164-1.944-.96-2.247-1.07-.303-.11-.524-.165-.744.165-.22.329-.853 1.07-1.045 1.29-.193.22-.386.247-.714.083-.328-.164-1.385-.51-2.637-1.627-.975-.87-1.632-1.947-1.823-2.275-.192-.329-.02-.507.144-.67.147-.147.329-.384.493-.576.164-.192.219-.329.329-.548.11-.22.055-.411-.027-.575-.082-.164-.744-1.793-1.02-2.457-.27-.648-.544-.56-.744-.57l-.63-.01c-.22 0-.576.082-.88.411-.303.329-1.157 1.13-1.157 2.756 0 1.626 1.184 3.197 1.348 3.417.164.22 2.328 3.555 5.64 4.986.788.34 1.402.544 1.882.697.79.25 1.512.215 2.08.13.635-.094 1.944-.795 2.218-1.564.275-.769.275-1.427.193-1.565-.083-.138-.303-.22-.63-.385z" />
                     </svg>
                     <span>Chat on WhatsApp</span>
-                  </button>
+                  </a>
                 </div>
 
                 {/* Support FAQs */}
@@ -2969,12 +2961,10 @@ const Dashboard = () => {
       )}
 
       {/* Floating WhatsApp Chat Icon bottom right */}
-      <button 
-        onClick={() => {
-          const transcript = supportHistory.map(h => `[${h.time} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text}`).join('\n');
-          const prefilled = `Hi! I'm contacting Nutritiva support. My name is ${user.name || ''} (${user.email || ''}). Here is our current chat history:\n\n${transcript}`;
-          window.open(`https://wa.me/919832627196?text=${encodeURIComponent(prefilled)}`, '_blank');
-        }}
+      <a 
+        href={`https://wa.me/919832627196?text=${encodeURIComponent(`Hi! I'm contacting Nutritiva support. My name is ${user?.name || ''} (${user?.email || ''}). Here is our current chat history:\n\n${(supportHistory || []).map(h => `[${h.time || ''} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text || ''}`).join('\n')}`)}`}
+        target="_blank"
+        rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full text-white transition-all flex items-center justify-center hover:scale-110 active:scale-95 animate-pulse-glow"
         style={{background: '#25D366', boxShadow: '0 8px 24px rgba(37, 211, 102, 0.4)'}}
         title="Chat with support on WhatsApp"
@@ -2982,7 +2972,7 @@ const Dashboard = () => {
         <svg className="w-7 h-7 fill-white" viewBox="0 0 24 24">
           <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.458L0 24zm5.735-3.305c1.62.96 3.238 1.455 4.881 1.456 5.485 0 9.95-4.463 9.953-9.94.002-2.653-1.03-5.148-2.905-7.025C15.845 3.311 13.354 2.28 10.701 2.28c-5.49 0-9.956 4.466-9.96 9.943-.001 1.765.487 3.418 1.417 4.907L1.137 20.89l3.968-.971-1.313 1.306zM18.006 14.86c-.328-.164-1.944-.96-2.247-1.07-.303-.11-.524-.165-.744.165-.22.329-.853 1.07-1.045 1.29-.193.22-.386.247-.714.083-.328-.164-1.385-.51-2.637-1.627-.975-.87-1.632-1.947-1.823-2.275-.192-.329-.02-.507.144-.67.147-.147.329-.384.493-.576.164-.192.219-.329.329-.548.11-.22.055-.411-.027-.575-.082-.164-.744-1.793-1.02-2.457-.27-.648-.544-.56-.744-.57l-.63-.01c-.22 0-.576.082-.88.411-.303.329-1.157 1.13-1.157 2.756 0 1.626 1.184 3.197 1.348 3.417.164.22 2.328 3.555 5.64 4.986.788.34 1.402.544 1.882.697.79.25 1.512.215 2.08.13.635-.094 1.944-.795 2.218-1.564.275-.769.275-1.427.193-1.565-.083-.138-.303-.22-.63-.385z" />
         </svg>
-      </button>
+      </a>
 
       {/* Order Details Modal Overlay */}
       {selectedOrderDetails && (

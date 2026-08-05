@@ -2390,11 +2390,10 @@ const Storefront = () => {
         </div>
       )}
 
-      <button 
-        onClick={() => {
-          const userDetails = isLoggedIn ? `%20My%20name%20is%20${encodeURIComponent(user.name || '')}%20and%20my%20registered%20email%20is%20${encodeURIComponent(user.email || '')}.` : '';
-          window.open(`https://wa.me/919832627196?text=Hi!%20I%27m%20contacting%20Nutritiva%20support%20for%20help.${userDetails}`, '_blank');
-        }}
+      <a 
+        href={`https://wa.me/919832627196?text=${encodeURIComponent(`Hi! I'm contacting Nutritiva support for help.${isLoggedIn ? ` My name is ${user?.name || ''} and my registered email is ${user?.email || ''}.` : ''}`)}`}
+        target="_blank"
+        rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full text-white transition-all flex items-center justify-center hover:scale-110 active:scale-95 animate-pulse-glow"
         style={{background: '#25D366', boxShadow: '0 8px 24px rgba(37, 211, 102, 0.4)'}}
         title="Chat with support on WhatsApp"
@@ -2402,7 +2401,7 @@ const Storefront = () => {
         <svg className="w-7 h-7 fill-white" viewBox="0 0 24 24">
           <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.458L0 24zm5.735-3.305c1.62.96 3.238 1.455 4.881 1.456 5.485 0 9.95-4.463 9.953-9.94.002-2.653-1.03-5.148-2.905-7.025C15.845 3.311 13.354 2.28 10.701 2.28c-5.49 0-9.956 4.466-9.96 9.943-.001 1.765.487 3.418 1.417 4.907L1.137 20.89l3.968-.971-1.313 1.306zM18.006 14.86c-.328-.164-1.944-.96-2.247-1.07-.303-.11-.524-.165-.744.165-.22.329-.853 1.07-1.045 1.29-.193.22-.386.247-.714.083-.328-.164-1.385-.51-2.637-1.627-.975-.87-1.632-1.947-1.823-2.275-.192-.329-.02-.507.144-.67.147-.147.329-.384.493-.576.164-.192.219-.329.329-.548.11-.22.055-.411-.027-.575-.082-.164-.744-1.793-1.02-2.457-.27-.648-.544-.56-.744-.57l-.63-.01c-.22 0-.576.082-.88.411-.303.329-1.157 1.13-1.157 2.756 0 1.626 1.184 3.197 1.348 3.417.164.22 2.328 3.555 5.64 4.986.788.34 1.402.544 1.882.697.79.25 1.512.215 2.08.13.635-.094 1.944-.795 2.218-1.564.275-.769.275-1.427.193-1.565-.083-.138-.303-.22-.63-.385z" />
         </svg>
-      </button>
+      </a>
 
 
       {/* Favourites Toast Notification */}

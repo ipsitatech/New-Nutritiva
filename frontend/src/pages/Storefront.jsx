@@ -1846,7 +1846,7 @@ const Storefront = () => {
             {/* Logo and Description */}
             <div className="lg:col-span-2 space-y-4">
               <div className="flex items-center cursor-pointer shrink-0" onClick={() => setCurrentPage('store')}>
-                <img src={logoImg} alt="Nutritiva Logo" className="h-16 w-auto object-contain brightness-0 invert" />
+                <img src={logoImg} alt="Nutritiva Logo" className="h-16 w-auto object-contain rounded-xl" />
               </div>
               <p className="text-sm text-slate-400 leading-relaxed max-w-sm font-medium">
                 We bring you the finest range of nuts, dry fruits, seeds, spices & healthy foods for a better you.

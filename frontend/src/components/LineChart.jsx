@@ -5,10 +5,24 @@ const LineChart = () => {
   const { orders, subscriptions } = useApp();
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   
-  const [filterType, setFilterType] = useState('all');
-  const [customYear, setCustomYear] = useState('');
-  const [chartYear, setChartYear] = useState(new Date().getFullYear());
+  const [filterType, setFilterType] = useState(() => {
+    return localStorage.getItem('linechart_filterType') || 'all';
+  });
+  const [customYear, setCustomYear] = useState(() => {
+    return localStorage.getItem('linechart_customYear') || '';
+  });
+  const [chartYear, setChartYear] = useState(() => {
+    const saved = localStorage.getItem('linechart_chartYear');
+    return saved ? parseInt(saved, 10) : new Date().getFullYear();
+  });
   const [validationError, setValidationError] = useState('');
+
+  // Persist filter values to LocalStorage (TC28)
+  useEffect(() => {
+    localStorage.setItem('linechart_filterType', filterType);
+    localStorage.setItem('linechart_customYear', customYear);
+    localStorage.setItem('linechart_chartYear', String(chartYear));
+  }, [filterType, customYear, chartYear]);
 
   const currentYear = new Date().getFullYear();
 
@@ -35,6 +49,9 @@ const LineChart = () => {
   // Always ensure the current year is in the list
   availableYears.add(currentYear);
   const sortedYears = Array.from(availableYears).sort((a, b) => b - a);
+
+  // Check if there are no records for the active view to display Empty Data Year message (TC29)
+  const hasNoData = ordersData.every(v => v === 0) && subsData.every(v => v === 0);
 
   // Compute dynamic orders data for the selected chartYear
   const ordersData = Array(12).fill(0);
@@ -255,8 +272,15 @@ const LineChart = () => {
         ref={containerRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="relative overflow-visible cursor-crosshair"
+        className="relative overflow-visible cursor-crosshair min-h-[220px]"
       >
+        {hasNoData && (
+          <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] flex flex-col items-center justify-center z-20">
+            <span className="text-slate-500 font-bold text-sm bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 shadow-2xs">
+              No Data Available
+            </span>
+          </div>
+        )}
         <svg 
           viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
           className="w-full h-auto overflow-visible"

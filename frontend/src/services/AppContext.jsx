@@ -56,6 +56,8 @@ export const aiRecommendedProducts = [
 ];
 
 export const AppProvider = ({ children }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
   const [currentPage, _setCurrentPage] = useState(() => {
     return sessionStorage.getItem('nutritva_current_page') || 'store';
   });
@@ -222,6 +224,14 @@ export const AppProvider = ({ children }) => {
     return fetch(url, {
       ...options,
       headers
+    }).then(res => {
+      if (res.status === 401) {
+        localStorage.removeItem("nutritva_token");
+        localStorage.removeItem("nutritva_role");
+        setIsLoggedIn(false);
+        window.location.href = "/signin";
+      }
+      return res;
     });
   };
 
@@ -454,87 +464,102 @@ export const AppProvider = ({ children }) => {
     });
   };
 
+  const fetchInitialData = async () => {
+    setIsLoading(true);
+    setErrorMessage('');
+    try {
+      const uRes = await authFetch('http://localhost:5000/api/user');
+      if (uRes.ok) {
+        _setUser(await uRes.json());
+      } else if (uRes.status === 401) {
+        return;
+      } else {
+        throw new Error('Failed to retrieve user profile');
+      }
+
+      // Fetch products dynamically from backend MySQL database
+      const prodRes = await authFetch('http://localhost:5000/api/products');
+      if (prodRes.ok) {
+        const prodList = await prodRes.json();
+        if (prodList && prodList.length > 0) {
+          setProducts(prodList);
+        }
+      } else {
+        throw new Error('Failed to load products');
+      }
+
+      const cRes = await authFetch('http://localhost:5000/api/cart');
+      if (cRes.ok) setCart(await cRes.json());
+
+      const wRes = await authFetch('http://localhost:5000/api/wishlist');
+      if (wRes.ok) setWishlist(await wRes.json());
+
+      const oRes = await authFetch('http://localhost:5000/api/orders');
+      let fetchedOrders = [];
+      if (oRes.ok) {
+        fetchedOrders = await oRes.json();
+        setOrders(fetchedOrders);
+      } else {
+        throw new Error('Failed to load orders');
+      }
+
+      const oiRes = await authFetch('http://localhost:5000/api/orders/items');
+      let fetchedOrderItems = [];
+      if (oiRes.ok) {
+        fetchedOrderItems = await oiRes.json();
+        setOrderItems(fetchedOrderItems);
+      }
+
+      const pRes = await authFetch('http://localhost:5000/api/payments');
+      if (pRes.ok) setPayments(await pRes.json());
+
+      const rRes = await authFetch('http://localhost:5000/api/reviews');
+      if (rRes.ok) setReviews(await rRes.json());
+
+      const nRes = await authFetch('http://localhost:5000/api/notifications');
+      if (nRes.ok) setNotifications(await nRes.json());
+
+      const sRes = await authFetch('http://localhost:5000/api/subscriptions');
+      if (sRes.ok) setSubscriptions(await sRes.json());
+
+      const hpRes = await authFetch('http://localhost:5000/api/health-preferences');
+      if (hpRes.ok) setHealthPreferences(await hpRes.json());
+
+      // Auto-resume active order tracking if one exists in the database
+      const activeOrd = fetchedOrders.find(ord => 
+        ord.tracking_id && 
+        !['DELIVERED', 'CANCELLED', 'RETURNED'].includes(ord.order_status?.toUpperCase())
+      );
+      
+      if (activeOrd) {
+        const itemsToTrack = fetchedOrderItems
+          .filter(oi => oi.order_id === activeOrd.id)
+          .map(oi => ({
+            id: oi.product_id,
+            product_id: oi.product_id,
+            quantity: oi.quantity,
+            name: oi.name || 'Product',
+            price: oi.price || 0
+          }));
+        
+        startOrderTrackingSimulation(
+          activeOrd.id, 
+          itemsToTrack, 
+          activeOrd.total_amount, 
+          activeOrd.tracking_id
+        );
+      }
+
+    } catch (err) {
+      console.error('Error loading database tables from API backend:', err);
+      setErrorMessage('Failed to connect to the backend server. Please verify your connection.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Load database tables from backend on mount and restore active shipment tracking
   useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const uRes = await authFetch('http://localhost:5000/api/user');
-        if (uRes.ok) _setUser(await uRes.json());
-
-        // Fetch products dynamically from backend MySQL database
-        const prodRes = await authFetch('http://localhost:5000/api/products');
-        if (prodRes.ok) {
-          const prodList = await prodRes.json();
-          if (prodList && prodList.length > 0) {
-            setProducts(prodList);
-          }
-        }
-
-        const cRes = await authFetch('http://localhost:5000/api/cart');
-        if (cRes.ok) setCart(await cRes.json());
-
-        const wRes = await authFetch('http://localhost:5000/api/wishlist');
-        if (wRes.ok) setWishlist(await wRes.json());
-
-        const oRes = await authFetch('http://localhost:5000/api/orders');
-        let fetchedOrders = [];
-        if (oRes.ok) {
-          fetchedOrders = await oRes.json();
-          setOrders(fetchedOrders);
-        }
-
-        const oiRes = await authFetch('http://localhost:5000/api/orders/items');
-        let fetchedOrderItems = [];
-        if (oiRes.ok) {
-          fetchedOrderItems = await oiRes.json();
-          setOrderItems(fetchedOrderItems);
-        }
-
-        const pRes = await authFetch('http://localhost:5000/api/payments');
-        if (pRes.ok) setPayments(await pRes.json());
-
-        const rRes = await authFetch('http://localhost:5000/api/reviews');
-        if (rRes.ok) setReviews(await rRes.json());
-
-        const nRes = await authFetch('http://localhost:5000/api/notifications');
-        if (nRes.ok) setNotifications(await nRes.json());
-
-        const sRes = await authFetch('http://localhost:5000/api/subscriptions');
-        if (sRes.ok) setSubscriptions(await sRes.json());
-
-        const hpRes = await authFetch('http://localhost:5000/api/health-preferences');
-        if (hpRes.ok) setHealthPreferences(await hpRes.json());
-
-        // Auto-resume active order tracking if one exists in the database
-        const activeOrd = fetchedOrders.find(ord => 
-          ord.tracking_id && 
-          !['DELIVERED', 'CANCELLED', 'RETURNED'].includes(ord.order_status?.toUpperCase())
-        );
-        
-        if (activeOrd) {
-          const itemsToTrack = fetchedOrderItems
-            .filter(oi => oi.order_id === activeOrd.id)
-            .map(oi => ({
-              id: oi.product_id,
-              product_id: oi.product_id,
-              quantity: oi.quantity,
-              name: oi.name || 'Product',
-              price: oi.price || 0
-            }));
-          
-          startOrderTrackingSimulation(
-            activeOrd.id, 
-            itemsToTrack, 
-            activeOrd.total_amount, 
-            activeOrd.tracking_id
-          );
-        }
-
-      } catch (err) {
-        console.error('Error loading database tables from API backend:', err);
-      }
-    };
-
     fetchInitialData();
   }, []);
 
@@ -588,7 +613,10 @@ export const AppProvider = ({ children }) => {
         setCart,
         setOrders,
         setOrderItems,
-        setPayments
+        setPayments,
+        isLoading,
+        errorMessage,
+        fetchInitialData
       }}
     >
       {children}

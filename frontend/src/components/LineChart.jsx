@@ -58,6 +58,27 @@ const LineChart = () => {
     }
   });
 
+  // Calculate unique years present in each month's orders/subscriptions for tooltip label
+  const monthYears = Array(12).fill(null).map(() => new Set());
+  (orders || []).forEach(ord => {
+    const dateSrc = ord.created_at || ord.delivery_date;
+    if (dateSrc) {
+      const d = new Date(dateSrc);
+      if (!isNaN(d.getTime())) {
+        monthYears[d.getMonth()].add(d.getFullYear());
+      }
+    }
+  });
+  (subscriptions || []).forEach(sub => {
+    const dateSrc = sub.created_at || sub.start_date;
+    if (dateSrc) {
+      const d = new Date(dateSrc);
+      if (!isNaN(d.getTime())) {
+        monthYears[d.getMonth()].add(d.getFullYear());
+      }
+    }
+  });
+
   const maxVal = Math.max(600, ...ordersData, ...subsData);
   
   const ticks = [];
@@ -346,7 +367,14 @@ const LineChart = () => {
             className="absolute z-10 -translate-x-1/2 -translate-y-full bg-slate-900 text-white text-xs rounded-xl p-3 shadow-xl min-w-36 pointer-events-none transition-all duration-75 border border-slate-800"
           >
             <div className="font-semibold border-b border-slate-800 pb-1 mb-1.5 flex justify-between">
-              <span>{months[hoverIndex]} {filterType === 'all' ? '(All Years)' : chartYear}</span>
+              <span>
+                {months[hoverIndex]}{' '}
+                {filterType === 'all'
+                  ? monthYears[hoverIndex] && monthYears[hoverIndex].size > 0
+                    ? `(${Array.from(monthYears[hoverIndex]).sort().join(', ')})`
+                    : '(All Years)'
+                  : chartYear}
+              </span>
             </div>
             <div className="flex justify-between items-center gap-4 mb-0.5">
               <span className="flex items-center gap-1.5 text-slate-400">

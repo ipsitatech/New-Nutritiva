@@ -50,9 +50,6 @@ const LineChart = () => {
   availableYears.add(currentYear);
   const sortedYears = Array.from(availableYears).sort((a, b) => b - a);
 
-  // Check if there are no records for the active view to display Empty Data Year message (TC29)
-  const hasNoData = ordersData.every(v => v === 0) && subsData.every(v => v === 0);
-
   // Compute dynamic orders data for the selected chartYear
   const ordersData = Array(12).fill(0);
   (orders || []).forEach(ord => {
@@ -110,6 +107,9 @@ const LineChart = () => {
       }
     }
   });
+
+  // Check if there are no records for the active view to display Empty Data Year message (TC29)
+  const hasNoData = ordersData.every(v => v === 0) && subsData.every(v => v === 0);
 
   const maxVal = Math.max(600, ...ordersData, ...subsData);
   

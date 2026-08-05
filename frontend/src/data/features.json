@@ -1,0 +1,22 @@
+[
+  {
+    "icon": "CheckCircle2",
+    "title": "100% Authentic",
+    "description": "Premium Grade Products directly from source farms. No adulteration, no compromise."
+  },
+  {
+    "icon": "Truck",
+    "title": "Fast Delivery",
+    "description": "Pan India shipping within 2-5 business days. Express delivery in metro cities."
+  },
+  {
+    "icon": "ShieldCheck",
+    "title": "Hygienic Packaging",
+    "description": "Temperature-controlled, airtight packaging preserves freshness for months."
+  },
+  {
+    "icon": "Star",
+    "title": "Quality Assured",
+    "description": "FSSAI certified. Transparent sourcing with full lab certifications available."
+  }
+]

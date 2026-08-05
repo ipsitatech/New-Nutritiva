@@ -1,0 +1,13 @@
+export { default as bottomStripData } from "./bottomStrip.json";
+export { default as categoriesData } from "./categories.json";
+export { default as corporateData } from "./corporate.json";
+export { default as faqData } from "./faq.json";
+export { default as featuresData } from "./features.json";
+export { default as footerData } from "./footer.json";
+export { default as hamperData } from "./HamperData.json";
+export { default as heroData } from "./hero.json";
+export { default as hotDealsData } from "./hotDeals.json";
+export { default as landingConfig } from "./landingConfig.json";
+export { default as navigationData } from "./navigation.json";
+export { default as subscriptionData } from "./subscription.json";
+export { default as testimonialsData } from "./testimonials.json";

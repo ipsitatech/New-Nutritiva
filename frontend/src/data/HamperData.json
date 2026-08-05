@@ -1,0 +1,220 @@
+[
+  {
+    "id": 1,
+    "name": "Premium Delight Hamper",
+    "description": "Luxury assortment perfect for special occasions",
+    "tag": "Weddings & Celebrations",
+    "category": "Weddings",
+    "featured": false,
+    "imageSrc": "/src/assets/product_imgs/almonds.png",
+    "imageAlt": "Premium Delight Hamper",
+    "includes": [
+      "500g Premium California Almonds",
+      "500g Whole Cashews",
+      "250g Medjool Dates",
+      "500g Iranian Pistachios",
+      "250g Golden Raisins",
+      "+ 2 more items"
+    ],
+    "waLink": "https://wa.me/917262866254?text=Interested%20in%20Premium%20Delight%20Hamper"
+  },
+  {
+    "id": 2,
+    "name": "Festive Joy Collection",
+    "description": "Traditional selection for Diwali and festivals",
+    "tag": "Diwali & Festivals",
+    "category": "Diwali",
+    "featured": true,
+    "imageSrc": "/src/assets/product_imgs/mixed_dryfruit.png",
+    "imageAlt": "Festive Joy Collection",
+    "includes": [
+      "500g Mixed Dry Fruits",
+      "500g Premium Dates",
+      "250g Seedless Raisins",
+      "250g Dried Figs",
+      "+ 2 more items"
+    ],
+    "waLink": "https://wa.me/917262866254?text=Interested%20in%20Festive%20Joy%20Collection"
+  },
+  {
+    "id": 3,
+    "name": "Wellness & Health Box",
+    "description": "Superfood collection for health-conscious gifting",
+    "tag": "Get Well Soon",
+    "category": "Corporate",
+    "featured": false,
+    "imageSrc": "/src/assets/product_imgs/goji_berries.png",
+    "imageAlt": "Wellness & Health Box",
+    "includes": [
+      "750g Goji Berries",
+      "500g Chia Seeds",
+      "500g Pumpkin Seeds",
+      "250g Sunflower Seeds",
+      "+ 2 more items"
+    ],
+    "waLink": "https://wa.me/917262866254?text=Interested%20in%20Wellness%20Health%20Box"
+  },
+  {
+    "id": 4,
+    "name": "Royal Wedding Hamper",
+    "description": "Opulent gifting for the grandest of celebrations",
+    "tag": "Weddings & Celebrations",
+    "category": "Weddings",
+    "featured": true,
+    "imageSrc": "/src/assets/product_imgs/cashews_bowl.png",
+    "imageAlt": "Royal Wedding Hamper",
+    "includes": [
+      "1kg Premium Cashews",
+      "1kg California Almonds",
+      "500g Macadamia Nuts",
+      "500g Turkish Apricots",
+      "500g Medjool Dates",
+      "+ 4 more items"
+    ],
+    "waLink": "https://wa.me/917262866254?text=Interested%20in%20Royal%20Wedding%20Hamper"
+  },
+  {
+    "id": 5,
+    "name": "Corporate Excellence Pack",
+    "description": "Sophisticated gifting for clients and teams",
+    "tag": "Corporate",
+    "category": "Corporate",
+    "featured": false,
+    "imageSrc": "/src/assets/product_imgs/almond_chocolate.png",
+    "imageAlt": "Corporate Excellence Pack",
+    "includes": [
+      "500g Premium Mixed Nuts",
+      "250g Dark Chocolate Almonds",
+      "250g Dried Cranberries",
+      "Custom Logo Packaging",
+      "+ 1 more item"
+    ],
+    "waLink": "https://wa.me/917262866254?text=Interested%20in%20Corporate%20Excellence%20Pack"
+  },
+  {
+    "id": 6,
+    "name": "Griha Pravesh Hamper",
+    "description": "Warm housewarming blessings in a beautiful box",
+    "tag": "Housewarming",
+    "category": "Housewarming",
+    "featured": false,
+    "imageSrc": "/src/assets/product_imgs/pistachios.png",
+    "imageAlt": "Griha Pravesh Hamper",
+    "includes": [
+      "500g Premium Almonds",
+      "500g Cashews",
+      "250g Walnuts",
+      "250g Pistachios",
+      "+ 2 more items"
+    ],
+    "waLink": "https://wa.me/917262866254?text=Interested%20in%20Griha%20Pravesh%20Hamper"
+  },
+  {
+    "id": 7,
+    "name": "Diwali Glow Box",
+    "description": "Brighten every home this festive season",
+    "tag": "Diwali & Festivals",
+    "category": "Diwali",
+    "featured": false,
+    "imageSrc": "/src/assets/product_imgs/dryfruits_falling.png",
+    "imageAlt": "Diwali Glow Box",
+    "includes": [
+      "750g Assorted Dry Fruits",
+      "500g Kaju Katli Dates",
+      "250g Dried Apricots",
+      "Festive Tin Packaging",
+      "+ 1 more item"
+    ],
+    "waLink": "https://wa.me/917262866254?text=Interested%20in%20Diwali%20Glow%20Box"
+  },
+  {
+    "id": 8,
+    "name": "Executive Team Gift",
+    "description": "Bulk-friendly gifting with premium presentation",
+    "tag": "Corporate",
+    "category": "Corporate",
+    "featured": true,
+    "imageSrc": "/src/assets/product_imgs/dryfruit bowl.png",
+    "imageAlt": "Executive Team Gift",
+    "includes": [
+      "500g Premium Trail Mix",
+      "250g Roasted Almonds",
+      "250g Dried Blueberries",
+      "Branded Gift Box",
+      "Personalised Card"
+    ],
+    "waLink": "https://wa.me/917262866254?text=Interested%20in%20Executive%20Team%20Gift"
+  },
+  {
+    "id": 9,
+    "name": "New Beginnings Basket",
+    "description": "Celebrate new homes with warmth and sweetness",
+    "tag": "Housewarming",
+    "category": "Housewarming",
+    "featured": false,
+    "imageSrc": "/src/assets/product_imgs/date.png",
+    "imageAlt": "New Beginnings Basket",
+    "includes": [
+      "500g Seedless Dates",
+      "500g Mixed Nuts",
+      "250g Dried Mango Slices",
+      "250g Coconut Chips",
+      "+ 1 more item"
+    ],
+    "waLink": "https://wa.me/917262866254?text=Interested%20in%20New%20Beginnings%20Basket"
+  },
+  {
+    "id": 10,
+    "name": "Eternal Bond Hamper",
+    "description": "Premium selection celebrating your special day",
+    "tag": "Weddings & Celebrations",
+    "category": "Weddings",
+    "featured": false,
+    "imageSrc": "/src/assets/product_imgs/walnuts.png",
+    "imageAlt": "Eternal Bond Hamper",
+    "includes": [
+      "500g Premium Walnuts",
+      "500g Dry Roasted Cashews",
+      "250g Turkish Apricots",
+      "250g Golden Dates",
+      "+ 2 more items"
+    ],
+    "waLink": "https://wa.me/917262866254?text=Interested%20in%20Eternal%20Bond%20Hamper"
+  },
+  {
+    "id": 11,
+    "name": "Festival Blessings Pack",
+    "description": "Traditional festive treat box for loved ones",
+    "tag": "Diwali & Festivals",
+    "category": "Diwali",
+    "featured": false,
+    "imageSrc": "/src/assets/product_imgs/raisins.png",
+    "imageAlt": "Festival Blessings Pack",
+    "includes": [
+      "500g Golden Raisins",
+      "500g Premium Almonds",
+      "250g Dried Cranberries",
+      "250g Pistachios",
+      "+ 2 more items"
+    ],
+    "waLink": "https://wa.me/917262866254?text=Interested%20in%20Festival%20Blessings%20Pack"
+  },
+  {
+    "id": 12,
+    "name": "Home Sweet Home Hamper",
+    "description": "Perfect welcome gift for a new beginning",
+    "tag": "Housewarming",
+    "category": "Housewarming",
+    "featured": false,
+    "imageSrc": "/src/assets/product_imgs/mixed_berries.png",
+    "imageAlt": "Home Sweet Home Hamper",
+    "includes": [
+      "500g Mixed Berries Blend",
+      "500g Premium Cashews",
+      "250g Dried Blueberries",
+      "250g Almonds",
+      "+ 2 more items"
+    ],
+    "waLink": "https://wa.me/917262866254?text=Interested%20in%20Home%20Sweet%20Home%20Hamper"
+  }
+]

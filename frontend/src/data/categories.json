@@ -1,0 +1,10 @@
+[
+  { "name": "Exotic Nuts", "img": "pistachios" },
+  { "name": "Dry Fruits", "img": "mixed_dryfruit" },
+  { "name": "Berries", "img": "mixed_berries" },
+  { "name": "Seeds &\nSuperfoods", "img": "pumpkin_seeds" },
+  { "name": "Gift Hampers", "img": "dryfruits_falling" },
+  { "name": "Corporate Packs", "img": "dryfruit bowl" },
+  { "name": "Subscription\nBoxes", "img": "almonds" },
+  { "name": "Organic\nSuperfoods", "img": "goji_berries" }
+]

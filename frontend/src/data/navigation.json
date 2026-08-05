@@ -1,0 +1,18 @@
+{
+  "locations": [
+    "Mumbai",
+    "Pune",
+    "Nagpur",
+    "Kanpur",
+    "Delhi",
+    "Chennai",
+    "Hyderabad",
+    "Kolkata",
+    "Bhubaneswar",
+    "Lucknow"
+  ],
+  "roles": {
+    "signIn": ["Buyer", "Seller"],
+    "signUp": ["Buyer", "Seller", "Guest"]
+  }
+}

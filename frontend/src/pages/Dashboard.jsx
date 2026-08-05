@@ -394,6 +394,18 @@ const Dashboard = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUpgradeToast, setShowUpgradeToast] = useState(false);
 
+  // Compute dynamic stats adjusting for new purchases and cancelled orders (TC61, TC62)
+  const dynamicOrdersCount = useMemo(() => {
+    const cancelledCount = (orders || []).filter(o => (o.order_status || '').toUpperCase() === 'CANCELLED').length;
+    return Math.max(0, totalOrdersCount - cancelledCount);
+  }, [orders, totalOrdersCount]);
+
+  const dynamicTotalSpent = useMemo(() => {
+    const baseline = totalOrdersCount * 650;
+    const cancelledAmount = (orders || []).filter(o => (o.order_status || '').toUpperCase() === 'CANCELLED').reduce((sum, o) => sum + (Number(o.total_amount) || 650), 0);
+    return Math.max(0, baseline - cancelledAmount);
+  }, [orders, totalOrdersCount]);
+
   const [tempProfile, setTempProfile] = useState({
     name: user.name,
     phone: user.phone,
@@ -1981,12 +1993,12 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs">
                   <span className="text-[9px] text-slate-400 font-black uppercase tracking-wider block">Total Spent</span>
-                  <span className="text-2xl font-black text-slate-800 leading-none">₹{(totalOrdersCount * 650).toLocaleString()}</span>
+                  <span className="text-2xl font-black text-slate-800 leading-none">₹{dynamicTotalSpent.toLocaleString()}</span>
                   <span className="text-[9px] text-emerald-600 font-bold block mt-1">● Within budget limits</span>
                 </div>
                 <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs">
                   <span className="text-[9px] text-slate-400 font-black uppercase tracking-wider block">Total Orders</span>
-                  <span className="text-2xl font-black text-slate-800 leading-none">{totalOrdersCount}</span>
+                  <span className="text-2xl font-black text-slate-800 leading-none">{dynamicOrdersCount}</span>
                   <span className="text-[9px] text-emerald-600 font-bold block mt-1">● Avg 5 orders per month</span>
                 </div>
                 <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs">

@@ -286,8 +286,8 @@ const LineChart = () => {
           className="w-full h-auto overflow-visible"
         >
           {/* Horizontal Gridlines */}
-          {ticks.map((tick) => (
-            <g key={tick}>
+          {ticks.map((tick, idx) => (
+            <g key={idx}>
               <line 
                 x1={paddingLeft} 
                 y1={getY(tick)} 

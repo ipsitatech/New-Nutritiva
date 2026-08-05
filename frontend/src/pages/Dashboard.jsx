@@ -1904,7 +1904,28 @@ const Dashboard = () => {
                             const p = products.find(prod => prod.id === oi.product_id);
                             return p && p.name.toLowerCase().includes(q);
                           });
-                          return matchOrderId || matchProduct;
+
+                          // Match Date (ISO, US, and UK/India locale formats)
+                          let matchDate = false;
+                          if (ord.delivery_date) {
+                            const dateStr = ord.delivery_date.toLowerCase();
+                            if (dateStr.includes(q)) {
+                              matchDate = true;
+                            } else {
+                              try {
+                                const d = new Date(ord.delivery_date);
+                                if (!isNaN(d.getTime())) {
+                                  const localeStr = d.toLocaleDateString('en-US').toLowerCase();
+                                  const localeStr2 = d.toLocaleDateString('en-GB').toLowerCase();
+                                  if (localeStr.includes(q) || localeStr2.includes(q)) {
+                                    matchDate = true;
+                                  }
+                                }
+                              } catch (e) {}
+                            }
+                          }
+
+                          return matchOrderId || matchProduct || matchDate;
                         });
 
                         if (filtered.length === 0) {

@@ -5,7 +5,7 @@ const LineChart = () => {
   const { orders, subscriptions } = useApp();
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   
-  const [filterType, setFilterType] = useState('this_year');
+  const [filterType, setFilterType] = useState('all');
   const [customYear, setCustomYear] = useState('');
   const [chartYear, setChartYear] = useState(new Date().getFullYear());
   const [validationError, setValidationError] = useState('');
@@ -27,9 +27,11 @@ const LineChart = () => {
     const dateSrc = ord.created_at || ord.delivery_date;
     if (dateSrc) {
       const d = new Date(dateSrc);
-      if (!isNaN(d.getTime()) && d.getFullYear() === chartYear) {
-        const month = d.getMonth();
-        ordersData[month] += Number(ord.total_amount) || 0;
+      if (!isNaN(d.getTime())) {
+        if (filterType === 'all' || d.getFullYear() === chartYear) {
+          const month = d.getMonth();
+          ordersData[month] += Number(ord.total_amount) || 0;
+        }
       }
     }
   });
@@ -40,16 +42,18 @@ const LineChart = () => {
     const dateSrc = sub.created_at || sub.start_date;
     if (dateSrc) {
       const d = new Date(dateSrc);
-      if (!isNaN(d.getTime()) && d.getFullYear() === chartYear) {
-        const month = d.getMonth();
-        const planName = (sub.plan_name || '').toLowerCase();
-        let amount = 0;
-        if (planName.includes('platinum')) {
-          amount = planName.includes('year') ? 2399 : 299;
-        } else if (planName.includes('pro')) {
-          amount = planName.includes('year') ? 1199 : 149;
+      if (!isNaN(d.getTime())) {
+        if (filterType === 'all' || d.getFullYear() === chartYear) {
+          const month = d.getMonth();
+          const planName = (sub.plan_name || '').toLowerCase();
+          let amount = 0;
+          if (planName.includes('platinum')) {
+            amount = planName.includes('year') ? 2399 : 299;
+          } else if (planName.includes('pro')) {
+            amount = planName.includes('year') ? 1199 : 149;
+          }
+          subsData[month] += amount;
         }
-        subsData[month] += amount;
       }
     }
   });
@@ -178,6 +182,7 @@ const LineChart = () => {
               }}
               className="border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 text-slate-600 font-medium text-xs focus:outline-none cursor-pointer"
             >
+              <option value="all">All</option>
               <option value="this_year">This Year</option>
               <option value="last_year">Last Year</option>
               <option value="custom">Custom Year...</option>
@@ -341,7 +346,7 @@ const LineChart = () => {
             className="absolute z-10 -translate-x-1/2 -translate-y-full bg-slate-900 text-white text-xs rounded-xl p-3 shadow-xl min-w-36 pointer-events-none transition-all duration-75 border border-slate-800"
           >
             <div className="font-semibold border-b border-slate-800 pb-1 mb-1.5 flex justify-between">
-              <span>{months[hoverIndex]} {chartYear}</span>
+              <span>{months[hoverIndex]} {filterType === 'all' ? '(All Years)' : chartYear}</span>
             </div>
             <div className="flex justify-between items-center gap-4 mb-0.5">
               <span className="flex items-center gap-1.5 text-slate-400">

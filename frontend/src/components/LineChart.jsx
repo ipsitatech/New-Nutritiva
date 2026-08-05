@@ -22,6 +22,27 @@ const LineChart = () => {
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const containerRef = useRef(null);
 
+  const [filterType, setFilterType] = useState('this_year');
+  const [customYear, setCustomYear] = useState('');
+  const [validationError, setValidationError] = useState('');
+
+  const handleCustomYearChange = (e) => {
+    const val = e.target.value;
+    setCustomYear(val);
+    
+    if (!/^\d{4}$/.test(val)) {
+      setValidationError('Validation: Please enter a valid 4-digit year');
+    } else {
+      const yearInt = parseInt(val, 10);
+      const currentYear = new Date().getFullYear();
+      if (yearInt < 2000 || yearInt > currentYear + 10) {
+        setValidationError(`Validation: Year must be between 2000 and ${currentYear + 10}`);
+      } else {
+        setValidationError('');
+      }
+    }
+  };
+
   // Helper to calculate X and Y coordinates
   const getX = (index) => paddingLeft + (index / (months.length - 1)) * graphWidth;
   const getY = (val) => paddingTop + graphHeight - (val / maxVal) * graphHeight;
@@ -83,10 +104,41 @@ const LineChart = () => {
             <span className="w-3 h-3 rounded-full bg-amber-500 block"></span>
             <span className="text-slate-600 font-medium">Subscriptions</span>
           </div>
-          <select className="border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 text-slate-600 font-medium text-xs focus:outline-none">
-            <option>This Year</option>
-            <option>Last Year</option>
-          </select>
+          <div className="flex flex-col items-end gap-1.5 relative">
+            <select 
+              value={filterType}
+              onChange={(e) => {
+                setFilterType(e.target.value);
+                if (e.target.value !== 'custom') {
+                  setCustomYear('');
+                  setValidationError('');
+                }
+              }}
+              className="border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 text-slate-600 font-medium text-xs focus:outline-none cursor-pointer"
+            >
+              <option value="this_year">This Year</option>
+              <option value="last_year">Last Year</option>
+              <option value="custom">Custom Year...</option>
+            </select>
+            
+            {filterType === 'custom' && (
+              <div className="flex flex-col items-end absolute right-0 top-9 bg-white border border-slate-200 rounded-xl p-3 shadow-md z-30 min-w-44">
+                <span className="text-[10px] text-slate-400 font-bold block mb-1">Enter Year:</span>
+                <input 
+                  type="text"
+                  placeholder="e.g. 2025"
+                  value={customYear}
+                  onChange={handleCustomYearChange}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:border-brand-green"
+                />
+                {validationError && (
+                  <span className="text-[9px] text-red-500 font-bold block mt-1.5 text-right w-full leading-tight">
+                    {validationError}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

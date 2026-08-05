@@ -12,14 +12,29 @@ const LineChart = () => {
 
   const currentYear = new Date().getFullYear();
 
-  // Keep chartYear updated when standard filter presets are selected
-  useEffect(() => {
-    if (filterType === 'this_year') {
-      setChartYear(currentYear);
-    } else if (filterType === 'last_year') {
-      setChartYear(currentYear - 1);
+  // Dynamically compute all unique available years in the database records
+  const availableYears = new Set();
+  (orders || []).forEach(ord => {
+    const dateSrc = ord.created_at || ord.delivery_date;
+    if (dateSrc) {
+      const d = new Date(dateSrc);
+      if (!isNaN(d.getTime())) {
+        availableYears.add(d.getFullYear());
+      }
     }
-  }, [filterType, currentYear]);
+  });
+  (subscriptions || []).forEach(sub => {
+    const dateSrc = sub.created_at || sub.start_date;
+    if (dateSrc) {
+      const d = new Date(dateSrc);
+      if (!isNaN(d.getTime())) {
+        availableYears.add(d.getFullYear());
+      }
+    }
+  });
+  // Always ensure the current year is in the list
+  availableYears.add(currentYear);
+  const sortedYears = Array.from(availableYears).sort((a, b) => b - a);
 
   // Compute dynamic orders data for the selected chartYear
   const ordersData = Array(12).fill(0);
@@ -195,17 +210,22 @@ const LineChart = () => {
             <select 
               value={filterType}
               onChange={(e) => {
-                setFilterType(e.target.value);
-                if (e.target.value !== 'custom') {
+                const val = e.target.value;
+                setFilterType(val);
+                if (val !== 'custom') {
                   setCustomYear('');
                   setValidationError('');
+                  if (val !== 'all') {
+                    setChartYear(parseInt(val, 10));
+                  }
                 }
               }}
               className="border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 text-slate-600 font-medium text-xs focus:outline-none cursor-pointer"
             >
               <option value="all">All</option>
-              <option value="this_year">This Year</option>
-              <option value="last_year">Last Year</option>
+              {sortedYears.map(yr => (
+                <option key={yr} value={String(yr)}>{yr}</option>
+              ))}
               <option value="custom">Custom Year...</option>
             </select>
             

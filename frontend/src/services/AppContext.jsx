@@ -31,12 +31,12 @@ export const initialProducts = [
   { id: 'pepper', name: 'Whole Black Pepper', weight: '200g', price: 189, originalPrice: 249, discount: '24% OFF', rating: 4.6, reviews: '720', category: 'Spices & Herbs', image: 'seeds' },
 
   // Honey & Sweeteners
-  { id: 'honey', name: 'Wild Forest Honey', weight: '500g', price: 349, originalPrice: 449, discount: '22% OFF', rating: 4.7, reviews: '1.5k', category: 'Honey & Sweeteners', image: 'raisins' },
-  { id: 'jaggery', name: 'Organic Jaggery Powder', weight: '1kg', price: 129, originalPrice: 179, discount: '28% OFF', rating: 4.5, reviews: '840', category: 'Honey & Sweeteners', image: 'walnuts' },
+  { id: 'honey', name: 'Wild Forest Honey', weight: '500g', price: 349, originalPrice: 449, discount: '22% OFF', rating: 4.7, reviews: '1.5k', category: 'Honey & Sweeteners', image: 'honey' },
+  { id: 'jaggery', name: 'Organic Jaggery Powder', weight: '1kg', price: 129, originalPrice: 179, discount: '28% OFF', rating: 4.5, reviews: '840', category: 'Honey & Sweeteners', image: 'jaggery' },
 
   // Wellness & Immunity
-  { id: 'juice', name: 'Giloy Amla Juice', weight: '1L', price: 289, originalPrice: 399, discount: '27% OFF', rating: 4.6, reviews: '310', category: 'Wellness & Immunity', image: 'raisins' },
-  { id: 'ashwagandha', name: 'Ashwagandha Capsules', weight: '60 caps', price: 449, originalPrice: 599, discount: '25% OFF', rating: 4.8, reviews: '580', category: 'Wellness & Immunity', image: 'almonds' },
+  { id: 'juice', name: 'Giloy Amla Juice', weight: '1L', price: 289, originalPrice: 399, discount: '27% OFF', rating: 4.6, reviews: '310', category: 'Wellness & Immunity', image: 'juice' },
+  { id: 'ashwagandha', name: 'Ashwagandha Capsules', weight: '60 caps', price: 449, originalPrice: 599, discount: '25% OFF', rating: 4.8, reviews: '580', category: 'Wellness & Immunity', image: 'ashwagandha' },
 
   // Gift Packs
   { id: 'giftbox', name: 'Royal Dry Fruit Gift Box', weight: '800g', price: 1299, originalPrice: 1799, discount: '27% OFF', rating: 4.9, reviews: '1.2k', category: 'Gift Packs', image: 'hero_nuts_bowl' },

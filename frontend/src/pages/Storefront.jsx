@@ -22,6 +22,12 @@ import catDriedBerriesImg from '../assets/category_dried_berries.png';
 import catSeedsImg from '../assets/category_seeds_superfoods.png';
 import catExoticNutsImg from '../assets/category_exotic_nuts.png';
 
+// Import new high-fidelity product images
+import honeyImg from '../assets/honey.png';
+import jaggeryImg from '../assets/jaggery.png';
+import juiceImg from '../assets/juice.png';
+import ashwagandhaImg from '../assets/ashwagandha.png';
+
 // Maps image names to imported files
 const imageMap = {
   almonds: almondsImg,
@@ -38,10 +44,10 @@ const imageMap = {
   quinoa: seedsImg,
   turmeric: spicesImg,
   pepper: seedsImg,
-  honey: raisinsImg,
-  jaggery: walnutsImg,
-  juice: raisinsImg,
-  ashwagandha: almondsImg,
+  honey: honeyImg,
+  jaggery: jaggeryImg,
+  juice: juiceImg,
+  ashwagandha: ashwagandhaImg,
   giftbox: heroNutsBowl,
   seedsbox: heroNutsBowl,
   // Fallbacks

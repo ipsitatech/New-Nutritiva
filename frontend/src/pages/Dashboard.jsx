@@ -24,6 +24,12 @@ import seedsImg from '../assets/seeds.png';
 import spicesImg from '../assets/spices.png';
 import heroNutsBowl from '../assets/hero_nuts_bowl.png';
 
+// Import new high-fidelity product images
+import honeyImg from '../assets/honey.png';
+import jaggeryImg from '../assets/jaggery.png';
+import juiceImg from '../assets/juice.png';
+import ashwagandhaImg from '../assets/ashwagandha.png';
+
 const imageMap = {
   almonds: almondsImg,
   cashews: cashewsImg,
@@ -39,10 +45,10 @@ const imageMap = {
   quinoa: seedsImg,
   turmeric: spicesImg,
   pepper: seedsImg,
-  honey: raisinsImg,
-  jaggery: walnutsImg,
-  juice: raisinsImg,
-  ashwagandha: almondsImg,
+  honey: honeyImg,
+  jaggery: jaggeryImg,
+  juice: juiceImg,
+  ashwagandha: ashwagandhaImg,
   giftbox: heroNutsBowl,
   seedsbox: heroNutsBowl,
   pumpkin_seeds: seedsImg,

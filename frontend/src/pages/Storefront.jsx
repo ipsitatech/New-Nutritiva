@@ -461,10 +461,14 @@ const Storefront = () => {
     const name = p.name || '';
     const description = p.description || '';
     const category = p.category || '';
+    const weight = p.weight || '';
+    const price = String(p.price || '');
     
     const matchesSearch = name.toLowerCase().includes(searchQuery.trim().toLowerCase()) || 
                           description.toLowerCase().includes(searchQuery.trim().toLowerCase()) ||
-                          category.toLowerCase().includes(searchQuery.trim().toLowerCase());
+                          category.toLowerCase().includes(searchQuery.trim().toLowerCase()) ||
+                          weight.toLowerCase().includes(searchQuery.trim().toLowerCase()) ||
+                          price.includes(searchQuery.trim());
     
     if (searchQuery) {
       return matchesSearch;
@@ -688,6 +692,7 @@ const Storefront = () => {
               placeholder="Search for nuts, dry fruits, seeds, spices & more..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              maxLength={255}
               className="flex-grow px-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none"
             />
             <button type="submit" className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-3 transition-colors shrink-0 rounded-r-xl">

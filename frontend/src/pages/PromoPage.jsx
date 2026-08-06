@@ -11,12 +11,54 @@ import raisinsImg   from '../assets/raisins.png';
 import seedsImg     from '../assets/seeds.png';
 import spicesImg    from '../assets/spices.png';
 import heroNutsBowl from '../assets/hero_nuts_bowl.png';
+import pumpkinSeedsImg from '../assets/pumpkin_seeds.png';
+import flaxSeedsImg from '../assets/flax_seeds.png';
+import makhanaImg from '../assets/makhana.png';
+import beetrootChipsImg from '../assets/beetroot_chips.png';
+import himalayanSaltImg from '../assets/himalayan_salt.png';
+import quinoaImg from '../assets/quinoa.png';
+import turmericImg from '../assets/turmeric.png';
+import pepperImg from '../assets/pepper.png';
+import pistachiosImg from '../assets/pistachios.png';
+import honeyImg from '../assets/honey.png';
+import jaggeryImg from '../assets/jaggery.png';
+import juiceImg from '../assets/juice.png';
+import ashwagandhaImg from '../assets/ashwagandha.png';
 
 const imageMap = {
-  almonds: almondsImg, cashews: cashewsImg, walnuts: walnutsImg,
-  raisins: raisinsImg, seeds: seedsImg, spices: spicesImg,
-  hero_nuts_bowl: heroNutsBowl, pistachios: almondsImg,
-  pumpkin: seedsImg, flax: seedsImg,
+  almonds: almondsImg,
+  cashews: cashewsImg,
+  walnuts: walnutsImg,
+  raisins: raisinsImg,
+  seeds: seedsImg,
+  spices: spicesImg,
+  pumpkin: pumpkinSeedsImg,
+  flax: flaxSeedsImg,
+  makhana: makhanaImg,
+  chips: beetrootChipsImg,
+  salt: himalayanSaltImg,
+  quinoa: quinoaImg,
+  turmeric: turmericImg,
+  pepper: pepperImg,
+  honey: honeyImg,
+  jaggery: jaggeryImg,
+  juice: juiceImg,
+  ashwagandha: ashwagandhaImg,
+  giftbox: heroNutsBowl,
+  seedsbox: heroNutsBowl,
+  hero_nuts_bowl: heroNutsBowl,
+  // Fallbacks
+  pumpkin_seeds: pumpkinSeedsImg,
+  himalayan_salt: himalayanSaltImg,
+  flax_seeds: flaxSeedsImg,
+  beetroot_chips: beetrootChipsImg,
+  sunflower_seeds: seedsImg,
+  mix_nuts: heroNutsBowl,
+  pistachios_small: pistachiosImg,
+  cashews_small: cashewsImg,
+  almonds_small: almondsImg,
+  walnuts_small: walnutsImg,
+  pistachios: pistachiosImg
 };
 
 const PROMO_CONFIG = {

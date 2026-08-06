@@ -1212,17 +1212,17 @@ const Storefront = () => {
               View All <ArrowRight className="w-3.5 h-3.5" />
             </span>
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 sm:gap-6">
             {categoryQuickLinks.map((item, index) => (
               <div 
                 key={index} 
                 onClick={() => handleQuickLinkClick(item.name)} 
                 className="flex flex-col items-center group cursor-pointer"
               >
-                <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center p-2 mb-3 group-hover:scale-110 transition-all duration-300" style={{background: 'linear-gradient(135deg, #fff0f5, white)', border: '2px solid rgba(255,180,200,0.4)', boxShadow: '0 4px 16px rgba(255,100,150,0.12)'}}>
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden flex items-center justify-center p-2 mb-3 group-hover:scale-110 transition-all duration-300" style={{background: 'linear-gradient(135deg, #fff0f5, white)', border: '2px solid rgba(255,180,200,0.4)', boxShadow: '0 4px 16px rgba(255,100,150,0.12)'}}>
                   <img src={item.img} alt={item.name} className="w-full h-full object-contain drop-shadow-md" />
                 </div>
-                <span className="text-xs font-bold text-slate-600 group-hover:text-brand-green transition-colors text-center">{item.name}</span>
+                <span className="text-[11px] sm:text-xs font-bold text-slate-600 group-hover:text-brand-green transition-colors text-center leading-tight">{item.name}</span>
               </div>
             ))}
           </div>

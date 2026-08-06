@@ -227,10 +227,10 @@ VALUES
 (12, 4, 1, 'Organic Quinoa', 'SKU-NUTR-ORGANIC-QUINOA', 'Premium quality organic Organic Quinoa loaded with nutrients.', 299.00, 500, 150, 'seeds', 1),
 (13, 5, 1, 'Organic Turmeric Powder', 'SKU-NUTR-ORGANIC-TURMERIC-POWDER', 'Premium quality organic Organic Turmeric Powder loaded with nutrients.', 99.00, 250, 150, 'spices', 1),
 (14, 5, 1, 'Whole Black Pepper', 'SKU-NUTR-WHOLE-BLACK-PEPPER', 'Premium quality organic Whole Black Pepper loaded with nutrients.', 189.00, 200, 150, 'seeds', 1),
-(15, 6, 1, 'Wild Forest Honey', 'SKU-NUTR-WILD-FOREST-HONEY', 'Premium quality organic Wild Forest Honey loaded with nutrients.', 349.00, 500, 150, 'raisins', 1),
-(16, 6, 1, 'Organic Jaggery Powder', 'SKU-NUTR-ORGANIC-JAGGERY-POWDER', 'Premium quality organic Organic Jaggery Powder loaded with nutrients.', 129.00, 1000, 150, 'walnuts', 1),
-(17, 7, 1, 'Giloy Amla Juice', 'SKU-NUTR-GILOY-AMLA-JUICE', 'Premium quality organic Giloy Amla Juice loaded with nutrients.', 289.00, 1000, 150, 'raisins', 1),
-(18, 7, 1, 'Ashwagandha Capsules', 'SKU-NUTR-ASHWAGANDHA-CAPSULES', 'Premium quality organic Ashwagandha Capsules loaded with nutrients.', 449.00, 120, 150, 'almonds', 1),
+(15, 6, 1, 'Wild Forest Honey', 'SKU-NUTR-WILD-FOREST-HONEY', 'Premium quality organic Wild Forest Honey loaded with nutrients.', 349.00, 500, 150, 'honey', 1),
+(16, 6, 1, 'Organic Jaggery Powder', 'SKU-NUTR-ORGANIC-JAGGERY-POWDER', 'Premium quality organic Organic Jaggery Powder loaded with nutrients.', 129.00, 1000, 150, 'jaggery', 1),
+(17, 7, 1, 'Giloy Amla Juice', 'SKU-NUTR-GILOY-AMLA-JUICE', 'Premium quality organic Giloy Amla Juice loaded with nutrients.', 289.00, 1000, 150, 'juice', 1),
+(18, 7, 1, 'Ashwagandha Capsules', 'SKU-NUTR-ASHWAGANDHA-CAPSULES', 'Premium quality organic Ashwagandha Capsules loaded with nutrients.', 449.00, 120, 150, 'ashwagandha', 1),
 (19, 8, 1, 'Royal Dry Fruit Gift Box', 'SKU-NUTR-ROYAL-DRY-FRUIT-GIFT-BOX', 'Premium quality organic Royal Dry Fruit Gift Box loaded with nutrients.', 1299.00, 800, 150, 'hero_nuts_bowl', 1),
 (20, 8, 1, 'Healthy Seeds Assortment Box', 'SKU-NUTR-HEALTHY-SEEDS-ASSORTMENT-BOX', 'Premium quality organic Healthy Seeds Assortment Box loaded with nutrients.', 799.00, 600, 150, 'hero_nuts_bowl', 1);
 

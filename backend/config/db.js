@@ -400,10 +400,10 @@ const initDB = async () => {
         { id: 12, name: 'Organic Quinoa', weight: 500, price: 299, originalPrice: 399, category_id: 4, image: 'seeds' },
         { id: 13, name: 'Organic Turmeric Powder', weight: 250, price: 99, originalPrice: 149, category_id: 5, image: 'spices' },
         { id: 14, name: 'Whole Black Pepper', weight: 200, price: 189, originalPrice: 249, category_id: 5, image: 'seeds' },
-        { id: 15, name: 'Wild Forest Honey', weight: 500, price: 349, originalPrice: 449, category_id: 6, image: 'raisins' },
-        { id: 16, name: 'Organic Jaggery Powder', weight: 1000, price: 129, originalPrice: 179, category_id: 6, image: 'walnuts' },
-        { id: 17, name: 'Giloy Amla Juice', weight: 1000, price: 289, originalPrice: 399, category_id: 7, image: 'raisins' },
-        { id: 18, name: 'Ashwagandha Capsules', weight: 120, price: 449, originalPrice: 599, category_id: 7, image: 'almonds' },
+        { id: 15, name: 'Wild Forest Honey', weight: 500, price: 349, originalPrice: 449, category_id: 6, image: 'honey' },
+        { id: 16, name: 'Organic Jaggery Powder', weight: 1000, price: 129, originalPrice: 179, category_id: 6, image: 'jaggery' },
+        { id: 17, name: 'Giloy Amla Juice', weight: 1000, price: 289, originalPrice: 399, category_id: 7, image: 'juice' },
+        { id: 18, name: 'Ashwagandha Capsules', weight: 120, price: 449, originalPrice: 599, category_id: 7, image: 'ashwagandha' },
         { id: 19, name: 'Royal Dry Fruit Gift Box', weight: 800, price: 1299, originalPrice: 1799, category_id: 8, image: 'hero_nuts_bowl' },
         { id: 20, name: 'Healthy Seeds Assortment Box', weight: 600, price: 799, originalPrice: 999, category_id: 8, image: 'hero_nuts_bowl' }
       ];

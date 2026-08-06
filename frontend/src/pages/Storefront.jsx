@@ -59,6 +59,7 @@ const imageMap = {
   ashwagandha: ashwagandhaImg,
   giftbox: heroNutsBowl,
   seedsbox: heroNutsBowl,
+  hero_nuts_bowl: heroNutsBowl,
   // Fallbacks
   pumpkin_seeds: pumpkinSeedsImg,
   himalayan_salt: himalayanSaltImg,

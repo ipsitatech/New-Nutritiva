@@ -231,8 +231,8 @@ VALUES
 (16, 6, 1, 'Organic Jaggery Powder', 'SKU-NUTR-ORGANIC-JAGGERY-POWDER', 'Premium quality organic Organic Jaggery Powder loaded with nutrients.', 129.00, 1000, 150, 'jaggery', 1),
 (17, 7, 1, 'Giloy Amla Juice', 'SKU-NUTR-GILOY-AMLA-JUICE', 'Premium quality organic Giloy Amla Juice loaded with nutrients.', 289.00, 1000, 150, 'juice', 1),
 (18, 7, 1, 'Ashwagandha Capsules', 'SKU-NUTR-ASHWAGANDHA-CAPSULES', 'Premium quality organic Ashwagandha Capsules loaded with nutrients.', 449.00, 120, 150, 'ashwagandha', 1),
-(19, 8, 1, 'Royal Dry Fruit Gift Box', 'SKU-NUTR-ROYAL-DRY-FRUIT-GIFT-BOX', 'Premium quality organic Royal Dry Fruit Gift Box loaded with nutrients.', 1299.00, 800, 150, 'hero_nuts_bowl', 1),
-(20, 8, 1, 'Healthy Seeds Assortment Box', 'SKU-NUTR-HEALTHY-SEEDS-ASSORTMENT-BOX', 'Premium quality organic Healthy Seeds Assortment Box loaded with nutrients.', 799.00, 600, 150, 'hero_nuts_bowl', 1);
+(19, 8, 1, 'Royal Dry Fruit Gift Box', 'SKU-NUTR-ROYAL-DRY-FRUIT-GIFT-BOX', 'Premium quality organic Royal Dry Fruit Gift Box loaded with nutrients.', 1299.00, 800, 150, 'giftbox', 1),
+(20, 8, 1, 'Healthy Seeds Assortment Box', 'SKU-NUTR-HEALTHY-SEEDS-ASSORTMENT-BOX', 'Premium quality organic Healthy Seeds Assortment Box loaded with nutrients.', 799.00, 600, 150, 'seedsbox', 1);
 
 -- Seed Mock Order History
 INSERT INTO orders (id, buyer_id, order_number, total_amount, payment_status, order_status, delivery_date, created_at, updated_at)

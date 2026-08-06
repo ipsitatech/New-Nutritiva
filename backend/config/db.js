@@ -404,8 +404,8 @@ const initDB = async () => {
         { id: 16, name: 'Organic Jaggery Powder', weight: 1000, price: 129, originalPrice: 179, category_id: 6, image: 'jaggery' },
         { id: 17, name: 'Giloy Amla Juice', weight: 1000, price: 289, originalPrice: 399, category_id: 7, image: 'juice' },
         { id: 18, name: 'Ashwagandha Capsules', weight: 120, price: 449, originalPrice: 599, category_id: 7, image: 'ashwagandha' },
-        { id: 19, name: 'Royal Dry Fruit Gift Box', weight: 800, price: 1299, originalPrice: 1799, category_id: 8, image: 'hero_nuts_bowl' },
-        { id: 20, name: 'Healthy Seeds Assortment Box', weight: 600, price: 799, originalPrice: 999, category_id: 8, image: 'hero_nuts_bowl' }
+        { id: 19, name: 'Royal Dry Fruit Gift Box', weight: 800, price: 1299, originalPrice: 1799, category_id: 8, image: 'giftbox' },
+        { id: 20, name: 'Healthy Seeds Assortment Box', weight: 600, price: 799, originalPrice: 999, category_id: 8, image: 'seedsbox' }
       ];
 
       for (const p of initialProducts) {

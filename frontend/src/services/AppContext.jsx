@@ -257,6 +257,10 @@ export const AppProvider = ({ children }) => {
 
   // Cart operations
   const addToCart = (product) => {
+    if (product.stock_quantity <= 0) {
+      alert('This product is currently out of stock.');
+      return;
+    }
     authFetch('http://localhost:5000/api/cart', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -277,6 +281,11 @@ export const AppProvider = ({ children }) => {
   };
 
   const updateQuantity = (productId, quantity) => {
+    const prod = products.find(p => p.id === productId);
+    if (prod && quantity > prod.stock_quantity) {
+      alert(`Only ${prod.stock_quantity} units of ${prod.name} are available in stock.`);
+      return;
+    }
     authFetch('http://localhost:5000/api/cart', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

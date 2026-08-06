@@ -1418,8 +1418,15 @@ const Storefront = () => {
                     <span className="text-[10px] text-slate-400 font-semibold line-through">₹{p.originalPrice}</span>
                   </div>
 
-                  {/* Add to Cart button */}
-                  {inCart ? (
+                   {/* Add to Cart button */}
+                  {p.stock_quantity <= 0 ? (
+                    <button
+                      disabled
+                      className="w-full bg-slate-100 text-slate-400 text-xs font-extrabold py-2 rounded-xl cursor-not-allowed text-center border border-slate-200"
+                    >
+                      Out of Stock
+                    </button>
+                  ) : inCart ? (
                     /* Blinkit Style quantity selector */
                     <div className="w-full bg-[#105335] text-white text-xs font-black py-2 rounded-xl flex items-center justify-between px-3 shadow-xs">
                       <button 

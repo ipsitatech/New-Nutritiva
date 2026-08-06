@@ -343,7 +343,14 @@ export default function CategoryPage() {
                     </div>
 
                     {/* Add to cart */}
-                    {inCart ? (
+                    {p.stock_quantity <= 0 ? (
+                      <button
+                        disabled
+                        className="w-full py-2.5 rounded-xl text-xs font-black text-slate-400 bg-slate-100 border border-slate-200 cursor-not-allowed text-center"
+                      >
+                        Out of Stock
+                      </button>
+                    ) : inCart ? (
                       <div className="flex items-center justify-between bg-white border rounded-xl px-3 py-1.5" style={{ borderColor: cfg.accentBorder }}>
                         <button onClick={() => addToCart({ ...p, quantity: -1 })} className="font-black text-sm" style={{ color: '#105335' }}>−</button>
                         <span className="text-xs font-black text-slate-700">{inCart.quantity} in cart</span>

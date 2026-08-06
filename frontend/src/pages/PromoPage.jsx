@@ -353,7 +353,14 @@ export default function PromoPage() {
                     </div>
 
                     {/* Add to Cart */}
-                    {inCart ? (
+                    {p.stock_quantity <= 0 ? (
+                      <button
+                        disabled
+                        className="w-full py-2 rounded-xl text-xs font-black text-slate-400 bg-slate-100 border border-slate-200 cursor-not-allowed text-center"
+                      >
+                        Out of Stock
+                      </button>
+                    ) : inCart ? (
                       <div className="flex items-center justify-between bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-1.5">
                         <button onClick={() => addToCart({ ...p, quantity: -1 })} className="text-emerald-600 font-black text-sm">−</button>
                         <span className="text-emerald-700 font-black text-xs">{inCart.quantity} in cart</span>

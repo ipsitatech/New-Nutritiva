@@ -1337,7 +1337,7 @@ const Storefront = () => {
               <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 text-3xl mb-4 border border-slate-100">
                 🔍
               </div>
-              <h3 className="text-base font-black text-slate-800 mb-1">No Matching Products</h3>
+              <h3 className="text-base font-black text-slate-800 mb-1">No Products Found</h3>
               <p className="text-xs text-slate-500 font-semibold mb-6 max-w-sm leading-relaxed">
                 We couldn't find any products matching "{searchQuery}". Try verifying the spelling or exploring another category.
               </p>

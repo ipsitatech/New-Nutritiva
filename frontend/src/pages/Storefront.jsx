@@ -710,9 +710,10 @@ const Storefront = () => {
           <div className="flex items-center gap-6">
             <button 
               onClick={() => {
-                localStorage.removeItem("nutritva_token");
-                localStorage.removeItem("nutritva_role");
-                window.location.href = '/';
+                setSearchQuery('');
+                setActiveCategory('All Categories');
+                setCurrentPage('store');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               className="flex flex-col items-center gap-0.5 text-slate-700 hover:text-brand-green font-bold text-xs transition-colors"
             >

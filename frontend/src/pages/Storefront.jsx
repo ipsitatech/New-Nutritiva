@@ -646,7 +646,13 @@ const Storefront = () => {
             </div>
           </div>
           <form 
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={(e) => {
+              e.preventDefault();
+              const grid = document.getElementById('products-grid');
+              if (grid) {
+                grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}
             className="flex-1 max-w-2xl hidden md:flex items-center border border-slate-200 rounded-xl relative shadow-xs hover:border-emerald-600 focus-within:border-emerald-600 focus-within:ring-1 focus-within:ring-emerald-600 transition-all bg-white"
           >
             {/* Custom Category Dropdown */}

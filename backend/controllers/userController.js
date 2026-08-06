@@ -15,6 +15,15 @@ exports.updateUserProfile = async (req, res) => {
   const { name, email, phone, dob, gender, city, status, reward_points, monthly_savings, total_orders, avatar } = req.body;
   try {
     const userId = req.userId;
+    
+    // Check if phone number is already registered by another user
+    if (phone) {
+      const existing = await dbGet('SELECT id FROM users WHERE phone = ? AND id != ?', [phone, userId]);
+      if (existing) {
+        return res.status(400).json({ error: 'Phone number is already registered by another user.' });
+      }
+    }
+
     await dbRun(`
       UPDATE users 
       SET name = ?, email = ?, phone = ?, dob = ?, gender = ?, city = ?, status = ?, reward_points = ?, monthly_savings = ?, total_orders = ?, avatar = ?

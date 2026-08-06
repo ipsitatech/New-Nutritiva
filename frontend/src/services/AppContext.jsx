@@ -245,9 +245,19 @@ export const AppProvider = ({ children }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nextVal)
       })
-      .then(res => res.json())
+      .then(async res => {
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to update user profile.');
+        }
+        return data;
+      })
       .then(freshUser => _setUser(freshUser))
-      .catch(err => console.error('Failed to sync user profile:', err));
+      .catch(err => {
+        console.error('Failed to sync user profile:', err);
+        alert(err.message);
+        _setUser(prev);
+      });
 
       return nextVal;
     });

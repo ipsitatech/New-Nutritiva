@@ -433,6 +433,8 @@ const Dashboard = () => {
     avatar: user.avatar || ''
   });
 
+  const [profileErrors, setProfileErrors] = useState({});
+
   useEffect(() => {
     setTempProfile({
       name: user.name,
@@ -1080,7 +1082,7 @@ const Dashboard = () => {
               {/* Profile Header Card */}
               <div className="rounded-3xl p-8 text-white relative overflow-hidden" style={{background: 'linear-gradient(135deg, #0d4a2e 0%, #105335 50%, #0a3d26 100%)', boxShadow: '0 12px 40px rgba(16,83,53,0.3)'}}>
                 <div className="absolute top-0 right-0 w-48 h-48 rounded-full opacity-10 -mr-16 -mt-16" style={{background: 'rgba(255,255,255,0.2)'}}></div>
-                <div className="flex items-center gap-6">
+                <div className="flex flex-col sm:flex-row items-center gap-6">
                   <div className="relative shrink-0">
                     <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl" style={{border: '4px solid rgba(255,255,255,0.3)'}}>
                       <img src={user.avatar || ipsitaAvatar} alt="Profile" className="w-full h-full object-cover" />
@@ -1099,28 +1101,28 @@ const Dashboard = () => {
                       onChange={handlePhotoChange}
                     />
                   </div>
-                  <div>
+                  <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
                     <h2 className="text-2xl font-black leading-tight">{user.name}</h2>
                     <p className="text-emerald-250 text-sm font-semibold mt-0.5">{user.email}</p>
-                    <div className="flex items-center gap-2 mt-2">
+                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-2">
                       <span className="inline-flex items-center gap-1.5 text-xs font-black px-3 py-1 rounded-full" style={{background: 'rgba(255,179,0,0.2)', color: '#FFB300', border: '1px solid rgba(255,179,0,0.3)'}}>
                         ✦ {user.status}
                       </span>
                       <span className="text-xs font-bold text-emerald-300">Since Jan 2024</span>
                     </div>
                   </div>
-                  <div className="ml-auto hidden md:grid grid-cols-3 gap-6 text-center">
+                  <div className="w-full sm:w-auto sm:ml-auto grid grid-cols-3 gap-4 sm:gap-6 text-center border-t border-emerald-800/40 sm:border-0 pt-4 sm:pt-0 mt-4 sm:mt-0">
                     <div>
-                      <p className="text-2xl font-black text-amber-400">24</p>
-                      <p className="text-xs text-emerald-200 font-semibold">Orders</p>
+                      <p className="text-xl sm:text-2xl font-black text-amber-400">24</p>
+                      <p className="text-[10px] sm:text-xs text-emerald-200 font-semibold">Orders</p>
                     </div>
                     <div>
-                      <p className="text-2xl font-black text-amber-400">₹8.4K</p>
-                      <p className="text-xs text-emerald-200 font-semibold">Spent</p>
+                      <p className="text-xl sm:text-2xl font-black text-amber-400">₹8.4K</p>
+                      <p className="text-[10px] sm:text-xs text-emerald-200 font-semibold">Spent</p>
                     </div>
                     <div>
-                      <p className="text-2xl font-black text-amber-400">1,240</p>
-                      <p className="text-xs text-emerald-200 font-semibold">Reward Pts</p>
+                      <p className="text-xl sm:text-2xl font-black text-amber-400">1,240</p>
+                      <p className="text-[10px] sm:text-xs text-emerald-200 font-semibold">Reward Pts</p>
                     </div>
                   </div>
                 </div>
@@ -1134,6 +1136,25 @@ const Dashboard = () => {
                     <h3 className="text-lg font-black text-slate-900">Personal Information</h3>
                     <button
                       onClick={() => {
+                        const errors = {};
+                        const nameVal = (tempProfile.name || '').trim();
+                        if (!nameVal) {
+                          errors.name = "Full Name is required.";
+                        } else if (/\d/.test(nameVal)) {
+                          errors.name = "Full Name cannot contain numbers.";
+                        } else if (/[^a-zA-Z\s.-]/.test(nameVal)) {
+                          errors.name = "Full Name cannot contain special characters.";
+                        } else if (nameVal.length > 100) {
+                          errors.name = "Full Name cannot exceed 100 characters.";
+                        }
+
+                        if (Object.keys(errors).length > 0) {
+                          setProfileErrors(errors);
+                          openDialog("Validation Error", errors.name, "⚠️");
+                          return;
+                        }
+
+                        setProfileErrors({});
                         setUser(prev => ({ ...prev, ...tempProfile }));
                         showToastNotification("🎉 Profile saved successfully!", "🎉");
                       }}
@@ -1152,10 +1173,16 @@ const Dashboard = () => {
                         value={tempProfile.name}
                         onChange={e => setTempProfile({ ...tempProfile, name: e.target.value })}
                         className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none transition-all"
-                        style={{background: '#f8fafc', border: '1.5px solid rgba(255,160,190,0.4)'}}
+                        style={{
+                          background: '#f8fafc',
+                          border: profileErrors.name ? '1.5px solid #ef4444' : '1.5px solid rgba(255,160,190,0.4)'
+                        }}
                         onFocus={e => e.target.style.borderColor = '#105335'}
-                        onBlur={e => e.target.style.borderColor = 'rgba(255,160,190,0.4)'}
+                        onBlur={e => e.target.style.borderColor = profileErrors.name ? '#ef4444' : 'rgba(255,160,190,0.4)'}
                       />
+                      {profileErrors.name && (
+                        <p className="text-red-500 text-[10px] font-bold mt-1">{profileErrors.name}</p>
+                      )}
                     </div>
                     <div>
                       <label className="text-xs font-black text-slate-700 block mb-1.5">Phone Number</label>

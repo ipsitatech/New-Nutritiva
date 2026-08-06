@@ -1124,7 +1124,28 @@ const Storefront = () => {
 
           {/* Right Banner Carousel matching image 1 */}
           <div 
-            className={`lg:col-span-3 rounded-3xl overflow-hidden shadow-md relative text-white flex flex-col md:flex-row items-center justify-between p-8 md:p-12 min-h-[380px] transition-all duration-700 bg-gradient-to-tr ${slides[carouselIndex].bgGradient}`}
+            onClick={() => {
+              if (carouselIndex === 0) {
+                setActiveCategory('All Categories');
+                setSearchQuery('');
+              } else if (carouselIndex === 1) {
+                setActiveCategory('Nuts & Dry Fruits');
+                setSearchQuery('Almonds');
+              } else if (carouselIndex === 2) {
+                setActiveCategory('Nuts & Dry Fruits');
+                setSearchQuery('Cashews');
+              } else if (carouselIndex === 3) {
+                setActiveCategory('Nuts & Dry Fruits');
+                setSearchQuery('Walnuts');
+              }
+              setTimeout(() => {
+                const grid = document.getElementById('products-grid');
+                if (grid) {
+                  grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }, 100);
+            }}
+            className={`lg:col-span-3 rounded-3xl overflow-hidden shadow-md relative text-white flex flex-col md:flex-row items-center justify-between p-8 md:p-12 min-h-[380px] transition-all duration-700 bg-gradient-to-tr ${slides[carouselIndex].bgGradient} cursor-pointer`}
             onMouseEnter={() => setIsCarouselHovered(true)}
             onMouseLeave={() => setIsCarouselHovered(false)}
           >
@@ -1141,33 +1162,13 @@ const Storefront = () => {
               </p>
               <div className="flex items-center justify-center md:justify-start gap-4">
                 <button 
-                  onClick={() => {
-                    if (carouselIndex === 0) {
-                      setActiveCategory('All Categories');
-                      setSearchQuery('');
-                    } else if (carouselIndex === 1) {
-                      setActiveCategory('Nuts & Dry Fruits');
-                      setSearchQuery('Almonds');
-                    } else if (carouselIndex === 2) {
-                      setActiveCategory('Nuts & Dry Fruits');
-                      setSearchQuery('Cashews');
-                    } else if (carouselIndex === 3) {
-                      setActiveCategory('Nuts & Dry Fruits');
-                      setSearchQuery('Walnuts');
-                    }
-                    setTimeout(() => {
-                      const grid = document.getElementById('products-grid');
-                      if (grid) {
-                        grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }
-                    }, 100);
-                  }}
                   className={`font-extrabold text-xs px-6 py-3 rounded-xl transition-all shadow-md active:scale-95 ${slides[carouselIndex].accentColor}`}
                 >
                   {slides[carouselIndex].btnText}
                 </button>
                 <button 
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     const nextIndex = (carouselIndex + 1) % slides.length;
                     setCarouselIndex(nextIndex);
                   }}
@@ -1192,7 +1193,10 @@ const Storefront = () => {
               {slides.map((_, dot) => (
                 <button 
                   key={dot} 
-                  onClick={() => setCarouselIndex(dot)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCarouselIndex(dot);
+                  }}
                   className={`w-2.5 h-2.5 rounded-full transition-all cursor-pointer ${dot === carouselIndex ? 'bg-white w-6' : 'bg-white/30'}`}
                 ></button>
               ))}

@@ -462,9 +462,9 @@ const Storefront = () => {
     const description = p.description || '';
     const category = p.category || '';
     
-    const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = name.toLowerCase().includes(searchQuery.trim().toLowerCase()) || 
+                          description.toLowerCase().includes(searchQuery.trim().toLowerCase()) ||
+                          category.toLowerCase().includes(searchQuery.trim().toLowerCase());
     
     if (searchQuery) {
       return matchesSearch;

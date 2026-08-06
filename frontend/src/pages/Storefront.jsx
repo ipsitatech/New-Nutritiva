@@ -1315,8 +1315,25 @@ const Storefront = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
-            {filteredProducts.map((p) => {
+          {filteredProducts.length === 0 ? (
+            <div className="bg-white rounded-3xl border border-slate-100 p-12 text-center shadow-xs flex flex-col items-center w-full col-span-full">
+              <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 text-3xl mb-4 border border-slate-100">
+                🔍
+              </div>
+              <h3 className="text-base font-black text-slate-800 mb-1">No Matching Products</h3>
+              <p className="text-xs text-slate-500 font-semibold mb-6 max-w-sm leading-relaxed">
+                We couldn't find any products matching "{searchQuery}". Try verifying the spelling or exploring another category.
+              </p>
+              <button
+                onClick={() => setSearchQuery('')}
+                className="bg-[#105335] hover:bg-emerald-800 text-white font-extrabold text-xs px-6 py-2.5 rounded-xl shadow-xs transition-all hover:scale-105 active:scale-95"
+              >
+                Clear Search & View All
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
+              {filteredProducts.map((p) => {
               const isWishlisted = wishlist.includes(p.id);
               const inCart = cart.find(item => item.product_id === p.id);
               
@@ -1401,6 +1418,7 @@ const Storefront = () => {
               );
             })}
           </div>
+          )}
         </section>
 
         {/* Promo Grid Banners styled exactly like the screenshot */}

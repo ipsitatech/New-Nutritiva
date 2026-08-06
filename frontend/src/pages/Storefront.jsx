@@ -27,6 +27,14 @@ import honeyImg from '../assets/honey.png';
 import jaggeryImg from '../assets/jaggery.png';
 import juiceImg from '../assets/juice.png';
 import ashwagandhaImg from '../assets/ashwagandha.png';
+import pumpkinSeedsImg from '../assets/pumpkin_seeds.png';
+import flaxSeedsImg from '../assets/flax_seeds.png';
+import makhanaImg from '../assets/makhana.png';
+import beetrootChipsImg from '../assets/beetroot_chips.png';
+import himalayanSaltImg from '../assets/himalayan_salt.png';
+import quinoaImg from '../assets/quinoa.png';
+import turmericImg from '../assets/turmeric.png';
+import pepperImg from '../assets/pepper.png';
 
 // Maps image names to imported files
 const imageMap = {
@@ -36,14 +44,14 @@ const imageMap = {
   raisins: raisinsImg,
   seeds: seedsImg,
   spices: spicesImg,
-  pumpkin: seedsImg,
-  flax: seedsImg,
-  makhana: cashewsImg,
-  chips: seedsImg,
-  salt: spicesImg,
-  quinoa: seedsImg,
-  turmeric: spicesImg,
-  pepper: seedsImg,
+  pumpkin: pumpkinSeedsImg,
+  flax: flaxSeedsImg,
+  makhana: makhanaImg,
+  chips: beetrootChipsImg,
+  salt: himalayanSaltImg,
+  quinoa: quinoaImg,
+  turmeric: turmericImg,
+  pepper: pepperImg,
   honey: honeyImg,
   jaggery: jaggeryImg,
   juice: juiceImg,
@@ -51,9 +59,9 @@ const imageMap = {
   giftbox: heroNutsBowl,
   seedsbox: heroNutsBowl,
   // Fallbacks
-  pumpkin_seeds: seedsImg,
-  himalayan_salt: spicesImg,
-  flax_seeds: seedsImg,
+  pumpkin_seeds: pumpkinSeedsImg,
+  himalayan_salt: himalayanSaltImg,
+  flax_seeds: flaxSeedsImg,
   sunflower_seeds: seedsImg,
   mix_nuts: heroNutsBowl,
   pistachios_small: almondsImg,

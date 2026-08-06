@@ -15,20 +15,20 @@ export const initialProducts = [
 
   // Seeds & Superfoods
   { id: 'seeds', name: 'Chia Seeds', weight: '250g', price: 199, originalPrice: 249, discount: '20% OFF', rating: 4.7, reviews: '890', category: 'Seeds & Superfoods', image: 'seeds' },
-  { id: 'pumpkin', name: 'Pumpkin Seeds', weight: '250g', price: 249, originalPrice: 299, discount: '16% OFF', rating: 4.6, reviews: '340', category: 'Seeds & Superfoods', image: 'seeds' },
-  { id: 'flax', name: 'Flax Seeds', weight: '250g', price: 129, originalPrice: 169, discount: '23% OFF', rating: 4.5, reviews: '280', category: 'Seeds & Superfoods', image: 'seeds' },
+  { id: 'pumpkin', name: 'Pumpkin Seeds', weight: '250g', price: 249, originalPrice: 299, discount: '16% OFF', rating: 4.6, reviews: '340', category: 'Seeds & Superfoods', image: 'pumpkin_seeds' },
+  { id: 'flax', name: 'Flax Seeds', weight: '250g', price: 129, originalPrice: 169, discount: '23% OFF', rating: 4.5, reviews: '280', category: 'Seeds & Superfoods', image: 'flax_seeds' },
 
   // Healthy Snacks
-  { id: 'makhana', name: 'Roasted Makhana', weight: '150g', price: 180, originalPrice: 240, discount: '25% OFF', rating: 4.6, reviews: '640', category: 'Healthy Snacks', image: 'cashews' },
-  { id: 'chips', name: 'Baked Beetroot Chips', weight: '100g', price: 120, originalPrice: 150, discount: '20% OFF', rating: 4.4, reviews: '410', category: 'Healthy Snacks', image: 'seeds' },
+  { id: 'makhana', name: 'Roasted Makhana', weight: '150g', price: 180, originalPrice: 240, discount: '25% OFF', rating: 4.6, reviews: '640', category: 'Healthy Snacks', image: 'makhana' },
+  { id: 'chips', name: 'Baked Beetroot Chips', weight: '100g', price: 120, originalPrice: 150, discount: '20% OFF', rating: 4.4, reviews: '410', category: 'Healthy Snacks', image: 'beetroot_chips' },
 
   // Organic Food
-  { id: 'salt', name: 'Pink Himalayan Salt', weight: '1kg', price: 139, originalPrice: 199, discount: '30% OFF', rating: 4.7, reviews: '920', category: 'Organic Food', image: 'spices' },
-  { id: 'quinoa', name: 'Organic Quinoa', weight: '500g', price: 299, originalPrice: 399, discount: '25% OFF', rating: 4.5, reviews: '530', category: 'Organic Food', image: 'seeds' },
+  { id: 'salt', name: 'Pink Himalayan Salt', weight: '1kg', price: 139, originalPrice: 199, discount: '30% OFF', rating: 4.7, reviews: '920', category: 'Organic Food', image: 'himalayan_salt' },
+  { id: 'quinoa', name: 'Organic Quinoa', weight: '500g', price: 299, originalPrice: 399, discount: '25% OFF', rating: 4.5, reviews: '530', category: 'Organic Food', image: 'quinoa' },
 
   // Spices & Herbs
-  { id: 'turmeric', name: 'Organic Turmeric Powder', weight: '250g', price: 99, originalPrice: 149, discount: '33% OFF', rating: 4.8, reviews: '1.1k', category: 'Spices & Herbs', image: 'spices' },
-  { id: 'pepper', name: 'Whole Black Pepper', weight: '200g', price: 189, originalPrice: 249, discount: '24% OFF', rating: 4.6, reviews: '720', category: 'Spices & Herbs', image: 'seeds' },
+  { id: 'turmeric', name: 'Organic Turmeric Powder', weight: '250g', price: 99, originalPrice: 149, discount: '33% OFF', rating: 4.8, reviews: '1.1k', category: 'Spices & Herbs', image: 'turmeric' },
+  { id: 'pepper', name: 'Whole Black Pepper', weight: '200g', price: 189, originalPrice: 249, discount: '24% OFF', rating: 4.6, reviews: '720', category: 'Spices & Herbs', image: 'pepper' },
 
   // Honey & Sweeteners
   { id: 'honey', name: 'Wild Forest Honey', weight: '500g', price: 349, originalPrice: 449, discount: '22% OFF', rating: 4.7, reviews: '1.5k', category: 'Honey & Sweeteners', image: 'honey' },

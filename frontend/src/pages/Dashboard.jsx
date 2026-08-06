@@ -63,6 +63,7 @@ const imageMap = {
   pumpkin_seeds: pumpkinSeedsImg,
   himalayan_salt: himalayanSaltImg,
   flax_seeds: flaxSeedsImg,
+  beetroot_chips: beetrootChipsImg,
   sunflower_seeds: seedsImg,
   mix_nuts: heroNutsBowl,
   pistachios_small: pistachiosImg,

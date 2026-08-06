@@ -37,6 +37,7 @@ import himalayanSaltImg from '../assets/himalayan_salt.png';
 import quinoaImg from '../assets/quinoa.png';
 import turmericImg from '../assets/turmeric.png';
 import pepperImg from '../assets/pepper.png';
+import pistachiosImg from '../assets/pistachios.png';
 
 const imageMap = {
   almonds: almondsImg,
@@ -64,11 +65,11 @@ const imageMap = {
   flax_seeds: flaxSeedsImg,
   sunflower_seeds: seedsImg,
   mix_nuts: heroNutsBowl,
-  pistachios_small: almondsImg,
+  pistachios_small: pistachiosImg,
   cashews_small: cashewsImg,
   almonds_small: almondsImg,
   walnuts_small: walnutsImg,
-  pistachios: almondsImg
+  pistachios: pistachiosImg
 };
 
 const VipMembershipPage = ({ onClose }) => {

@@ -1471,7 +1471,7 @@ const Storefront = () => {
               <div>
                 <span className="text-[#FFB300] font-black text-[10px] tracking-wider uppercase">Exclusive Offer</span>
                 <h3 className="text-xl font-black mt-1 leading-tight">Flat 40% OFF</h3>
-                <p className="text-[10px] text-slate-350 font-medium mt-1">On Premium Dry Fruits</p>
+                <p className="text-[10px] text-slate-350 font-medium mt-1">On Premium Dry Fruits • Expires: Dec 31, 2026</p>
                 <div className="mt-2 text-[9px] bg-white/10 w-fit px-2.5 py-0.5 rounded-lg border border-white/10 font-bold">Use Code: NUTRITIVA40</div>
               </div>
               <button className="bg-white text-slate-900 hover:bg-[#FFB300] font-extrabold text-[10px] px-5 py-2 rounded-xl transition-all w-fit shadow-md">
@@ -1490,7 +1490,7 @@ const Storefront = () => {
               <div>
                 <span className="text-slate-800/80 font-black text-[10px] tracking-wider uppercase">Fresh Stock</span>
                 <h3 className="text-xl font-black mt-1 leading-tight">New Arrivals</h3>
-                <p className="text-[10px] text-slate-800 font-semibold mt-1">Fresh & Healthy</p>
+                <p className="text-[10px] text-slate-800 font-bold mt-1">Fresh & Healthy • Expires: Dec 31, 2026</p>
               </div>
               <span className="text-xs font-black flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                 Explore Now <ArrowRight className="w-4 h-4 stroke-[3]" />
@@ -1508,7 +1508,7 @@ const Storefront = () => {
               <div>
                 <span className="text-purple-300 font-black text-[10px] tracking-wider uppercase">Big Savings</span>
                 <h3 className="text-xl font-black mt-1 leading-tight">Combo Offers</h3>
-                <p className="text-[10px] text-purple-100 font-medium mt-1 font-semibold">Save More With Exclusive Combos</p>
+                <p className="text-[10px] text-purple-100 font-bold mt-1">Save More With Exclusive Combos • Expires: Dec 31, 2026</p>
               </div>
               <span className="text-xs font-black flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                 Shop Combos <ArrowRight className="w-4 h-4 stroke-[3]" />
@@ -1908,10 +1908,18 @@ const Storefront = () => {
               </p>
               {/* Social Icons */}
               <div className="flex items-center gap-3">
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" title="Facebook" className="w-9 h-9 rounded-full bg-blue-600 hover:bg-blue-500 hover:scale-110 transition-all flex items-center justify-center text-white font-black text-sm shadow-md">f</a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" title="Instagram" className="w-9 h-9 rounded-full bg-pink-600 hover:bg-pink-500 hover:scale-110 transition-all flex items-center justify-center text-white font-black text-sm shadow-md">i</a>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" title="YouTube" className="w-9 h-9 rounded-full bg-red-600 hover:bg-red-500 hover:scale-110 transition-all flex items-center justify-center text-white font-black text-sm shadow-md">▶</a>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" title="Twitter / X" className="w-9 h-9 rounded-full bg-sky-500 hover:bg-sky-400 hover:scale-110 transition-all flex items-center justify-center text-white font-black text-sm shadow-md">𝕏</a>
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" title="Facebook" className="w-9 h-9 rounded-full bg-blue-600 hover:bg-blue-500 hover:scale-110 transition-all flex items-center justify-center text-white shadow-md">
+                  <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M9 8H7v3h2v9h4v-9h3.6l.4-3h-4V6.5C13 5.3 13.5 5 14.5 5H16V2h-3C9.8 2 9 3.5 9 5.8V8z"/></svg>
+                </a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" title="Instagram" className="w-9 h-9 rounded-full bg-pink-600 hover:bg-pink-500 hover:scale-110 transition-all flex items-center justify-center text-white shadow-md">
+                  <svg className="w-4 h-4 fill-none stroke-white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zM17.5 6.5h.01"/></svg>
+                </a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" title="YouTube" className="w-9 h-9 rounded-full bg-red-600 hover:bg-red-500 hover:scale-110 transition-all flex items-center justify-center text-white shadow-md">
+                  <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M23.5 6.2c-.3-1.1-1.1-2-2.2-2.2C19.3 3.6 12 3.6 12 3.6s-7.3 0-9.3.4C1.6 4.2.8 5.1.5 6.2.1 8.2.1 12 .1 12s0 3.8.4 5.8c.3 1.1 1.1 2 2.2 2.2 2 .4 9.3.4 9.3.4s7.3 0 9.3-.4c1.1-.2 1.9-1.1 2.2-2.2.4-2 .4-5.8.4-5.8s0-3.8-.4-5.8zM9.5 15.5V8.5l6.5 3.5-6.5 3.5z"/></svg>
+                </a>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" title="Twitter / X" className="w-9 h-9 rounded-full bg-sky-500 hover:bg-sky-400 hover:scale-110 transition-all flex items-center justify-center text-white shadow-md">
+                  <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
               </div>
             </div>
 

@@ -77,6 +77,7 @@ const PROMO_CONFIG = {
     filter: (p) => p.category === 'Nuts & Dry Fruits',
     categories: ['All', 'Nuts & Dry Fruits'],
     bannerImg: heroNutsBowl,
+    expiry: 'Dec 31, 2026',
   },
   'new_arrivals': {
     title: 'New Arrivals',
@@ -93,6 +94,7 @@ const PROMO_CONFIG = {
     filter: (p) => ['Seeds & Superfoods', 'Healthy Snacks', 'Wellness & Immunity'].includes(p.category),
     categories: ['All', 'Seeds & Superfoods', 'Healthy Snacks', 'Wellness & Immunity'],
     bannerImg: cashewsImg,
+    expiry: 'Dec 31, 2026',
   },
   'combos': {
     title: 'Combo Offers',
@@ -109,6 +111,7 @@ const PROMO_CONFIG = {
     filter: (p) => ['Gift Packs', 'Honey & Sweeteners', 'Organic Food'].includes(p.category),
     categories: ['All', 'Gift Packs', 'Honey & Sweeteners', 'Organic Food'],
     bannerImg: walnutsImg,
+    expiry: 'Dec 31, 2026',
   },
 };
 
@@ -207,8 +210,8 @@ export default function PromoPage() {
             <h1 className={`text-4xl md:text-5xl font-black ${config.textColor} leading-tight`}>
               {config.title}
             </h1>
-            <p className={`mt-2 text-sm font-semibold opacity-80 ${config.textColor}`}>
-              {config.subtitle}
+            <p className={`mt-2 text-sm font-semibold opacity-85 ${config.textColor}`}>
+              {config.subtitle} {config.expiry && ` • Expires: ${config.expiry}`}
             </p>
             {config.code && (
               <button

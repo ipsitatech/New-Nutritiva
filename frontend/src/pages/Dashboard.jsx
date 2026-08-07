@@ -714,6 +714,8 @@ const Dashboard = () => {
   const [newAddressIsDefault, setNewAddressIsDefault] = useState(false);
   const [addressFormErrors, setAddressFormErrors] = useState({}); // TC33: field validation
   const [addrDuplicateWarn, setAddrDuplicateWarn] = useState(false); // TC37: duplicate warning
+  const [addrDeleteTarget, setAddrDeleteTarget] = useState(null);   // TC43/TC44/TC45: confirm before delete
+  const [addrDeleteLoading, setAddrDeleteLoading] = useState(false); // TC49: loading on delete
 
   // Support State
   const [supportHistory, setSupportHistory] = useState([
@@ -2649,16 +2651,10 @@ const Dashboard = () => {
                                 Set Default
                               </button>
                             )}
-                            {/* TC41: Delete button always visible with unique id for testability */}
+                            {/* TC43: Delete opens confirmation modal instead of deleting immediately */}
                             <button
                               id={`delete-address-${addr.id}`}
-                              onClick={() => {
-                                const updated = addresses.filter(a => a.id !== addr.id);
-                                setAddresses(updated);
-                                // TC10+TC26: sync cache after delete
-                                try { localStorage.setItem('nutritva_addresses_cache', JSON.stringify(updated)); } catch {};
-                                showToastNotification('🗑️ Address removed.', '🗑️');
-                              }}
+                              onClick={() => setAddrDeleteTarget(addr)}
                               className="text-slate-400 hover:text-red-600 hover:underline bg-transparent border-none p-1 font-semibold transition-colors"
                               title="Delete this address"
                             >
@@ -2669,6 +2665,82 @@ const Dashboard = () => {
                       </div>
                     ))}
                   </div>
+
+                  {/* TC46: Empty state when all addresses deleted */}
+                  {addresses.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-16 text-center col-span-3">
+                      <span className="text-5xl mb-4">📭</span>
+                      <p className="text-sm font-black text-slate-600">No Saved Addresses</p>
+                      <p className="text-xs font-semibold text-slate-400 mt-1">Add a delivery address to speed up checkout.</p>
+                    </div>
+                  )}
+
+                  {/* TC43/TC44/TC45: Delete confirmation modal */}
+                  {addrDeleteTarget && (
+                    <div
+                      className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+                      onClick={() => { if (!addrDeleteLoading) setAddrDeleteTarget(null); }}
+                    >
+                      <div
+                        className="bg-white rounded-3xl p-7 max-w-sm w-full shadow-2xl border border-slate-100 animate-slide-up text-left"
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className="w-10 h-10 rounded-2xl bg-red-50 flex items-center justify-center text-xl shrink-0">🗑️</span>
+                          <div>
+                            <h3 className="font-black text-slate-800 text-sm">
+                              {/* TC43: Special message for default address deletion */}
+                              {addrDeleteTarget.is_default ? '⚠️ Delete Default Address?' : 'Delete Address?'}
+                            </h3>
+                            <p className="text-[11px] font-semibold text-slate-500 mt-0.5">
+                              {addrDeleteTarget.is_default
+                                ? 'This is your default address. Deleting it may affect checkout. Are you sure?'
+                                : `Delete "${addrDeleteTarget.address_line1}, ${addrDeleteTarget.city}"? This cannot be undone.`
+                              }
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-3 mt-5">
+                          {/* TC45: Cancel — address retained */}
+                          <button
+                            id="cancel-delete-address-btn"
+                            disabled={addrDeleteLoading}
+                            onClick={() => setAddrDeleteTarget(null)}
+                            className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs rounded-xl transition-all"
+                          >
+                            Cancel
+                          </button>
+
+                          {/* TC44: Confirm — address removed; TC49: loading spinner */}
+                          <button
+                            id="confirm-delete-address-btn"
+                            disabled={addrDeleteLoading}
+                            onClick={() => {
+                              setAddrDeleteLoading(true);
+                              // TC49: simulate slow network with 600ms delay before removing
+                              setTimeout(() => {
+                                const updated = addresses.filter(a => a.id !== addrDeleteTarget.id);
+                                setAddresses(updated);
+                                // TC47: sync localStorage so deleted address not shown on refresh
+                                try { localStorage.setItem('nutritva_addresses_cache', JSON.stringify(updated)); } catch {};
+                                setAddrDeleteTarget(null);
+                                setAddrDeleteLoading(false);
+                                showToastNotification('🗑️ Address removed successfully.', '🗑️');
+                              }, 600);
+                            }}
+                            className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-xs rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+                          >
+                            {addrDeleteLoading ? (
+                              <><span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span> Deleting...</>
+                            ) : (
+                              '🗑️ Yes, Delete'
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="space-y-6">

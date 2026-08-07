@@ -1209,9 +1209,30 @@ const Dashboard = () => {
                           }
                         }
 
+                        const cityVal = (tempProfile.city || '').trim();
+                        if (!cityVal) {
+                          errors.city = "City is required.";
+                        } else if (/\d/.test(cityVal)) {
+                          errors.city = "City cannot contain numbers.";
+                        }
+
                         if (Object.keys(errors).length > 0) {
                           setProfileErrors(errors);
-                          openDialog("Validation Error", errors.name || errors.phone || errors.email || errors.dob, "⚠️");
+                          openDialog("Validation Error", errors.name || errors.phone || errors.email || errors.dob || errors.city, "⚠️");
+                          return;
+                        }
+
+                        // Save without changes check (TC57)
+                        const isUnchanged = 
+                          tempProfile.name === user.name &&
+                          tempProfile.phone === user.phone &&
+                          tempProfile.email === user.email &&
+                          tempProfile.dob === user.dob &&
+                          tempProfile.gender === user.gender &&
+                          tempProfile.city === user.city;
+                        
+                        if (isUnchanged) {
+                          openDialog("No Changes", "No changes detected to save. Profile details are already up to date!", "ℹ️");
                           return;
                         }
 
@@ -1364,10 +1385,16 @@ const Dashboard = () => {
                         value={tempProfile.city}
                         onChange={e => setTempProfile({ ...tempProfile, city: e.target.value })}
                         className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none transition-all"
-                        style={{background: '#f8fafc', border: '1.5px solid rgba(255,160,190,0.4)'}}
+                        style={{
+                          background: '#f8fafc',
+                          border: profileErrors.city ? '1.5px solid #ef4444' : '1.5px solid rgba(255,160,190,0.4)'
+                        }}
                         onFocus={e => e.target.style.borderColor = '#105335'}
-                        onBlur={e => e.target.style.borderColor = 'rgba(255,160,190,0.4)'}
+                        onBlur={e => e.target.style.borderColor = profileErrors.city ? '#ef4444' : 'rgba(255,160,190,0.4)'}
                       />
+                      {profileErrors.city && (
+                        <p className="text-red-500 text-[10px] font-bold mt-1">{profileErrors.city}</p>
+                      )}
                       <datalist id="city-suggestions">
                         <option value="Noida, Uttar Pradesh" />
                         <option value="Delhi, NCR" />
@@ -1415,6 +1442,7 @@ const Dashboard = () => {
                     <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full opacity-20" style={{background: 'rgba(255,255,255,0.3)'}}></div>
                     <p className="text-[10px] font-black tracking-widest uppercase text-purple-300 mb-2">Membership</p>
                     <h3 className="text-xl font-black mb-0.5">{user.status}</h3>
+                    <p className="text-[10px] text-purple-200 font-bold mb-3 uppercase tracking-wider">ID: MID-{user.id ? user.id.toString().replace('u_', '').toUpperCase() : 'NUTR001'}</p>
                     <p className="text-xs text-purple-200 font-semibold mb-4">Renews: Dec 31, 2026</p>
                     <div className="space-y-1.5 mb-4">
                       {['Unlimited Free Delivery', 'Priority Packing', 'Exclusive Member Deals', 'Early Sale Access'].map(b => (

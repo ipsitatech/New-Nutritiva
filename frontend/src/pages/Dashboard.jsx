@@ -1159,9 +1159,17 @@ const Dashboard = () => {
                           errors.phone = "Phone Number cannot exceed 10 digits.";
                         }
 
+                        const emailVal = (tempProfile.email || '').trim();
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailVal) {
+                          errors.email = "Email Address is required.";
+                        } else if (!emailRegex.test(emailVal)) {
+                          errors.email = "Invalid Email Address format.";
+                        }
+
                         if (Object.keys(errors).length > 0) {
                           setProfileErrors(errors);
-                          openDialog("Validation Error", errors.name || errors.phone, "⚠️");
+                          openDialog("Validation Error", errors.name || errors.phone || errors.email, "⚠️");
                           return;
                         }
 
@@ -1220,10 +1228,16 @@ const Dashboard = () => {
                         value={tempProfile.email}
                         onChange={e => setTempProfile({ ...tempProfile, email: e.target.value })}
                         className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none transition-all"
-                        style={{background: '#f8fafc', border: '1.5px solid rgba(255,160,190,0.4)'}}
+                        style={{
+                          background: '#f8fafc',
+                          border: profileErrors.email ? '1.5px solid #ef4444' : '1.5px solid rgba(255,160,190,0.4)'
+                        }}
                         onFocus={e => e.target.style.borderColor = '#105335'}
-                        onBlur={e => e.target.style.borderColor = 'rgba(255,160,190,0.4)'}
+                        onBlur={e => e.target.style.borderColor = profileErrors.email ? '#ef4444' : 'rgba(255,160,190,0.4)'}
                       />
+                      {profileErrors.email && (
+                        <p className="text-red-500 text-[10px] font-bold mt-1">{profileErrors.email}</p>
+                      )}
                     </div>
                     <div>
                       <label className="text-xs font-black text-slate-700 block mb-1.5">Date of Birth</label>

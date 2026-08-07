@@ -24,6 +24,15 @@ exports.updateUserProfile = async (req, res) => {
       }
     }
 
+    // Check if email address is already registered by another user
+    if (email) {
+      const emailVal = email.trim();
+      const existingEmail = await dbGet('SELECT id FROM users WHERE email = ? AND id != ?', [emailVal, userId]);
+      if (existingEmail) {
+        return res.status(400).json({ error: 'Email Address is already registered by another user.' });
+      }
+    }
+
     await dbRun(`
       UPDATE users 
       SET name = ?, email = ?, phone = ?, dob = ?, gender = ?, city = ?, status = ?, reward_points = ?, monthly_savings = ?, total_orders = ?, avatar = ?

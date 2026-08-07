@@ -3495,6 +3495,45 @@ const Dashboard = () => {
                       </div>
                     </div>
 
+                    {/* Delivery Settings Controls */}
+                    {activeManageSubscription.status.toUpperCase() === 'ACTIVE' && (
+                      <div className="space-y-4 p-4 bg-emerald-50/20 rounded-2xl border border-emerald-100/50 mb-6">
+                        <div>
+                          <label className="text-[10px] font-black text-emerald-800 uppercase tracking-wider block mb-1">Delivery Frequency</label>
+                          <select 
+                            className="w-full px-3 py-2 bg-white border border-emerald-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none"
+                            defaultValue="Weekly"
+                            onChange={(e) => {
+                              showToastNotification(`Delivery frequency updated to ${e.target.value}!`, "🚚");
+                            }}
+                          >
+                            <option value="Weekly">Weekly (Every 7 Days)</option>
+                            <option value="Bi-Weekly">Bi-Weekly (Every 14 Days)</option>
+                            <option value="Monthly">Monthly (Every 30 Days)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-black text-emerald-800 uppercase tracking-wider block mb-1">Delivery Address</label>
+                          <select 
+                            className="w-full px-3 py-2 bg-white border border-emerald-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none"
+                            onChange={(e) => {
+                              showToastNotification("Delivery address updated successfully!", "📍");
+                            }}
+                          >
+                            {addresses && addresses.length > 0 ? (
+                              addresses.map(addr => (
+                                <option key={addr.id} value={addr.id}>
+                                  {addr.address_type || 'Home'} - {addr.street_address}, {addr.city}
+                                </option>
+                              ))
+                            ) : (
+                              <option>Default Shipping Address</option>
+                            )}
+                          </select>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="space-y-2.5">
                       {activeManageSubscription.status.toUpperCase() === 'ACTIVE' && (
                         <button

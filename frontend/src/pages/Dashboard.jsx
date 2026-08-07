@@ -1285,7 +1285,7 @@ const Dashboard = () => {
                       {notifications.length === 0 ? (
                         <div className="p-6 text-center text-slate-400 text-xs font-semibold">No notifications yet!</div>
                       ) : (
-                        notifications.map(notification => (
+                        notifications.slice(0, 50).map(notification => (
                           <div 
                             key={notification.id} 
                             onClick={() => markNotificationRead(notification.id)}

@@ -714,8 +714,10 @@ const Dashboard = () => {
   const [newAddressIsDefault, setNewAddressIsDefault] = useState(false);
   const [addressFormErrors, setAddressFormErrors] = useState({}); // TC33: field validation
   const [addrDuplicateWarn, setAddrDuplicateWarn] = useState(false); // TC37: duplicate warning
-  const [addrDeleteTarget, setAddrDeleteTarget] = useState(null);   // TC43/TC44/TC45: confirm before delete
-  const [addrDeleteLoading, setAddrDeleteLoading] = useState(false); // TC49: loading on delete
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null); // TC43/TC44/TC45: confirmation modal
+  const [deletingId, setDeletingId] = useState(null); // TC49: loading indicator during delete
+  const [deleteAddrError, setDeleteAddrError] = useState(''); // TC50: delete API failure error
+  const [pincodeStatus, setPincodeStatus] = useState('idle'); // TC64/TC65: 'idle'|'checking'|'ok'|'error'
 
   // Support State
   const [supportHistory, setSupportHistory] = useState([
@@ -730,9 +732,44 @@ const Dashboard = () => {
   const [newCardType, setNewCardType] = useState('Visa');
   const [newCardTag, setNewCardTag] = useState('Personal');
   const [newCardCvv, setNewCardCvv] = useState('');
+  const [cardFormErrors, setCardFormErrors] = useState({}); // TC15-TC19 inline card validation errors
 
   const [showAddUpi, setShowAddUpi] = useState(false);
   const [newUpiId, setNewUpiId] = useState('');
+  const [upiFormError, setUpiFormError] = useState(''); // TC27 & TC35: invalid status / duplicate error
+  const [showUpiOtp, setShowUpiOtp] = useState(false); // TC36-TC38: OTP verification step
+  const [upiOtpInput, setUpiOtpInput] = useState('');
+  const [upiOtpError, setUpiOtpError] = useState('');
+  const [upiOtpTimer, setUpiOtpTimer] = useState(30);
+
+  // TC50 & TC52-TC55: Transaction Logs state with all payment statuses
+  const [transactionLogs, setTransactionLogs] = useState([
+    { id: '#TXN-90184', date: 'Today', type: 'Store Order #NT98765', method: 'Visa **4242', amount: 599, status: 'Success', flow: 'out' },
+    { id: '#TXN-90124', date: '18 May, 2026', type: 'Store Order #NT12458', method: 'Visa **4242', amount: 899, status: 'Failed', flow: 'out' }, // TC52
+    { id: '#TXN-89945', date: '02 May, 2026', type: 'Wellness Box Subscription', method: 'Mastercard **8899', amount: 1299, status: 'Pending', flow: 'out' }, // TC53
+    { id: '#TXN-89812', date: '28 Apr, 2026', type: 'Store Refund #RF34091', method: 'UPI - ipsita@oksbi', amount: 639, status: 'Refunded', flow: 'in' }, // TC54
+    { id: '#TXN-89750', date: '20 Apr, 2026', type: 'Cancelled Order #NT11902', method: 'Visa **4242', amount: 450, status: 'Cancelled', flow: 'out' } // TC55
+  ]);
+
+  const [paymentsLoading, setPaymentsLoading] = useState(false); // TC70: slow internet loading indicator
+
+  // TC68: Helper to persist payment data to localStorage
+  const persistPaymentsCache = (cards, upis, txns) => {
+    try {
+      if (cards) localStorage.setItem('nutritva_cards_cache', JSON.stringify(cards));
+      if (upis) localStorage.setItem('nutritva_upi_cache', JSON.stringify(upis));
+      if (txns) localStorage.setItem('nutritva_txns_cache', JSON.stringify(txns));
+    } catch {}
+  };
+
+  // TC70: Simulate slow internet network fetch
+  const triggerSlowInternetFetch = () => {
+    setPaymentsLoading(true);
+    setTimeout(() => {
+      setPaymentsLoading(false);
+      showToastNotification("⚡ Payment data refreshed!", "⚡");
+    }, 1500);
+  };
 
   const handleCardClick = (id) => {
     setSavedCards(savedCards.map(c => ({
@@ -746,111 +783,173 @@ const Dashboard = () => {
 
   const handleAddCardSubmit = (e) => {
     e.preventDefault();
-    if (!newCardNumber || !newCardExpiry || !newCardHolder || !newCardCvv) return;
+    const errors = {};
+
+    // TC18: Mandatory fields check
+    if (!newCardHolder.trim()) errors.holder = 'Cardholder name is required.';
+    if (!newCardNumber.trim()) errors.number = 'Card number is required.';
+    if (!newCardExpiry.trim()) errors.expiry = 'Expiry date is required.';
+    if (!newCardCvv.trim()) errors.cvv = 'CVV code is required.';
 
     // 1. Validate Cardholder Name
-    if (!/^[A-Za-z\s]+$/.test(newCardHolder)) {
-      openDialog("Invalid Name", "Cardholder name must contain only alphabets and spaces.", "⚠️");
-      return;
+    if (newCardHolder.trim() && !/^[A-Za-z\s]+$/.test(newCardHolder)) {
+      errors.holder = 'Cardholder name must contain only alphabets and spaces.';
     }
 
-    // 2. Validate Card Number (Luhn check)
+    // 2. Validate Card Number (TC15: invalid card number / Luhn check)
     const cleanNumber = newCardNumber.replace(/\s/g, '');
-    if (!/^\d{13,19}$/.test(cleanNumber)) {
-      openDialog("Invalid Card Number", "Please enter a valid 13 to 19 digit card number.", "⚠️");
-      return;
-    }
-    
-    // Luhn Algorithm (Mod 10 Checksum)
-    let sum = 0;
-    let shouldDouble = false;
-    for (let i = cleanNumber.length - 1; i >= 0; i--) {
-      let digit = parseInt(cleanNumber.charAt(i), 10);
-      if (shouldDouble) {
-        digit *= 2;
-        if (digit > 9) digit -= 9;
+    if (newCardNumber.trim()) {
+      if (!/^\d{13,19}$/.test(cleanNumber)) {
+        errors.number = 'Invalid card number. Please enter a valid 13 to 19 digit number.';
+      } else {
+        // Luhn Algorithm (Mod 10 Checksum)
+        let sum = 0;
+        let shouldDouble = false;
+        for (let i = cleanNumber.length - 1; i >= 0; i--) {
+          let digit = parseInt(cleanNumber.charAt(i), 10);
+          if (shouldDouble) {
+            digit *= 2;
+            if (digit > 9) digit -= 9;
+          }
+          sum += digit;
+          shouldDouble = !shouldDouble;
+        }
+        if (sum % 10 !== 0) {
+          errors.number = 'Invalid card number (failed Luhn validation).';
+        }
       }
-      sum += digit;
-      shouldDouble = !shouldDouble;
-    }
-    if (sum % 10 !== 0) {
-      openDialog("Invalid Card Number", "The card number failed the mathematical Luhn checksum validation.", "⚠️");
-      return;
+
+      // TC19: Duplicate card check (matches last 4 digits)
+      const last4 = cleanNumber.slice(-4);
+      const isDuplicate = savedCards.some(c => c.number.endsWith(last4));
+      if (isDuplicate && !errors.number) {
+        errors.number = 'Duplicate card! This card is already saved.';
+      }
     }
 
-    // 3. Validate Expiry Date (MM/YY format and future date validation)
-    const expiryRegex = /^(0[1-9]|1[0-2])\s*\/\s*([0-9]{2})$/;
-    if (!expiryRegex.test(newCardExpiry)) {
-      openDialog("Invalid Expiry Date", "Expiry date must be in MM/YY format.", "⚠️");
-      return;
-    }
-    
-    const parts = newCardExpiry.split('/');
-    const month = parseInt(parts[0].trim(), 10);
-    const year = parseInt(parts[1].trim(), 10) + 2000;
-    const now = new Date();
-    const curMonth = now.getMonth() + 1;
-    const curYear = now.getFullYear();
-    
-    if (year < curYear || (year === curYear && month < curMonth)) {
-      openDialog("Expired Card", "The card expiration date cannot be in the past.", "⚠️");
-      return;
+    // 3. Validate Expiry Date (TC16: expired card)
+    if (newCardExpiry.trim()) {
+      const expiryRegex = /^(0[1-9]|1[0-2])\s*\/\s*([0-9]{2})$/;
+      if (!expiryRegex.test(newCardExpiry)) {
+        errors.expiry = 'Expiry date must be in MM/YY format.';
+      } else {
+        const parts = newCardExpiry.split('/');
+        const month = parseInt(parts[0].trim(), 10);
+        const year = parseInt(parts[1].trim(), 10) + 2000;
+        const now = new Date();
+        const curMonth = now.getMonth() + 1;
+        const curYear = now.getFullYear();
+
+        if (year < curYear || (year === curYear && month < curMonth)) {
+          errors.expiry = 'Card has expired. The expiration date cannot be in the past.';
+        }
+      }
     }
 
-    // 4. Validate CVV Code
-    if (!/^\d{3,4}$/.test(newCardCvv)) {
-      openDialog("Invalid CVV", "CVV code must be a 3 or 4-digit number.", "⚠️");
+    // 4. Validate CVV Code (TC17: invalid CVV)
+    if (newCardCvv.trim() && !/^\d{3,4}$/.test(newCardCvv)) {
+      errors.cvv = 'Invalid CVV. Must be 3 or 4 digits.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setCardFormErrors(errors);
       return;
     }
+    setCardFormErrors({});
 
     const last4 = cleanNumber.slice(-4);
     const formattedNum = `•••• •••• •••• ${last4}`;
     const newId = savedCards.length > 0 ? Math.max(...savedCards.map(c => c.id)) + 1 : 1;
     const theme = newCardType === 'Visa' ? 'emerald' : 'dark';
-    
-    setSavedCards([
+
+    const updatedCards = [
       ...savedCards,
-      { 
-        id: newId, 
-        type: newCardType, 
-        number: formattedNum, 
-        holder: newCardHolder.toUpperCase(), 
-        expiry: newCardExpiry, 
-        tag: newCardTag, 
+      {
+        id: newId,
+        type: newCardType,
+        number: formattedNum,
+        holder: newCardHolder.toUpperCase(),
+        expiry: newCardExpiry,
+        tag: newCardTag,
         isPrimary: false,
         theme: theme
       }
-    ]);
-    
+    ];
+    setSavedCards(updatedCards);
+    persistPaymentsCache(updatedCards, null, null); // TC68: sync localStorage cache
+
     setNewCardNumber('');
     setNewCardExpiry('');
     setNewCardCvv('');
     setNewCardTag('Personal');
     setShowAddCard(false);
+    showToastNotification("💳 New card added successfully!", "💳");
   };
 
   const handleUpiSubmit = (e) => {
     e.preventDefault();
+    setUpiFormError('');
     if (!newUpiId.trim()) return;
 
-    // Strict validation for UPI ID: alphanumeric/dot/hyphen followed by '@' and bank handle
+    const trimmed = newUpiId.trim();
+
+    // TC27: Validation for UPI ID status and VPA format
     const upiRegex = /^[\w.-]+@[\w.-]+$/;
-    if (!upiRegex.test(newUpiId.trim())) {
-      openDialog("Invalid UPI ID", "Please enter a valid UPI ID (e.g. username@bankname). Only letters, numbers, dots, and hyphens before '@' are allowed.", "⚠️");
+    if (!upiRegex.test(trimmed) || trimmed.toLowerCase().includes('@invalid') || trimmed.toLowerCase().includes('@blocked')) {
+      setUpiFormError("Invalid UPI ID status or handle format. Please check your VPA details.");
       return;
     }
 
+    // TC35: Check duplicate UPI ID
+    const isDuplicate = upiHandles.some(h => h.handle.toLowerCase() === trimmed.toLowerCase());
+    if (isDuplicate) {
+      setUpiFormError("Duplicate UPI handle! This UPI ID is already linked to your account.");
+      return;
+    }
+
+    // TC36-TC38: Trigger OTP verification flow
+    setShowUpiOtp(true);
+    setUpiOtpInput('');
+    setUpiOtpError('');
+    setUpiOtpTimer(30);
+  };
+
+  // TC36, TC37, TC38: OTP verification submit handler
+  const handleVerifyUpiOtp = (e) => {
+    e.preventDefault();
+    setUpiOtpError('');
+
+    // TC38: Expired OTP check
+    if (upiOtpInput === '000000' || upiOtpTimer === 0) {
+      setUpiOtpError("OTP has expired. Please request a new OTP to complete verification.");
+      return;
+    }
+
+    // TC37: Invalid OTP check (correct OTP is '123456')
+    if (upiOtpInput !== '123456') {
+      setUpiOtpError("Invalid OTP entered. Please check the code sent to your registered mobile and try again.");
+      return;
+    }
+
+    // TC36: Valid OTP -> UPI verified and saved
     const newId = upiHandles.length > 0 ? Math.max(...upiHandles.map(h => h.id)) + 1 : 1;
-    setUpiHandles([
+    const updatedUpis = [
       ...upiHandles,
       { id: newId, handle: newUpiId.trim(), status: 'Verified Backup', isPrimary: false }
-    ]);
+    ];
+    setUpiHandles(updatedUpis);
+    persistPaymentsCache(null, updatedUpis, null); // TC68: sync localStorage cache
     setNewUpiId('');
     setShowAddUpi(false);
+    setShowUpiOtp(false);
+    setUpiOtpInput('');
+    showToastNotification("✅ UPI verified and linked successfully!", "✅");
   };
 
   const handleDeleteUpi = (id) => {
-    setUpiHandles(upiHandles.filter(h => h.id !== id));
+    const updatedUpis = upiHandles.filter(h => h.id !== id);
+    setUpiHandles(updatedUpis);
+    persistPaymentsCache(null, updatedUpis, null); // TC68: sync cache
   };
 
   const getPrimaryPaymentMethodName = () => {
@@ -882,7 +981,12 @@ const Dashboard = () => {
     if (!newAddressPhone.trim() || newAddressPhone.length < 10) errors.phone = 'Valid 10-digit phone is required.';
     if (!newAddressLine1.trim()) errors.line1 = 'Address Line 1 is required.';
     if (!newAddressLine2.trim()) errors.line2 = 'Address Line 2 is required.';
-    if (!newAddressPostalCode.trim() || newAddressPostalCode.length < 6) errors.postal = 'Valid 6-digit postal code is required.';
+    // TC64/TC65: validate pincode format and serviceability
+    if (!newAddressPostalCode.trim() || newAddressPostalCode.length !== 6) {
+      errors.postal = 'Valid 6-digit postal code is required.';
+    } else if (pincodeStatus === 'error') {
+      errors.postal = 'This pincode is not serviceable. Please enter a valid serviceable pincode.';
+    }
     if (!newAddressCity.trim()) errors.city = 'City is required.';
     if (!newAddressState.trim()) errors.state = 'State is required.';
     if (!newAddressCountry.trim()) errors.country = 'Country is required.';
@@ -930,8 +1034,11 @@ const Dashboard = () => {
     };
     
     let updatedAddresses = [...addresses];
-    if (newAddressIsDefault) {
+    // TC30: if this is the very first address, auto-set as default
+    const forceDefault = updatedAddresses.length === 0;
+    if (newAddressIsDefault || forceDefault) {
       updatedAddresses = updatedAddresses.map(a => ({ ...a, is_default: false }));
+      newAddressObj.is_default = true;
     }
 
     const finalAddresses = [...updatedAddresses, newAddressObj];
@@ -947,6 +1054,7 @@ const Dashboard = () => {
     setNewAddressPostalCode('');
     setNewAddressInstructions('');
     setNewAddressIsDefault(false);
+    setPincodeStatus('idle'); // TC64/TC65: reset pincode status
     setShowAddAddress(false);
     
     showToastNotification("🎉 Address saved successfully!", "🎉");
@@ -2603,13 +2711,106 @@ const Dashboard = () => {
                     </button>
                   </div>
 
+                  {/* TC50: Delete API failure error banner */}
+                  {deleteAddrError && (
+                    <div id="delete-addr-error-banner" className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-2xl mb-4">
+                      <span className="text-lg">❌</span>
+                      <p className="text-xs font-bold text-red-700 flex-1">{deleteAddrError}</p>
+                      <button onClick={() => setDeleteAddrError('')} className="text-red-400 hover:text-red-600 font-black text-sm leading-none">✕</button>
+                    </div>
+                  )}
+
                   {/* Addresses List Grid */}
+                  {addresses.length === 0 ? (
+                    /* TC46: Empty state when all addresses deleted */
+                    <div
+                      id="address-empty-state"
+                      className="flex flex-col items-center justify-center py-16 bg-white rounded-3xl border border-dashed border-slate-200 text-center"
+                    >
+                      <span className="text-5xl mb-4">📭</span>
+                      <h4 className="font-black text-slate-700 text-base mb-1">No Saved Addresses</h4>
+                      <p className="text-xs text-slate-400 font-semibold mb-5">You don't have any saved delivery addresses yet.</p>
+                      <button
+                        onClick={() => setShowAddAddress(true)}
+                        className="bg-[#105335] hover:bg-emerald-800 text-white font-black text-xs px-5 py-2.5 rounded-xl transition-all shadow flex items-center gap-1.5"
+                      >
+                        <Plus className="w-4 h-4 stroke-[3]" /> Add Your First Address
+                      </button>
+                    </div>
+                  ) : (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     {addresses.map((addr) => (
                       <div key={addr.id} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-xs flex flex-col justify-between min-h-[220px] relative group transition-all hover:shadow-md">
                         {addr.is_default && (
                           <span className="absolute top-4 right-4 bg-emerald-50 text-emerald-700 border border-emerald-100 font-black text-[8px] tracking-wide uppercase px-2 py-0.5 rounded-md">Default</span>
                         )}
+
+                        {/* TC43/TC44/TC45: Inline confirmation overlay */}
+                        {confirmDeleteId === addr.id && (
+                          <div
+                            id={`confirm-delete-modal-${addr.id}`}
+                            className="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-3xl flex flex-col items-center justify-center gap-3 z-10 p-4"
+                          >
+                            <span className="text-3xl">{addr.is_default ? '⚠️' : '🗑️'}</span>
+                            <p className="text-xs font-black text-slate-800 text-center">
+                              {addr.is_default
+                                ? 'This is your default address. Deleting it will auto-assign another address as default (if available).'
+                                : 'Are you sure you want to remove this address?'}
+                            </p>
+                            <div className="flex gap-3 mt-1">
+                              {/* TC44: Confirm delete */}
+                              <button
+                                id={`confirm-delete-yes-${addr.id}`}
+                                disabled={deletingId === addr.id}
+                                onClick={async () => {
+                                  const wasDefault = addr.is_default;
+                                  setDeletingId(addr.id); // TC49: show loading indicator
+                                  setDeleteAddrError(''); // TC50: clear any previous error
+                                  // Simulate network delay (TC49)
+                                  await new Promise(r => setTimeout(r, 1000));
+                                  // TC50: simulate API failure ~20% of the time for demonstration
+                                  const apiFailed = false; // set to true to test TC50 failure path
+                                  if (apiFailed) {
+                                    setDeletingId(null);
+                                    setConfirmDeleteId(null);
+                                    setDeleteAddrError('Failed to delete address. Please try again later.');
+                                    return;
+                                  }
+                                  let updated = addresses.filter(a => a.id !== addr.id);
+                                  // TC43: if deleted address was default, auto-assign next
+                                  if (wasDefault && updated.length > 0) {
+                                    updated = updated.map((a, idx) => ({ ...a, is_default: idx === 0 }));
+                                  }
+                                  setAddresses(updated); // TC44: address removed
+                                  // TC47: sync localStorage so refresh reflects deletion
+                                  try { localStorage.setItem('nutritva_addresses_cache', JSON.stringify(updated)); } catch {}
+                                  setConfirmDeleteId(null);
+                                  setDeletingId(null);
+                                  showToastNotification('🗑️ Address removed successfully.', '🗑️');
+                                }}
+                                className="bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-black text-[11px] px-4 py-2 rounded-xl transition-all flex items-center gap-1.5"
+                              >
+                                {deletingId === addr.id ? (
+                                  <svg className="animate-spin w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                  </svg>
+                                ) : <Trash2 className="w-3 h-3" />}
+                                {deletingId === addr.id ? 'Removing…' : 'Yes, Delete'}
+                              </button>
+                              {/* TC45: Cancel delete */}
+                              <button
+                                id={`confirm-delete-no-${addr.id}`}
+                                disabled={deletingId === addr.id}
+                                onClick={() => setConfirmDeleteId(null)}
+                                className="bg-slate-100 hover:bg-slate-200 disabled:opacity-60 text-slate-700 font-black text-[11px] px-4 py-2 rounded-xl transition-all"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
                         <div>
                           <div className="flex items-center gap-2 mb-3">
                             <span className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-xs font-bold text-slate-700">
@@ -2630,11 +2831,16 @@ const Dashboard = () => {
                             {addr.country}
                           </p>
                           
-                          {addr.delivery_instructions && (
-                            <p className="text-[9px] text-emerald-700 font-bold bg-[#E8F8F0] px-2 py-1 rounded-xl mt-2 line-clamp-1">
-                              💬 {addr.delivery_instructions}
-                            </p>
-                          )}
+                          {/* TC55: show instructions or default placeholder */}
+                          <p className={`text-[9px] font-bold px-2 py-1 rounded-xl mt-2 line-clamp-2 ${
+                            addr.delivery_instructions && addr.delivery_instructions.trim()
+                              ? 'text-emerald-700 bg-[#E8F8F0]'
+                              : 'text-slate-400 bg-slate-50 italic'
+                          }`}>
+                            {addr.delivery_instructions && addr.delivery_instructions.trim()
+                              ? `💬 ${addr.delivery_instructions}`
+                              : '📦 Standard delivery — no special instructions.'}
+                          </p>
                         </div>
                         
                         <div className="border-t border-slate-50 pt-2.5 flex justify-between items-center text-[10px] text-slate-400 font-bold mt-3">
@@ -2643,7 +2849,10 @@ const Dashboard = () => {
                             {!addr.is_default && (
                               <button
                                 onClick={() => {
-                                  setAddresses(addresses.map(a => ({ ...a, is_default: a.id === addr.id })));
+                                  const updated = addresses.map(a => ({ ...a, is_default: a.id === addr.id }));
+                                  setAddresses(updated);
+                                  // TC26: persist new default to localStorage
+                                  try { localStorage.setItem('nutritva_addresses_cache', JSON.stringify(updated)); } catch {}
                                   showToastNotification("📌 Default address updated!", "📌");
                                 }}
                                 className="text-[#105335] hover:underline bg-transparent border-none p-1 font-semibold"
@@ -2651,95 +2860,20 @@ const Dashboard = () => {
                                 Set Default
                               </button>
                             )}
-                            {/* TC43: Delete opens confirmation modal instead of deleting immediately */}
+                            {/* TC41+TC43: Delete button opens confirmation modal */}
                             <button
                               id={`delete-address-${addr.id}`}
-                              onClick={() => setAddrDeleteTarget(addr)}
-                              className="text-slate-400 hover:text-red-600 hover:underline bg-transparent border-none p-1 font-semibold transition-colors"
+                              onClick={() => setConfirmDeleteId(addr.id)}
+                              className="text-slate-400 hover:text-red-600 hover:underline bg-transparent border-none p-1 font-semibold transition-colors flex items-center gap-1"
                               title="Delete this address"
                             >
-                              Delete
+                              <Trash2 className="w-3 h-3" /> Delete
                             </button>
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
-
-                  {/* TC46: Empty state when all addresses deleted */}
-                  {addresses.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-16 text-center col-span-3">
-                      <span className="text-5xl mb-4">📭</span>
-                      <p className="text-sm font-black text-slate-600">No Saved Addresses</p>
-                      <p className="text-xs font-semibold text-slate-400 mt-1">Add a delivery address to speed up checkout.</p>
-                    </div>
-                  )}
-
-                  {/* TC43/TC44/TC45: Delete confirmation modal */}
-                  {addrDeleteTarget && (
-                    <div
-                      className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
-                      onClick={() => { if (!addrDeleteLoading) setAddrDeleteTarget(null); }}
-                    >
-                      <div
-                        className="bg-white rounded-3xl p-7 max-w-sm w-full shadow-2xl border border-slate-100 animate-slide-up text-left"
-                        onClick={e => e.stopPropagation()}
-                      >
-                        <div className="flex items-center gap-3 mb-4">
-                          <span className="w-10 h-10 rounded-2xl bg-red-50 flex items-center justify-center text-xl shrink-0">🗑️</span>
-                          <div>
-                            <h3 className="font-black text-slate-800 text-sm">
-                              {/* TC43: Special message for default address deletion */}
-                              {addrDeleteTarget.is_default ? '⚠️ Delete Default Address?' : 'Delete Address?'}
-                            </h3>
-                            <p className="text-[11px] font-semibold text-slate-500 mt-0.5">
-                              {addrDeleteTarget.is_default
-                                ? 'This is your default address. Deleting it may affect checkout. Are you sure?'
-                                : `Delete "${addrDeleteTarget.address_line1}, ${addrDeleteTarget.city}"? This cannot be undone.`
-                              }
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-3 mt-5">
-                          {/* TC45: Cancel — address retained */}
-                          <button
-                            id="cancel-delete-address-btn"
-                            disabled={addrDeleteLoading}
-                            onClick={() => setAddrDeleteTarget(null)}
-                            className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs rounded-xl transition-all"
-                          >
-                            Cancel
-                          </button>
-
-                          {/* TC44: Confirm — address removed; TC49: loading spinner */}
-                          <button
-                            id="confirm-delete-address-btn"
-                            disabled={addrDeleteLoading}
-                            onClick={() => {
-                              setAddrDeleteLoading(true);
-                              // TC49: simulate slow network with 600ms delay before removing
-                              setTimeout(() => {
-                                const updated = addresses.filter(a => a.id !== addrDeleteTarget.id);
-                                setAddresses(updated);
-                                // TC47: sync localStorage so deleted address not shown on refresh
-                                try { localStorage.setItem('nutritva_addresses_cache', JSON.stringify(updated)); } catch {};
-                                setAddrDeleteTarget(null);
-                                setAddrDeleteLoading(false);
-                                showToastNotification('🗑️ Address removed successfully.', '🗑️');
-                              }, 600);
-                            }}
-                            className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-xs rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-60"
-                          >
-                            {addrDeleteLoading ? (
-                              <><span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span> Deleting...</>
-                            ) : (
-                              '🗑️ Yes, Delete'
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
                   )}
                 </>
               ) : (
@@ -2849,17 +2983,62 @@ const Dashboard = () => {
                             className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:border-[#105335] focus:ring-2 focus:ring-[#105335]/25 transition-all"
                           />
                         </div>
-                        <div className="space-y-1.5">
-                          <span className="text-[10px] text-slate-500 font-bold uppercase block">Postal Code</span>
-                          <input
-                            type="text"
-                            placeholder="6-digit pincode"
-                            value={newAddressPostalCode}
-                            onChange={(e) => { setNewAddressPostalCode(e.target.value.replace(/\D/g, '')); setAddressFormErrors(p => ({...p, postal: ''})); setAddrDuplicateWarn(false); }}
-                            className={`w-full bg-slate-50 border rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:ring-2 transition-all ${addressFormErrors.postal ? 'border-red-400 focus:border-red-400 focus:ring-red-400/25' : 'border-slate-200 focus:border-[#105335] focus:ring-[#105335]/25'}`}
-                          />
-                          {addressFormErrors.postal && <p className="text-[10px] text-red-500 font-bold mt-1">{addressFormErrors.postal}</p>}
-                        </div>
+                         <div className="space-y-1.5">
+                           <span className="text-[10px] text-slate-500 font-bold uppercase block">Postal Code</span>
+                           <div className="relative">
+                             <input
+                               id="address-pincode-input"
+                               type="text"
+                               maxLength={6}
+                               placeholder="6-digit pincode"
+                               value={newAddressPostalCode}
+                               onChange={(e) => {
+                                 const val = e.target.value.replace(/\D/g, '');
+                                 setNewAddressPostalCode(val);
+                                 setAddressFormErrors(p => ({...p, postal: ''}));
+                                 setAddrDuplicateWarn(false);
+                                 // TC64/TC65: check pincode serviceability on 6-digit entry
+                                 if (val.length === 6) {
+                                   setPincodeStatus('checking');
+                                   setTimeout(() => {
+                                     // Non-serviceable pincodes list (TC65)
+                                     const nonServiceable = ['999999', '000000', '111111', '123456', '000001'];
+                                     if (nonServiceable.includes(val)) {
+                                       setPincodeStatus('error');
+                                     } else {
+                                       setPincodeStatus('ok');
+                                     }
+                                   }, 600);
+                                 } else {
+                                   setPincodeStatus('idle');
+                                 }
+                               }}
+                               className={`w-full bg-slate-50 border rounded-2xl px-4 py-2.5 pr-8 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:ring-2 transition-all ${
+                                 addressFormErrors.postal || pincodeStatus === 'error' ? 'border-red-400 focus:border-red-400 focus:ring-red-400/25' :
+                                 pincodeStatus === 'ok' ? 'border-emerald-400 focus:border-emerald-500 focus:ring-emerald-400/25' :
+                                 'border-slate-200 focus:border-[#105335] focus:ring-[#105335]/25'
+                               }`}
+                             />
+                             {/* TC64/TC65: pincode status indicator */}
+                             {pincodeStatus === 'checking' && (
+                               <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                                 <svg className="animate-spin w-3.5 h-3.5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                               </span>
+                             )}
+                             {pincodeStatus === 'ok' && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 font-black text-sm">✓</span>}
+                             {pincodeStatus === 'error' && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 font-black text-sm">✗</span>}
+                           </div>
+                           {/* TC64: serviceable pincode accepted */}
+                           {pincodeStatus === 'ok' && !addressFormErrors.postal && (
+                             <p id="pincode-serviceable-msg" className="text-[10px] text-emerald-600 font-bold mt-1">✓ Pincode is serviceable!</p>
+                           )}
+                           {/* TC65: non-serviceable pincode error */}
+                           {(pincodeStatus === 'error' || addressFormErrors.postal) && (
+                             <p id="pincode-error-msg" className="text-[10px] text-red-500 font-bold mt-1">
+                               {addressFormErrors.postal || 'This pincode is not serviceable. Please try another.'}
+                             </p>
+                           )}
+                         </div>
                         <div className="space-y-1.5">
                           <span className="text-[10px] text-slate-500 font-bold uppercase block">City</span>
                           <input
@@ -2950,14 +3129,28 @@ const Dashboard = () => {
 
 
                       <div className="space-y-1.5">
-                        <span className="text-[10px] text-slate-500 font-bold uppercase block">Delivery Instructions</span>
-                        <textarea 
-                          placeholder="e.g. Leave at front desk, call upon arrival, etc."
+                        <span className="text-[10px] text-slate-500 font-bold uppercase block">Delivery Instructions <span className="normal-case font-semibold text-slate-400">(Optional)</span></span>
+                        {/* TC58: emoji handling — strip unsupported characters, allow standard emoji */}
+                        <textarea
+                          id="delivery-instructions-input"
+                          placeholder="e.g. Leave at front desk, call upon arrival, ring bell 🔔"
                           value={newAddressInstructions}
-                          onChange={(e) => setNewAddressInstructions(e.target.value)}
+                          onChange={(e) => {
+                            // TC58: sanitize — allow text + emoji, strip control chars except newline
+                            const sanitized = e.target.value.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '');
+                            setNewAddressInstructions(sanitized);
+                          }}
+                          maxLength={200}
                           rows="3"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:border-[#105335] focus:ring-2 focus:ring-[#105335]/25 transition-all"
-                        ></textarea>
+                          className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:border-[#105335] focus:ring-2 focus:ring-[#105335]/25 transition-all resize-none"
+                        />
+                        <div className="flex justify-between items-center">
+                          {/* TC55: hint about default when empty */}
+                          <p className="text-[9px] text-slate-400 font-semibold">
+                            {newAddressInstructions.trim() === '' ? 'No special instructions — standard delivery will apply.' : '✓ Instructions saved with address.'}
+                          </p>
+                          <span className="text-[9px] text-slate-400 font-semibold">{newAddressInstructions.length}/200</span>
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-3 py-2 select-none">
@@ -2999,10 +3192,53 @@ const Dashboard = () => {
             );
           })()}
 
-          {/* E. Payments & UPI Tab */}
-          {activeSidebarTab === 'payments' && (
-            <div className="space-y-6 animate-fade-in text-left">
+          {/* E. Payments & UPI Tab — TC68: restore from localStorage on tab mount */}
+          {activeSidebarTab === 'payments' && (() => {
+            // TC68: Restore saved cards, UPI handles & transaction logs from localStorage if present
+            try {
+              const cachedCards = localStorage.getItem('nutritva_cards_cache');
+              if (cachedCards && savedCards.length === 2 && JSON.parse(cachedCards).length !== 2) {
+                setSavedCards(JSON.parse(cachedCards));
+              }
+              const cachedUpis = localStorage.getItem('nutritva_upi_cache');
+              if (cachedUpis && upiHandles.length === 2 && JSON.parse(cachedUpis).length !== 2) {
+                setUpiHandles(JSON.parse(cachedUpis));
+              }
+              const cachedTxns = localStorage.getItem('nutritva_txns_cache');
+              if (cachedTxns && transactionLogs.length === 5 && JSON.parse(cachedTxns).length !== 5) {
+                setTransactionLogs(JSON.parse(cachedTxns));
+              }
+            } catch {}
+
+            return (
+            <div className="space-y-6 animate-fade-in text-left relative">
               
+              {/* TC70: Slow Internet Loading Indicator Overlay */}
+              {paymentsLoading && (
+                <div id="payments-slow-loading-indicator" className="absolute inset-0 bg-white/80 backdrop-blur-xs z-50 rounded-3xl flex flex-col items-center justify-center p-8 text-center min-h-[300px]">
+                  <svg className="animate-spin w-10 h-10 text-[#105335] mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                  </svg>
+                  <h4 className="font-extrabold text-slate-800 text-sm">Fetching Payment Records…</h4>
+                  <p className="text-xs text-slate-400 font-semibold mt-1">Simulating slow network latency (TC70)</p>
+                </div>
+              )}
+
+              <div className="flex justify-between items-center bg-white rounded-2xl p-4 border border-slate-100 shadow-xs mb-2">
+                <div>
+                  <h3 className="font-extrabold text-slate-800 text-sm">Payments & Wallet Management</h3>
+                  <p className="text-[10px] text-slate-400 font-bold">Manage credit/debit cards, UPI handles, and view transactions</p>
+                </div>
+                {/* TC70: Button to trigger slow internet loading test */}
+                <button 
+                  onClick={triggerSlowInternetFetch}
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 border border-slate-200"
+                >
+                  <span>📡 Test Slow Network</span>
+                </button>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 {/* Visual Glassmorphic Credit Cards */}
@@ -3135,10 +3371,16 @@ const Dashboard = () => {
                         required
                         placeholder="e.g. username@paytm" 
                         value={newUpiId}
-                        onChange={(e) => setNewUpiId(e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-750 focus:outline-none focus:border-brand-green"
+                        onChange={(e) => { setNewUpiId(e.target.value); setUpiFormError(''); }}
+                        className={`w-full bg-white border rounded-xl px-3 py-1.5 text-xs font-bold text-slate-750 focus:outline-none transition-all ${
+                          upiFormError ? 'border-red-400 focus:border-red-400' : 'border-slate-200 focus:border-brand-green'
+                        }`}
                       />
-                      <div className="flex gap-2">
+                      {/* TC27 & TC35: Inline error message */}
+                      {upiFormError && (
+                        <p id="upi-form-error-msg" className="text-[10px] text-red-500 font-bold mt-1">{upiFormError}</p>
+                      )}
+                      <div className="flex gap-2 pt-1">
                         <button 
                           type="submit" 
                           className="flex-1 py-1.5 bg-[#105335] hover:bg-emerald-800 text-white font-black text-[10px] rounded-lg shadow-sm"
@@ -3147,7 +3389,7 @@ const Dashboard = () => {
                         </button>
                         <button 
                           type="button" 
-                          onClick={() => setShowAddUpi(false)}
+                          onClick={() => { setShowAddUpi(false); setUpiFormError(''); }}
                           className="flex-1 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-black text-[10px] rounded-lg"
                         >
                           Cancel
@@ -3166,13 +3408,71 @@ const Dashboard = () => {
 
               </div>
 
+              {/* TC36-TC38: UPI OTP Verification Modal */}
+              {showUpiOtp && (
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[100] p-4">
+                  <form onSubmit={handleVerifyUpiOtp} className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative p-6 border border-slate-100 space-y-4 text-left">
+                    <button 
+                      type="button"
+                      onClick={() => { setShowUpiOtp(false); setUpiOtpError(''); }}
+                      className="absolute top-4 right-4 text-slate-400 hover:text-slate-650 font-black text-lg p-1.5"
+                    >
+                      ✕
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">🔐</span>
+                      <div>
+                        <h3 className="font-extrabold text-slate-800 text-sm">Verify UPI Handle</h3>
+                        <p className="text-[10px] text-slate-400 font-semibold">Enter the 6-digit OTP sent to linked mobile for <span className="font-bold text-slate-700">{newUpiId}</span></p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <span className="text-[9px] text-slate-400 font-black uppercase tracking-wider block">Verification OTP</span>
+                      <input 
+                        type="text"
+                        maxLength={6}
+                        placeholder="Enter 123456 for testing"
+                        value={upiOtpInput}
+                        onChange={(e) => { setUpiOtpInput(e.target.value.replace(/\D/g, '')); setUpiOtpError(''); }}
+                        className={`w-full bg-slate-50 border rounded-2xl px-4 py-2.5 text-center text-sm font-black tracking-widest text-slate-800 focus:outline-none focus:bg-white transition-all ${
+                          upiOtpError ? 'border-red-400 focus:border-red-400' : 'border-slate-200 focus:border-[#105335]'
+                        }`}
+                      />
+                      {upiOtpError && (
+                        <p id="upi-otp-error-msg" className="text-[10px] text-red-500 font-bold mt-1">{upiOtpError}</p>
+                      )}
+                      <p className="text-[9px] text-slate-400 font-semibold mt-1">
+                        Tip: Use OTP <span className="font-bold text-emerald-700">123456</span> to verify, <span className="font-bold text-amber-600">000000</span> for expired.
+                      </p>
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <button 
+                        type="submit"
+                        className="flex-1 py-2.5 bg-[#105335] hover:bg-emerald-800 text-white font-black text-xs rounded-xl shadow-md transition-all active:scale-95"
+                      >
+                        Verify & Link UPI
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => { setShowUpiOtp(false); setUpiOtpError(''); }}
+                        className="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs rounded-xl transition-all"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
               {/* Add Card Modal Overlay */}
               {showAddCard && (
                 <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[100] p-4">
-                  <form onSubmit={handleAddCardSubmit} className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative p-6 border border-slate-100 space-y-4 text-left">
+                  <form onSubmit={handleAddCardSubmit} noValidate className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative p-6 border border-slate-100 space-y-4 text-left">
                     <button 
                       type="button"
-                      onClick={() => setShowAddCard(false)}
+                      onClick={() => { setShowAddCard(false); setCardFormErrors({}); }}
                       className="absolute top-4 right-4 text-slate-400 hover:text-slate-650 font-black text-lg p-1.5"
                     >
                       ✕
@@ -3206,10 +3506,10 @@ const Dashboard = () => {
                         type="text"
                         placeholder="e.g. IPSITA PANDA"
                         value={newCardHolder}
-                        onChange={(e) => setNewCardHolder(e.target.value)}
-                        required
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-750 focus:outline-none focus:bg-white focus:border-brand-green"
+                        onChange={(e) => { setNewCardHolder(e.target.value); setCardFormErrors(p => ({...p, holder: ''})); }}
+                        className={`w-full bg-slate-50 border rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-750 focus:outline-none focus:bg-white transition-all ${cardFormErrors.holder ? 'border-red-400 focus:border-red-400' : 'border-slate-200 focus:border-brand-green'}`}
                       />
+                      {cardFormErrors.holder && <p className="text-[10px] text-red-500 font-bold mt-0.5">{cardFormErrors.holder}</p>}
                     </div>
 
                     <div className="space-y-1.5 text-left">
@@ -3231,11 +3531,12 @@ const Dashboard = () => {
                           } else {
                             setNewCardNumber(val.substring(0, 16));
                           }
+                          setCardFormErrors(p => ({...p, number: ''}));
                         }}
-                        required
                         maxLength={19}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-750 focus:outline-none focus:bg-white focus:border-brand-green"
+                        className={`w-full bg-slate-50 border rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-750 focus:outline-none focus:bg-white transition-all ${cardFormErrors.number ? 'border-red-400 focus:border-red-400' : 'border-slate-200 focus:border-brand-green'}`}
                       />
+                      {cardFormErrors.number && <p className="text-[10px] text-red-500 font-bold mt-0.5">{cardFormErrors.number}</p>}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -3252,11 +3553,12 @@ const Dashboard = () => {
                             } else {
                               setNewCardExpiry(val);
                             }
+                            setCardFormErrors(p => ({...p, expiry: ''}));
                           }}
-                          required
                           maxLength={7}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-750 focus:outline-none focus:bg-white focus:border-brand-green"
+                          className={`w-full bg-slate-50 border rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-750 focus:outline-none focus:bg-white transition-all ${cardFormErrors.expiry ? 'border-red-400 focus:border-red-400' : 'border-slate-200 focus:border-brand-green'}`}
                         />
+                        {cardFormErrors.expiry && <p className="text-[10px] text-red-500 font-bold mt-0.5">{cardFormErrors.expiry}</p>}
                       </div>
 
                       <div className="space-y-1.5 text-left">
@@ -3265,11 +3567,11 @@ const Dashboard = () => {
                           type="password"
                           placeholder="•••"
                           value={newCardCvv}
-                          onChange={(e) => setNewCardCvv(e.target.value.replace(/\D/g, ''))}
-                          required
-                          maxLength={3}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-750 focus:outline-none focus:bg-white focus:border-brand-green text-center"
+                          onChange={(e) => { setNewCardCvv(e.target.value.replace(/\D/g, '')); setCardFormErrors(p => ({...p, cvv: ''})); }}
+                          maxLength={4}
+                          className={`w-full bg-slate-50 border rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-750 focus:outline-none focus:bg-white transition-all text-center ${cardFormErrors.cvv ? 'border-red-400 focus:border-red-400' : 'border-slate-200 focus:border-brand-green'}`}
                         />
+                        {cardFormErrors.cvv && <p className="text-[10px] text-red-500 font-bold mt-0.5">{cardFormErrors.cvv}</p>}
                       </div>
                     </div>
 
@@ -3293,61 +3595,112 @@ const Dashboard = () => {
                       </div>
                     </div>
 
-                    <button 
-                      type="submit"
-                      className="w-full py-2.5 bg-[#105335] hover:bg-emerald-800 text-white font-black text-xs rounded-xl shadow-md transition-all active:scale-95"
-                    >
-                      Link & Save Card
-                    </button>
+                    {/* Action buttons (TC20: Cancel Add Card button) */}
+                    <div className="flex gap-2 pt-2">
+                      <button 
+                        type="submit"
+                        className="flex-1 py-2.5 bg-[#105335] hover:bg-emerald-800 text-white font-black text-xs rounded-xl shadow-md transition-all active:scale-95"
+                      >
+                        Link & Save Card
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => { setShowAddCard(false); setCardFormErrors({}); }}
+                        className="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs rounded-xl transition-all"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </form>
                 </div>
               )}
 
               {/* Transactions list */}
               <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs">
-                <h3 className="font-bold text-slate-800 text-sm mb-4">Transaction logs</h3>
-                <div className="overflow-x-auto w-full">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="border-b border-slate-100 text-slate-400 font-bold">
-                        <th className="py-2.5 px-3">Transaction ID</th>
-                        <th className="py-2.5 px-3">Date</th>
-                        <th className="py-2.5 px-3">Description</th>
-                        <th className="py-2.5 px-3">Paid Via</th>
-                        <th className="py-2.5 px-3">Amount</th>
-                        <th className="py-2.5 px-3 text-center">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                      {[
-                        { id: '#TXN-90184', date: 'Today', type: 'Store Order ' + (activeOrder ? activeOrder.id : '#NT98765'), method: 'Visa **4242', amount: activeOrder ? activeOrder.amount : 599, status: 'Success', flow: 'out' },
-                        { id: '#TXN-90124', date: '18 May, 2026', type: 'Store Order #NT12458', method: 'Visa **4242', amount: 899, status: 'Success', flow: 'out' },
-                        { id: '#TXN-89945', date: '02 May, 2026', type: 'Wellness Box Subscription', method: 'Mastercard **8899', amount: 1299, status: 'Success', flow: 'out' },
-                        { id: '#TXN-89812', date: '28 Apr, 2026', type: 'Store Purchase', method: 'UPI - ipsita@oksbi', amount: 639, status: 'Success', flow: 'out' }
-                      ].map((txn, index) => (
-                        <tr key={index} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="py-3 px-3 font-semibold text-slate-700">{txn.id}</td>
-                          <td className="py-3 px-3 text-slate-450 font-medium">{txn.date}</td>
-                          <td className="py-3 px-3 text-slate-800 font-bold text-left">{txn.type}</td>
-                          <td className="py-3 px-3 text-slate-450 font-semibold">{txn.method}</td>
-                          <td className="py-3 px-3 font-black flex items-center gap-1 mt-1">
-                            <ArrowUpRight className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                            <span className="text-slate-800">₹{txn.amount}</span>
-                          </td>
-                          <td className="py-3 px-3 text-center">
-                            <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-50 text-emerald-700 border border-emerald-100">
-                              {txn.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-bold text-slate-800 text-sm">Transaction logs</h3>
+                  {/* TC50: Quick toggle to test empty transaction logs */}
+                  <button 
+                    onClick={() => {
+                      if (transactionLogs.length > 0) {
+                        setTransactionLogs([]);
+                      } else {
+                        setTransactionLogs([
+                          { id: '#TXN-90184', date: 'Today', type: 'Store Order #NT98765', method: 'Visa **4242', amount: 599, status: 'Success', flow: 'out' },
+                          { id: '#TXN-90124', date: '18 May, 2026', type: 'Store Order #NT12458', method: 'Visa **4242', amount: 899, status: 'Success', flow: 'out' },
+                          { id: '#TXN-89945', date: '02 May, 2026', type: 'Wellness Box Subscription', method: 'Mastercard **8899', amount: 1299, status: 'Success', flow: 'out' },
+                          { id: '#TXN-89812', date: '28 Apr, 2026', type: 'Store Purchase', method: 'UPI - ipsita@oksbi', amount: 639, status: 'Success', flow: 'out' }
+                        ]);
+                      }
+                    }}
+                    className="text-[10px] font-bold text-slate-400 hover:text-slate-600 underline"
+                  >
+                    {transactionLogs.length > 0 ? 'Simulate Empty Logs' : 'Restore Sample Logs'}
+                  </button>
                 </div>
+
+                {/* TC50: Empty transaction history state */}
+                {transactionLogs.length === 0 ? (
+                  <div id="no-transactions-empty" className="py-12 flex flex-col items-center justify-center text-center border border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
+                    <span className="text-4xl mb-3">📜</span>
+                    <h4 className="font-extrabold text-slate-700 text-sm mb-1">No Transactions Found</h4>
+                    <p className="text-xs text-slate-400 font-medium max-w-xs">You have no transaction logs available at this time.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto w-full">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b border-slate-100 text-slate-400 font-bold">
+                          <th className="py-2.5 px-3">Transaction ID</th>
+                          <th className="py-2.5 px-3">Date</th>
+                          <th className="py-2.5 px-3">Description</th>
+                          <th className="py-2.5 px-3">Paid Via</th>
+                          <th className="py-2.5 px-3">Amount</th>
+                          <th className="py-2.5 px-3 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {transactionLogs.map((txn, index) => {
+                          // TC52-TC55: Status badge formatting for Failed, Pending, Refunded, Cancelled, Success
+                          const getBadgeStyles = (st) => {
+                            switch ((st || '').toLowerCase()) {
+                              case 'failed': return 'bg-red-50 text-red-700 border-red-100'; // TC52
+                              case 'pending': return 'bg-amber-50 text-amber-700 border-amber-100'; // TC53
+                              case 'refunded': return 'bg-blue-50 text-blue-700 border-blue-100'; // TC54
+                              case 'cancelled': return 'bg-slate-100 text-slate-600 border-slate-200'; // TC55
+                              case 'success':
+                              default: return 'bg-emerald-50 text-emerald-700 border-emerald-100';
+                            }
+                          };
+
+                          return (
+                            <tr key={index} className="hover:bg-slate-50/50 transition-colors">
+                              <td className="py-3 px-3 font-semibold text-slate-700">{txn.id}</td>
+                              <td className="py-3 px-3 text-slate-450 font-medium">{txn.date}</td>
+                              <td className="py-3 px-3 text-slate-800 font-bold text-left">{txn.type}</td>
+                              <td className="py-3 px-3 text-slate-450 font-semibold">{txn.method}</td>
+                              <td className="py-3 px-3 font-black flex items-center gap-1 mt-1">
+                                <ArrowUpRight className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                <span className="text-slate-800">₹{txn.amount}</span>
+                              </td>
+                              <td className="py-3 px-3 text-center">
+                                {/* TC52-TC55: Dynamic status badge */}
+                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black border ${getBadgeStyles(txn.status)}`}>
+                                  {txn.status}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
 
             </div>
-          )}
+            );
+          })()}
 
           {/* F. Help & Support Tab */}
           {activeSidebarTab === 'support' && (

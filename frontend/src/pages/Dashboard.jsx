@@ -3792,41 +3792,126 @@ const Dashboard = () => {
           )}
 
           {/* H. Reviews & Ratings Tab */}
-          {activeSidebarTab === 'reviews' && (
-            <div className="animate-fade-in space-y-6 text-left">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3 className="text-xl font-black text-slate-800">Reviews & Ratings</h3>
-                  <p className="text-xs font-semibold text-slate-400">Your feedback matters</p>
+          {activeSidebarTab === 'reviews' && (() => {
+            // TC10: Persist reviews on browser refresh via localStorage
+            const cachedReviews = (() => {
+              try {
+                const cached = localStorage.getItem('nutritva_reviews_cache');
+                return cached ? JSON.parse(cached) : reviews;
+              } catch { return reviews; }
+            })();
+            if (reviews.length > 0) {
+              try { localStorage.setItem('nutritva_reviews_cache', JSON.stringify(reviews)); } catch {}
+            }
+            const displayReviews = reviews.length > 0 ? reviews : cachedReviews;
+
+            // TC26: Half-star rating renderer (supports 0.5 increments)
+            const renderStars = (rating) => {
+              const numRating = parseFloat(rating) || 0;
+              return [1, 2, 3, 4, 5].map((star, idx) => {
+                const filled   = numRating >= star;
+                const halfFill = !filled && numRating >= star - 0.5;
+                return (
+                  <span key={idx} className="relative inline-block w-3.5 h-3.5">
+                    {/* Background (empty) star */}
+                    <Star className="absolute inset-0 w-3.5 h-3.5 fill-slate-100 text-slate-200" />
+                    {/* Full fill */}
+                    {filled && <Star className="absolute inset-0 w-3.5 h-3.5 fill-amber-400 text-amber-400" />}
+                    {/* Half fill using clip */}
+                    {halfFill && (
+                      <span className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>
+                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      </span>
+                    )}
+                  </span>
+                );
+              });
+            };
+
+            return (
+              <div className="animate-fade-in space-y-6 text-left">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="text-xl font-black text-slate-800">Reviews & Ratings</h3>
+                    <p className="text-xs font-semibold text-slate-400">
+                      {displayReviews.length > 0 ? `${displayReviews.length} review${displayReviews.length > 1 ? 's' : ''} submitted` : 'Your feedback matters'}
+                    </p>
+                  </div>
+                </div>
+
+                {displayReviews.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-16 text-center">
+                    <span className="text-5xl mb-4">⭐</span>
+                    <p className="text-sm font-black text-slate-600">No Reviews Yet</p>
+                    <p className="text-xs font-semibold text-slate-400 mt-1">Purchase a product and share your experience!</p>
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  {/* TC18: Use index in key to display duplicate reviews separately */}
+                  {displayReviews.map((rev, revIndex) => {
+                    const product = products.find(p => p.id === rev.product_id);
+                    const numRating = parseFloat(rev.rating) || 0;
+
+                    return (
+                      <div
+                        key={`${rev.id}-${revIndex}`}
+                        className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-5 transition-all hover:shadow-md"
+                      >
+                        {/* TC16: Product image loads correctly with img tag + emoji fallback */}
+                        <div className="w-16 h-16 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 border border-slate-100 overflow-hidden">
+                          {product?.image ? (
+                            <img
+                              src={product.image}
+                              alt={product?.name || 'Product'}
+                              className="w-full h-full object-cover rounded-xl"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <span
+                            className="text-2xl"
+                            style={{ display: product?.image ? 'none' : 'flex' }}
+                          >
+                            {product?.icon || '📦'}
+                          </span>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start gap-2">
+                            <h4 className="text-sm font-black text-slate-800 truncate">
+                              {product?.name || rev.product_name || 'Product'}
+                            </h4>
+                            <span className="text-[10px] font-semibold text-slate-400 shrink-0">
+                              {rev.created_at ? new Date(rev.created_at).toLocaleDateString() : '——'}
+                            </span>
+                          </div>
+
+                          {/* TC26 + TC27: Half-star display + numeric rating value from backend */}
+                          <div className="flex items-center gap-2 my-1.5">
+                            <div className="flex gap-0.5">
+                              {renderStars(numRating)}
+                            </div>
+                            {/* TC27: Show exact backend rating value */}
+                            <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md">
+                              {numRating % 1 === 0 ? numRating.toFixed(1) : numRating} / 5
+                            </span>
+                          </div>
+
+                          <p className="text-xs font-semibold text-slate-600 italic mt-1.5 leading-relaxed">
+                            "{rev.review || 'No written review provided.'}"
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-              <div className="space-y-4">
-                {reviews.map(rev => {
-                  const product = products.find(p => p.id === rev.product_id);
-                  if (!product) return null;
-                  return (
-                    <div key={rev.id} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-5">
-                      <div className="w-16 h-16 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 border border-slate-100">
-                        <span className="text-2xl">{product.icon || '📦'}</span>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start">
-                          <h4 className="text-sm font-black text-slate-800">{product.name}</h4>
-                          <span className="text-[10px] font-semibold text-slate-400">{new Date(rev.created_at).toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex gap-1 my-1.5">
-                          {[1,2,3,4,5].map(star => (
-                            <Star key={star} className={`w-3.5 h-3.5 ${star <= rev.rating ? 'fill-amber-400 text-amber-400' : 'fill-slate-100 text-slate-200'}`} />
-                          ))}
-                        </div>
-                        <p className="text-xs font-semibold text-slate-600 italic mt-1.5">"{rev.review}"</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+            );
+          })()}
+
 
         </main>
       </div>

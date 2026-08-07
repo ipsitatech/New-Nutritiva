@@ -206,6 +206,8 @@ const Storefront = () => {
     return saved !== null ? saved : 'gold';
   });
   const [favToast, setFavToast] = useState({ show: false, msg: '', added: true });
+  const [vipActivationError, setVipActivationError] = useState('');
+  const [vipActivating, setVipActivating] = useState(false);
 
   const [genericToast, setGenericToast] = useState({ show: false, msg: '', icon: 'ℹ️' });
   const showToastNotification = (msg, icon = 'ℹ️') => {
@@ -2377,31 +2379,85 @@ const Storefront = () => {
                 </div>
 
                 {/* CTA Button */}
-                <div className="flex flex-col items-center gap-3">
+                <div className="flex flex-col items-center gap-3 w-full">
+                  {/* Activation Error Display (TC66, TC67) */}
+                  {vipActivationError && (
+                    <div className="w-full max-w-sm mb-2 p-3 rounded-xl border border-red-500/30 text-red-400 bg-red-500/10 text-xs font-semibold text-center flex flex-col gap-1.5 animate-fade-in">
+                      <p>⚠️ {vipActivationError}</p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const activateBtn = document.getElementById('vip-activate-btn');
+                          if (activateBtn) activateBtn.click();
+                        }}
+                        className="text-[10px] font-black underline uppercase text-white hover:text-amber-400 transition-colors"
+                      >
+                        🔄 Retry Activation
+                      </button>
+                    </div>
+                  )}
+
                   <button
+                    id="vip-activate-btn"
+                    disabled={vipActivating}
                     onClick={() => {
+                      const validPlans = ['silver', 'gold', 'platinum'];
+                      if (!validPlans.includes(vipSelectedPlan)) {
+                        setVipActivationError("Invalid Plan ID selected. Please select a valid membership plan.");
+                        return;
+                      }
+
                       const oldStatus = user.status || 'Regular Member';
                       const newStatus = vipSelectedPlan === 'silver' ? 'VIP Silver Member' : vipSelectedPlan === 'gold' ? 'VIP Gold Member' : 'VIP Platinum Member';
                       
                       const oldRank = oldStatus.includes('Platinum') ? 3 : oldStatus.includes('Gold') ? 2 : oldStatus.includes('Silver') ? 1 : 0;
                       const newRank = vipSelectedPlan === 'platinum' ? 3 : vipSelectedPlan === 'gold' ? 2 : 1;
-                      
-                      setVipJoined(true);
-                      setUser(prev => ({ ...prev, status: newStatus }));
-                      
-                      if (oldRank !== 0) {
-                        if (newRank > oldRank) {
-                          showToastNotification("👑 Membership Upgraded Successfully!", "👑");
-                        } else if (newRank < oldRank) {
-                          showToastNotification("✅ Membership Changed Successfully!", "✅");
-                        } else {
-                          showToastNotification("✅ Membership Re-activated Successfully!", "✅");
-                        }
-                      } else {
-                        showToastNotification("🎉 Membership Activated Successfully!", "🎉");
+
+                      const currentPlanShort = oldStatus.includes('Silver') ? 'silver' : oldStatus.includes('Gold') ? 'gold' : oldStatus.includes('Platinum') ? 'platinum' : 'none';
+                      if (currentPlanShort === vipSelectedPlan) {
+                        alert("You are already subscribed to this membership plan.");
+                        return;
                       }
+
+                      setVipActivating(true);
+                      setVipActivationError('');
+
+                      authFetch('http://localhost:5000/api/user', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...user, status: newStatus })
+                      })
+                      .then(async res => {
+                        const data = await res.json();
+                        if (!res.ok) {
+                          throw new Error(data.error || 'Failed to update membership.');
+                        }
+                        return data;
+                      })
+                      .then(freshUser => {
+                        setUser(freshUser);
+                        setVipJoined(true);
+                        setVipActivating(false);
+                        
+                        if (oldRank !== 0) {
+                          if (newRank > oldRank) {
+                            showToastNotification("👑 Membership Upgraded Successfully!", "👑");
+                          } else if (newRank < oldRank) {
+                            showToastNotification("✅ Membership Changed Successfully!", "✅");
+                          } else {
+                            showToastNotification("✅ Membership Re-activated Successfully!", "✅");
+                          }
+                        } else {
+                          showToastNotification("🎉 Membership Activated Successfully!", "🎉");
+                        }
+                      })
+                      .catch(err => {
+                        console.error('Failed to update membership:', err);
+                        setVipActivating(false);
+                        setVipActivationError("Network interruption: Could not activate membership. Please check your connection and try again.");
+                      });
                     }}
-                    className="w-full max-w-sm font-black text-base py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
+                    className={`w-full max-w-sm font-black text-base py-4 rounded-2xl transition-all flex items-center justify-center gap-3 ${vipActivating ? 'opacity-75 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-95'}`}
                     style={{
                       background: vipSelectedPlan === 'silver'
                         ? 'linear-gradient(135deg, #94a3b8, #64748b)'
@@ -2417,7 +2473,7 @@ const Storefront = () => {
                     }}
                   >
                     <span>
-                      {vipSelectedPlan === 'silver' ? 'Join Free — Silver Plan' : `Activate ${vipSelectedPlan.charAt(0).toUpperCase() + vipSelectedPlan.slice(1)} Plan`}
+                      {vipActivating ? 'Activating Plan...' : vipSelectedPlan === 'silver' ? 'Join Free — Silver Plan' : `Activate ${vipSelectedPlan.charAt(0).toUpperCase() + vipSelectedPlan.slice(1)} Plan`}
                     </span>
                     <span className="text-xl">{vipSelectedPlan === 'silver' ? '🥈' : vipSelectedPlan === 'gold' ? '🥇' : '💎'}</span>
                   </button>

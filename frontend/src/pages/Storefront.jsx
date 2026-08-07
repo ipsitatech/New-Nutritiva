@@ -778,7 +778,10 @@ const Storefront = () => {
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-black text-slate-900 leading-tight">{user.name}</p>
                         <p className="text-xs text-slate-500 font-semibold">{user.email}</p>
-                        <span className="inline-flex items-center gap-1 text-[10px] font-black text-amber-600 mt-0.5">
+                        <span 
+                          onClick={() => { setActiveDashboardTab('vip'); setCurrentPage('dashboard'); setShowProfileDropdown(false); }}
+                          className="inline-flex items-center gap-1 text-[10px] font-black text-amber-600 mt-0.5 cursor-pointer hover:underline"
+                        >
                           ✦ {user.status}
                         </span>
                       </div>

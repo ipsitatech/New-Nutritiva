@@ -97,7 +97,7 @@ const imageMap = {
 };
 
 const VipMembershipPage = ({ onClose }) => {
-  const { setUser } = useApp();
+  const { user, setUser, authFetch } = useApp();
   const [yearly, setYearly] = useState(true);
   const [selected, setSelected] = useState('gold');
   const [joined, setJoined] = useState(false);
@@ -143,6 +143,14 @@ const VipMembershipPage = ({ onClose }) => {
       ]
     }
   ];
+
+  const isVip = user && (user.status || '').includes('VIP');
+  const currentPlanId = isVip 
+    ? ((user.status || '').includes('Silver') ? 'silver' : (user.status || '').includes('Gold') ? 'gold' : 'platinum')
+    : null;
+  const currentPlan = plans.find(p => p.id === currentPlanId);
+
+  const [showPlanChange, setShowPlanChange] = useState(!isVip);
 
   const activePlan = plans.find(p => p.id === selected);
 
@@ -199,12 +207,140 @@ const VipMembershipPage = ({ onClose }) => {
           ))}
         </div>
         <button
-          onClick={onClose}
+          onClick={() => {
+            setJoined(false);
+            setShowPlanChange(false);
+          }}
           className="font-black text-sm px-10 py-3.5 rounded-2xl transition-all hover:scale-105 active:scale-95 z-10"
-          style={{background: `linear-gradient(135deg, ${activePlan.color}, ${activePlan.id === 'gold' ? '#FF8C00' : activePlan.id === 'silver' ? '#64748b' : '#6366f1'})`, color: activePlan.id === 'gold' ? '#0d1f17' : 'white', boxShadow: `0 8px 24px ${activePlan.glow}`}}
+          style={{
+            background: `linear-gradient(135deg, ${activePlan.color}, ${activePlan.id === 'gold' ? '#FF8C00' : activePlan.id === 'silver' ? '#64748b' : '#6366f1'})`,
+            color: activePlan.id === 'gold' ? '#0d1f17' : 'white',
+            boxShadow: `0 8px 24px ${activePlan.glow}`
+          }}
         >
-          Start Shopping Now 🛒
+          View Dashboard 🛒
         </button>
+      </div>
+    );
+  }
+
+  if (!showPlanChange && currentPlan) {
+    return (
+      <div className="animate-fade-in space-y-6 text-left">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-xl font-black text-slate-800">VIP Club Membership</h3>
+            <p className="text-xs font-semibold text-slate-400">Your exclusive membership details & perks</p>
+          </div>
+        </div>
+
+        {/* Premium Membership Card */}
+        <div 
+          className="rounded-3xl p-8 text-white relative overflow-hidden shadow-xl"
+          style={{
+            background: currentPlan.id === 'silver'
+              ? 'linear-gradient(135deg, #475569, #1e293b)'
+              : currentPlan.id === 'gold'
+              ? 'linear-gradient(135deg, #b45309, #78350f)'
+              : 'linear-gradient(135deg, #6d28d9, #4c1d95)',
+            boxShadow: currentPlan.id === 'silver'
+              ? '0 12px 36px rgba(30,41,59,0.3)'
+              : currentPlan.id === 'gold'
+              ? '0 12px 36px rgba(120,53,15,0.4)'
+              : '0 12px 36px rgba(76,29,149,0.4)'
+          }}
+        >
+          <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full opacity-10 bg-white"></div>
+          <div className="absolute -bottom-12 -left-12 w-36 h-36 rounded-full opacity-10 bg-white"></div>
+          
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <span className="text-[10px] font-black tracking-widest uppercase bg-white/20 px-3 py-1.5 rounded-full text-white/95">
+                👑 Active Member
+              </span>
+              <h2 className="text-3xl font-black mt-3 flex items-center gap-2">
+                Nutritiva {currentPlan.name} <span className="text-2xl">{currentPlan.icon}</span>
+              </h2>
+            </div>
+            <div className="text-4xl">✦</div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-white/10 text-white/90">
+            <div>
+              <p className="text-[10px] uppercase font-bold text-white/60">Membership ID</p>
+              <p className="text-sm font-black mt-0.5">NUTR-{user.id ? user.id.replace('u_', '').toUpperCase() : 'VIP888'}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase font-bold text-white/60">Renewal Date</p>
+              <p className="text-sm font-black mt-0.5">Dec 31, 2026</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase font-bold text-white/60">Billing Cycle</p>
+              <p className="text-sm font-black mt-0.5">Yearly Billing</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Benefits Grid */}
+        <div>
+          <h4 className="text-sm font-black text-slate-800 mb-3">Active Membership Benefits</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {currentPlan.perks.map((p, idx) => (
+              <div 
+                key={idx} 
+                className={`p-4 rounded-2xl border flex items-center gap-3 ${
+                  p.ok 
+                    ? 'bg-emerald-50/50 border-emerald-100 text-slate-800' 
+                    : 'bg-slate-50 border-slate-100 text-slate-400 line-through'
+                }`}
+              >
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-sm ${
+                  p.ok ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'
+                }`}>
+                  {p.ok ? '✓' : '🔒'}
+                </div>
+                <div>
+                  <p className="text-xs font-bold">{p.t}</p>
+                  <p className="text-[9px] text-slate-400 font-semibold">{p.ok ? 'Active perk' : 'Upgrade to unlock'}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <button
+            onClick={() => setShowPlanChange(true)}
+            className="flex-1 py-3 bg-slate-800 hover:bg-slate-900 text-white text-xs font-black rounded-xl transition-colors text-center"
+          >
+            🔄 Upgrade / Downgrade Plan
+          </button>
+          <button
+            onClick={() => {
+              if (confirm("Are you sure you want to cancel your VIP Membership auto-renewal?")) {
+                authFetch('http://localhost:5000/api/user', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ ...user, status: 'Regular Member' })
+                })
+                .then(res => res.json())
+                .then(freshUser => {
+                  setUser(freshUser);
+                  alert("VIP Membership cancelled successfully.");
+                })
+                .catch(err => {
+                  console.error('Error cancelling VIP Membership:', err);
+                  setUser(prev => ({ ...prev, status: 'Regular Member' }));
+                  alert("VIP Membership cancelled successfully.");
+                });
+              }
+            }}
+            className="flex-1 py-3 border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-black rounded-xl transition-colors text-center"
+          >
+            ✕ Cancel Membership
+          </button>
+        </div>
       </div>
     );
   }
@@ -217,7 +353,17 @@ const VipMembershipPage = ({ onClose }) => {
         <div className="inline-flex items-center gap-2 text-[11px] font-black tracking-widest uppercase text-amber-400 mb-4 px-4 py-1.5 rounded-full" style={{background: 'rgba(255,179,0,0.12)', border: '1px solid rgba(255,179,0,0.25)'}}>
           👑 Nutritiva Club
         </div>
-        <h1 className="text-3xl font-black mb-2">Choose Your <span className="text-amber-400">VIP Plan</span></h1>
+        <div className="flex flex-col sm:flex-row justify-between items-center max-w-lg mx-auto mb-2 gap-3">
+          {isVip && (
+            <button 
+              onClick={() => setShowPlanChange(false)}
+              className="text-xs font-black text-amber-400 bg-amber-400/10 px-3.5 py-2 rounded-xl border border-amber-400/25 hover:bg-amber-400 hover:text-[#0d1f17] transition-all"
+            >
+              ← Back to Membership
+            </button>
+          )}
+          <h1 className="text-3xl font-black mx-auto">Choose Your <span className="text-amber-400">VIP Plan</span></h1>
+        </div>
         <p className="text-emerald-300/70 text-sm font-semibold mb-6">Join 50,000+ members enjoying exclusive health benefits</p>
 
         {/* Billing Toggle */}
@@ -339,8 +485,22 @@ const VipMembershipPage = ({ onClose }) => {
         <button
           onClick={() => {
             const statusName = selected === 'silver' ? 'VIP Silver Member' : selected === 'gold' ? 'VIP Gold Member' : 'VIP Platinum Member';
-            setUser(prev => ({ ...prev, status: statusName }));
-            setJoined(true);
+            
+            authFetch('http://localhost:5000/api/user', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ...user, status: statusName })
+            })
+            .then(res => res.json())
+            .then(freshUser => {
+              setUser(freshUser);
+              setJoined(true);
+            })
+            .catch(err => {
+              console.error('Error upgrading VIP plan in dashboard:', err);
+              setUser(prev => ({ ...prev, status: statusName }));
+              setJoined(true);
+            });
           }}
           className="shrink-0 font-black text-sm px-8 py-3.5 rounded-2xl transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
           style={{
@@ -865,6 +1025,24 @@ const Dashboard = () => {
             >
               <ShoppingBag className="w-4 h-4 shrink-0" />
               <span>My Orders</span>
+            </button>
+
+            {/* VIP Club Membership */}
+            <button
+              onClick={() => setActiveSidebarTab('vip')}
+              className={`w-full flex items-center justify-between px-4 py-2.5 text-xs font-bold rounded-xl transition-all ${
+                activeSidebarTab === 'vip'
+                  ? 'bg-brand-green text-white shadow-sm shadow-emerald-950/20'
+                  : 'text-slate-600 hover:bg-[#ffe5ec] hover:text-[#105335]'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Crown className={`w-4 h-4 shrink-0 ${activeSidebarTab === 'vip' ? 'text-amber-300' : 'text-amber-500 fill-amber-500/20'}`} />
+                <span>VIP Club Membership</span>
+              </div>
+              {(user.status || '').includes('VIP') && (
+                <span className="text-[9px] font-black bg-amber-400 text-slate-900 px-2 py-0.5 rounded-md uppercase">Active</span>
+              )}
             </button>
 
             {/* Spendings & Charts */}
@@ -1449,25 +1627,45 @@ const Dashboard = () => {
                 <div className="space-y-4">
 
                   {/* Membership Card */}
-                  <div className="rounded-3xl p-5 text-white relative overflow-hidden" style={{background: 'linear-gradient(135deg, #7c3aed, #4c1d95)', boxShadow: '0 8px 24px rgba(124,58,237,0.3)'}}>
+                  <div 
+                    onClick={() => setActiveSidebarTab('vip')}
+                    className="rounded-3xl p-5 text-white relative overflow-hidden cursor-pointer transition-all hover:scale-[1.02] active:scale-95 group" 
+                    style={{
+                      background: user.status.includes('Silver')
+                        ? 'linear-gradient(135deg, #64748b, #334155)'
+                        : user.status.includes('Gold')
+                        ? 'linear-gradient(135deg, #FFB300, #b45309)'
+                        : user.status.includes('Platinum')
+                        ? 'linear-gradient(135deg, #7c3aed, #4c1d95)'
+                        : 'linear-gradient(135deg, #105335, #08331e)',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
+                    }}
+                  >
                     <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full opacity-20" style={{background: 'rgba(255,255,255,0.3)'}}></div>
-                    <p className="text-[10px] font-black tracking-widest uppercase text-purple-300 mb-2">Membership</p>
+                    <p className="text-[10px] font-black tracking-widest uppercase text-white/70 mb-2">Membership</p>
                     <h3 className="text-xl font-black mb-0.5">{user.status}</h3>
-                    <p className="text-[10px] text-purple-200 font-bold mb-3 uppercase tracking-wider">ID: MID-{user.id ? user.id.toString().replace('u_', '').toUpperCase() : 'NUTR001'}</p>
-                    <p className="text-xs text-purple-200 font-semibold mb-4">Renews: Dec 31, 2026</p>
+                    <p className="text-[10px] text-white/80 font-bold mb-3 uppercase tracking-wider">ID: MID-{user.id ? user.id.toString().replace('u_', '').toUpperCase() : 'NUTR001'}</p>
+                    <p className="text-xs text-white/85 font-semibold mb-4">Renews: Dec 31, 2026</p>
                     <div className="space-y-1.5 mb-4">
                       {['Unlimited Free Delivery', 'Priority Packing', 'Exclusive Member Deals', 'Early Sale Access'].map(b => (
-                        <div key={b} className="flex items-center gap-2 text-xs font-semibold text-purple-100">
+                        <div key={b} className="flex items-center gap-2 text-xs font-semibold text-white/90">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span> {b}
                         </div>
                       ))}
                     </div>
                     {!user.status.includes('Platinum') && (
                       <button
-                        onClick={() => openDialog('Upgrade to Platinum', 'Platinum membership is available for just ₹299/month or ₹2399/yearly.\n\nBenefits:\n• 25% off on all orders\n• Free birthday gift box\n• Dedicated account manager\n• Zero delivery fees always\n\nYou can activate it under the VIP Membership Tab! 💎', '💎')}
-                        className="w-full text-xs font-black py-2 rounded-xl transition-all hover:scale-[1.02]" style={{background: 'rgba(255,179,0,0.9)', color: '#4c1d95'}}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveSidebarTab('vip');
+                        }}
+                        className="w-full text-xs font-black py-2 rounded-xl transition-all hover:scale-[1.02]"
+                        style={{
+                          background: user.status.includes('Gold') ? '#ffffff' : 'rgba(255,179,0,0.9)',
+                          color: user.status.includes('Gold') ? '#b45309' : '#4c1d95'
+                        }}
                       >
-                        Upgrade to Platinum ✦
+                        Upgrade Membership ✦
                       </button>
                     )}
                   </div>

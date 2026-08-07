@@ -3416,13 +3416,19 @@ const Dashboard = () => {
                     <div key={sub.id} className="bg-white p-6 rounded-3xl border border-emerald-100 shadow-sm relative overflow-hidden transition-all hover:shadow-md">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50/50 rounded-bl-[100px] -z-10"></div>
                       <div className="flex justify-between items-start mb-4">
-                        <div>
+                        <div 
+                          onClick={() => setActiveManageSubscription(sub)}
+                          className="cursor-pointer group hover:opacity-80 transition-opacity"
+                        >
                           {getStatusBadge(sub.status)}
-                          <h4 className="text-lg font-black text-slate-800 mt-3.5">
+                          <h4 className="text-lg font-black text-slate-800 mt-3.5 hover:text-emerald-700 transition-colors">
                             {sub.plan_name ? sub.plan_name : "Standard Nutrition Plan"}
                           </h4>
                         </div>
-                        <Repeat className="w-6 h-6 text-emerald-300" />
+                        <Repeat 
+                          onClick={() => setActiveManageSubscription(sub)}
+                          className="w-6 h-6 text-emerald-400 hover:text-emerald-600 transition-all cursor-pointer hover:scale-110 active:scale-95" 
+                        />
                       </div>
                       <div className="space-y-2 mb-6">
                         <div className="flex justify-between text-xs font-semibold text-slate-500">

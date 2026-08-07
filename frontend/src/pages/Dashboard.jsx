@@ -1205,18 +1205,33 @@ const Dashboard = () => {
                     </div>
                     <div>
                       <label className="text-xs font-black text-slate-700 block mb-1.5">Phone Number</label>
-                      <input
-                        type="text"
-                        value={tempProfile.phone}
-                        onChange={e => setTempProfile({ ...tempProfile, phone: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none transition-all"
-                        style={{
-                          background: '#f8fafc',
-                          border: profileErrors.phone ? '1.5px solid #ef4444' : '1.5px solid rgba(255,160,190,0.4)'
-                        }}
-                        onFocus={e => e.target.style.borderColor = '#105335'}
-                        onBlur={e => e.target.style.borderColor = profileErrors.phone ? '#ef4444' : 'rgba(255,160,190,0.4)'}
-                      />
+                      <div className="flex gap-2">
+                        <select
+                          className="px-3 py-2.5 rounded-xl text-sm font-bold text-slate-700 border bg-white focus:outline-none transition-all cursor-pointer"
+                          style={{
+                            borderColor: 'rgba(255,160,190,0.4)'
+                          }}
+                        >
+                          <option value="+91">🇮🇳 +91</option>
+                          <option value="+1">🇺🇸 +1</option>
+                          <option value="+44">🇬🇧 +44</option>
+                          <option value="+971">🇦🇪 +971</option>
+                        </select>
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={tempProfile.phone}
+                            onChange={e => setTempProfile({ ...tempProfile, phone: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none transition-all"
+                            style={{
+                              background: '#f8fafc',
+                              border: profileErrors.phone ? '1.5px solid #ef4444' : '1.5px solid rgba(255,160,190,0.4)'
+                            }}
+                            onFocus={e => e.target.style.borderColor = '#105335'}
+                            onBlur={e => e.target.style.borderColor = profileErrors.phone ? '#ef4444' : 'rgba(255,160,190,0.4)'}
+                          />
+                        </div>
+                      </div>
                       {profileErrors.phone && (
                         <p className="text-red-500 text-[10px] font-bold mt-1">{profileErrors.phone}</p>
                       )}

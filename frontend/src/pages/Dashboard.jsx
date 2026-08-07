@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useApp } from '../services/AppContext';
 import LineChart from '../components/LineChart';
 import DoughnutChart from '../components/DoughnutChart';
@@ -719,11 +719,39 @@ const Dashboard = () => {
   const [deleteAddrError, setDeleteAddrError] = useState(''); // TC50: delete API failure error
   const [pincodeStatus, setPincodeStatus] = useState('idle'); // TC64/TC65: 'idle'|'checking'|'ok'|'error'
 
-  // Support State
-  const [supportHistory, setSupportHistory] = useState([
-    { sender: 'bot', text: 'Hi Ipsita! How can I assist you with your orders or delivery today?', time: '11:00 PM' }
-  ]);
+  // Support State (TC14, TC15, TC16, TC20: welcome message, cache restoration, scrollable history)
+  const [supportHistory, setSupportHistory] = useState(() => {
+    try {
+      const cached = localStorage.getItem('nutritva_support_chat_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.warn('Support history cache read error:', e);
+    }
+    return [
+      { sender: 'bot', text: 'Hi Ipsita! How can I assist you with your orders or delivery today?', time: '11:00 PM' }
+    ];
+  });
   const [chatInput, setChatInput] = useState('');
+  const chatBoxRef = useRef(null);
+
+  // TC20: Persist support history to localStorage so chat reloads retain messages after refresh
+  useEffect(() => {
+    try {
+      localStorage.setItem('nutritva_support_chat_cache', JSON.stringify(supportHistory));
+    } catch (e) {
+      console.warn('Error persisting support history cache:', e);
+    }
+  }, [supportHistory]);
+
+  // TC16: Auto scroll chat container on new message arrival while preserving scrollability for older messages
+  useEffect(() => {
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
+  }, [supportHistory]);
 
   const [showAddCard, setShowAddCard] = useState(false);
   const [newCardNumber, setNewCardNumber] = useState('');
@@ -3737,8 +3765,8 @@ const Dashboard = () => {
                   </a>
                 </div>
 
-                {/* Messages Box */}
-                <div className="flex-grow p-4 overflow-y-auto space-y-3 bg-slate-50/50">
+                {/* Messages Box (TC15, TC16: visible chat history, scrollable older messages ref) */}
+                <div ref={chatBoxRef} id="support-chat-container" className="flex-grow p-4 overflow-y-auto space-y-3 bg-slate-50/50">
                   {supportHistory.map((chat, idx) => (
                     <div key={idx} className={`flex flex-col max-w-[80%] ${chat.sender === 'user' ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
                       <div className={`p-3 rounded-2xl text-xs font-bold leading-relaxed ${

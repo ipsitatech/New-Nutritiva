@@ -1618,9 +1618,9 @@ const Dashboard = () => {
                       </datalist>
                     </div>
 
-                    {/* VIP Membership Status Field */}
+                    {/* Membership Status Field */}
                     <div>
-                      <label className="text-xs font-black text-slate-700 block mb-1.5">VIP Membership Status</label>
+                      <label className="text-xs font-black text-slate-700 block mb-1.5">Membership Status</label>
                       <div 
                         className="w-full px-4 py-2.5 rounded-xl text-sm font-black flex items-center justify-between"
                         style={{
@@ -1630,32 +1630,33 @@ const Dashboard = () => {
                             ? '#fffbeb'
                             : (user.status || '').includes('Platinum')
                             ? '#f5f3ff'
-                            : '#f8fafc',
+                            : '#f0fdf4',
                           border: (user.status || '').includes('Silver')
                             ? '1.5px solid #cbd5e1'
                             : (user.status || '').includes('Gold')
                             ? '1.5px solid #fef3c7'
                             : (user.status || '').includes('Platinum')
                             ? '1.5px solid #ddd6fe'
-                            : '1.5px solid rgba(255,160,190,0.4)',
+                            : '1.5px solid #bbf7d0',
                           color: (user.status || '').includes('Silver')
                             ? '#475569'
                             : (user.status || '').includes('Gold')
                             ? '#d97706'
                             : (user.status || '').includes('Platinum')
                             ? '#7c3aed'
-                            : '#105335'
+                            : '#16a34a'
                         }}
                       >
                         <span className="flex items-center gap-2">
-                          👑 {user.status || 'Regular Member'}
+                          {(user.status || '').includes('Silver') ? '🥈' : (user.status || '').includes('Gold') ? '🥇' : (user.status || '').includes('Platinum') ? '💎' : '🌱'}{' '}
+                          {user.status || 'Regular Member'}
                         </span>
                         <button
                           type="button"
                           onClick={() => setActiveSidebarTab('vip')}
                           className="text-[10px] font-black underline uppercase transition-all text-slate-500 hover:text-brand-green"
                         >
-                          Manage Plan
+                          {(user.status || '').startsWith('VIP') ? 'Manage Plan' : 'Explore VIP Plans ✦'}
                         </button>
                       </div>
                     </div>

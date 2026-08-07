@@ -5,5 +5,6 @@ const { extractUserId } = require('../middlewares/authMiddleware');
 
 router.get('/', extractUserId, subscriptionController.getSubscriptions);
 router.put('/:id/status', extractUserId, subscriptionController.updateSubscriptionStatus);
+router.put('/:id/plan', extractUserId, subscriptionController.changeSubscriptionPlan);
 
 module.exports = router;

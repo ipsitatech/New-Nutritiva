@@ -610,6 +610,7 @@ const Dashboard = () => {
     markNotificationRead,
     refreshNotifications,
     updateSubscriptionStatus,
+    changeSubscriptionPlan,
     products,
     addresses,
     setAddresses,
@@ -3534,6 +3535,29 @@ const Dashboard = () => {
                             ) : (
                               <option>Default Shipping Address</option>
                             )}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-black text-emerald-800 uppercase tracking-wider block mb-1">Upgrade / Downgrade Plan (TC54, TC55)</label>
+                          <select 
+                            className="w-full px-3 py-2 bg-white border border-emerald-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none"
+                            defaultValue={activeManageSubscription.plan_name || "Standard Nutrition Plan"}
+                            onChange={(e) => {
+                              const newPlan = e.target.value;
+                              changeSubscriptionPlan(activeManageSubscription.id, newPlan)
+                                .then(() => {
+                                  setActiveManageSubscription(null);
+                                  showToastNotification(`Successfully changed plan to ${newPlan}!`, "🎉");
+                                })
+                                .catch(err => {
+                                  console.error(err);
+                                  alert("Failed to change plan. Please try again.");
+                                });
+                            }}
+                          >
+                            <option value="Standard Nutrition Plan">Standard Nutrition Plan (₹399/mo)</option>
+                            <option value="Premium Keto Plan">Premium Keto Plan (₹599/mo)</option>
+                            <option value="VIP Athlete Plan">VIP Athlete Plan (₹899/mo)</option>
                           </select>
                         </div>
                       </div>

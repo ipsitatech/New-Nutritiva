@@ -388,6 +388,31 @@ export const AppProvider = ({ children }) => {
     });
   };
 
+  const changeSubscriptionPlan = (id, plan_name) => {
+    return authFetch(`http://localhost:5000/api/subscriptions/${id}/plan`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan_name })
+    })
+    .then(async res => {
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update subscription plan.');
+      }
+      return data;
+    })
+    .then(subs => {
+      setSubscriptions(subs);
+      localStorage.setItem('nutritva_subscriptions', JSON.stringify(subs));
+      return subs;
+    })
+    .catch(err => {
+      console.error('Error updating subscription plan:', err);
+      alert(err.message);
+      throw err;
+    });
+  };
+
   // Live Tracking Simulation for Blinkit / Zepto feel linked to Delivery Partner API
   const startOrderTrackingSimulation = (orderId, items, totalAmount, trackingId) => {
     // Initial order tracking structure
@@ -680,6 +705,7 @@ export const AppProvider = ({ children }) => {
         markNotificationRead,
         refreshNotifications,
         updateSubscriptionStatus,
+        changeSubscriptionPlan,
         authFetch,
         setCart,
         setOrders,

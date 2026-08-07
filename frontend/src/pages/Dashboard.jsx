@@ -658,6 +658,7 @@ const Dashboard = () => {
   const [isDropdownHovered, setIsDropdownHovered] = useState(false);
   const [activeManageSubscription, setActiveManageSubscription] = useState(null);
   const [subActionLoading, setSubActionLoading] = useState(false);
+  const [subActionError, setSubActionError] = useState('');
 
   useEffect(() => {
     setTempProfile({
@@ -670,6 +671,10 @@ const Dashboard = () => {
       avatar: user.avatar || ''
     });
   }, [user]);
+
+  useEffect(() => {
+    setSubActionError('');
+  }, [activeManageSubscription]);
 
   const [dialog, setDialog] = useState({ isOpen: false, title: '', message: '', icon: '🌿' });
   const openDialog = (title, message, icon = '🌿') => {
@@ -3534,6 +3539,12 @@ const Dashboard = () => {
                       </div>
                     )}
 
+                    {subActionError && (
+                      <div className="mb-4 p-3.5 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-xs font-bold animate-fade-in text-center">
+                        ⚠️ {subActionError}
+                      </div>
+                    )}
+
                     <div className="space-y-2.5">
                       {activeManageSubscription.status.toUpperCase() === 'ACTIVE' && (
                         <button
@@ -3541,14 +3552,25 @@ const Dashboard = () => {
                           onClick={() => {
                             if (subActionLoading) return;
                             setSubActionLoading(true);
+                            setSubActionError('');
                             updateSubscriptionStatus(activeManageSubscription.id, 'PAUSED')
                               .then(() => setActiveManageSubscription(null))
-                              .catch(err => console.error(err))
+                              .catch(err => {
+                                console.error('Subscription API failure:', err);
+                                setSubActionError('API Timeout: We couldn\'t update your subscription status. Please check your internet connection and try again.');
+                              })
                               .finally(() => setSubActionLoading(false));
                           }}
                           className="w-full py-3 bg-amber-500 hover:bg-amber-600 hover:shadow-md text-white text-xs font-black rounded-xl transition-all active:scale-98 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {subActionLoading ? '⏳ Processing...' : '⏸️ Pause Subscription'}
+                          {subActionLoading ? (
+                            <span className="flex items-center gap-2">
+                              <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0"></span>
+                              Processing...
+                            </span>
+                          ) : (
+                            <span>⏸️ Pause Subscription</span>
+                          )}
                         </button>
                       )}
 
@@ -3558,14 +3580,25 @@ const Dashboard = () => {
                           onClick={() => {
                             if (subActionLoading) return;
                             setSubActionLoading(true);
+                            setSubActionError('');
                             updateSubscriptionStatus(activeManageSubscription.id, 'ACTIVE')
                               .then(() => setActiveManageSubscription(null))
-                              .catch(err => console.error(err))
+                              .catch(err => {
+                                console.error('Subscription API failure:', err);
+                                setSubActionError('API Timeout: We couldn\'t update your subscription status. Please check your internet connection and try again.');
+                              })
                               .finally(() => setSubActionLoading(false));
                           }}
                           className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 hover:shadow-md text-white text-xs font-black rounded-xl transition-all active:scale-98 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {subActionLoading ? '⏳ Processing...' : '▶️ Resume Subscription'}
+                          {subActionLoading ? (
+                            <span className="flex items-center gap-2">
+                              <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0"></span>
+                              Processing...
+                            </span>
+                          ) : (
+                            <span>▶️ Resume Subscription</span>
+                          )}
                         </button>
                       )}
 
@@ -3576,15 +3609,26 @@ const Dashboard = () => {
                             if (subActionLoading) return;
                             if (confirm("Are you sure you want to cancel this subscription? This action cannot be undone.")) {
                               setSubActionLoading(true);
+                              setSubActionError('');
                               updateSubscriptionStatus(activeManageSubscription.id, 'CANCELLED')
                                 .then(() => setActiveManageSubscription(null))
-                                .catch(err => console.error(err))
+                                .catch(err => {
+                                  console.error('Subscription API failure:', err);
+                                  setSubActionError('API Timeout: We couldn\'t update your subscription status. Please check your internet connection and try again.');
+                                })
                                 .finally(() => setSubActionLoading(false));
                             }
                           }}
                           className="w-full py-3 bg-rose-600 hover:bg-rose-700 hover:shadow-md text-white text-xs font-black rounded-xl transition-all active:scale-98 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {subActionLoading ? '⏳ Processing...' : '❌ Cancel Subscription'}
+                          {subActionLoading ? (
+                            <span className="flex items-center gap-2">
+                              <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0"></span>
+                              Processing...
+                            </span>
+                          ) : (
+                            <span>❌ Cancel Subscription</span>
+                          )}
                         </button>
                       )}
 
@@ -3594,17 +3638,28 @@ const Dashboard = () => {
                           onClick={() => {
                             if (subActionLoading) return;
                             setSubActionLoading(true);
+                            setSubActionError('');
                             updateSubscriptionStatus(activeManageSubscription.id, 'ACTIVE')
                               .then(() => {
                                 setActiveManageSubscription(null);
                                 alert("Subscription reactivated successfully!");
                               })
-                              .catch(err => console.error(err))
+                              .catch(err => {
+                                console.error('Subscription API failure:', err);
+                                setSubActionError('API Timeout: We couldn\'t update your subscription status. Please check your internet connection and try again.');
+                              })
                               .finally(() => setSubActionLoading(false));
                           }}
                           className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 hover:shadow-md text-white text-xs font-black rounded-xl transition-all active:scale-98 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {subActionLoading ? '⏳ Processing...' : '🔄 Reactivate / Renew Subscription'}
+                          {subActionLoading ? (
+                            <span className="flex items-center gap-2">
+                              <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0"></span>
+                              Processing...
+                            </span>
+                          ) : (
+                            <span>🔄 Reactivate / Renew Subscription</span>
+                          )}
                         </button>
                       )}
                     </div>

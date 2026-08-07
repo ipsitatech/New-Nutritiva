@@ -92,6 +92,18 @@ const initDB = async () => {
       // Table doesn't exist yet, which is fine
     }
 
+    // Schema check for subscriptions table to ensure auto_renew column exists
+    try {
+      const subColumns = await dbAll("SHOW COLUMNS FROM subscriptions");
+      const hasAutoRenew = subColumns.some(col => col.Field === 'auto_renew');
+      if (!hasAutoRenew) {
+        await dbRun("ALTER TABLE subscriptions ADD COLUMN auto_renew INT DEFAULT 1");
+        console.log("Migrated subscriptions table with auto_renew column.");
+      }
+    } catch (e) {
+      // Table doesn't exist yet, which is fine
+    }
+
     // 3. Create tables using unified schemas for Auth + Storefront
     
     // Core users table matching auth controller enums and ID type
@@ -301,6 +313,7 @@ const initDB = async () => {
         start_date VARCHAR(50),
         end_date VARCHAR(50),
         status VARCHAR(50),
+        auto_renew INT DEFAULT 1,
         created_at VARCHAR(50),
         FOREIGN KEY (buyer_id) REFERENCES users(id) ON DELETE CASCADE
       )

@@ -413,6 +413,31 @@ export const AppProvider = ({ children }) => {
     });
   };
 
+  const updateSubscriptionAutoRenew = (id, auto_renew) => {
+    return authFetch(`http://localhost:5000/api/subscriptions/${id}/auto-renew`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ auto_renew })
+    })
+    .then(async res => {
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update auto renew status.');
+      }
+      return data;
+    })
+    .then(subs => {
+      setSubscriptions(subs);
+      localStorage.setItem('nutritva_subscriptions', JSON.stringify(subs));
+      return subs;
+    })
+    .catch(err => {
+      console.error('Error updating auto renew status:', err);
+      alert(err.message);
+      throw err;
+    });
+  };
+
   // Live Tracking Simulation for Blinkit / Zepto feel linked to Delivery Partner API
   const startOrderTrackingSimulation = (orderId, items, totalAmount, trackingId) => {
     // Initial order tracking structure
@@ -706,6 +731,7 @@ export const AppProvider = ({ children }) => {
         refreshNotifications,
         updateSubscriptionStatus,
         changeSubscriptionPlan,
+        updateSubscriptionAutoRenew,
         authFetch,
         setCart,
         setOrders,

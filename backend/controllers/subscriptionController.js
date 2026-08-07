@@ -67,3 +67,30 @@ exports.changeSubscriptionPlan = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.updateSubscriptionAutoRenew = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { auto_renew } = req.body;
+    const userId = req.userId;
+
+    if (auto_renew === undefined) {
+      return res.status(400).json({ error: 'auto_renew value is required.' });
+    }
+
+    // Verify ownership
+    const sub = await dbGet('SELECT * FROM subscriptions WHERE id = ? AND buyer_id = ?', [id, userId]);
+    if (!sub) {
+      return res.status(404).json({ error: 'Subscription not found.' });
+    }
+
+    const autoRenewVal = auto_renew ? 1 : 0;
+    await dbRun('UPDATE subscriptions SET auto_renew = ? WHERE id = ?', [autoRenewVal, id]);
+    
+    // Return updated list
+    const list = await dbAll('SELECT * FROM subscriptions WHERE buyer_id = ? ORDER BY created_at DESC', [userId]);
+    res.json(list);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

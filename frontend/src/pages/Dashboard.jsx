@@ -611,6 +611,7 @@ const Dashboard = () => {
     refreshNotifications,
     updateSubscriptionStatus,
     changeSubscriptionPlan,
+    updateSubscriptionAutoRenew,
     products,
     addresses,
     setAddresses,
@@ -3559,6 +3560,36 @@ const Dashboard = () => {
                             <option value="Premium Keto Plan">Premium Keto Plan (₹599/mo)</option>
                             <option value="VIP Athlete Plan">VIP Athlete Plan (₹899/mo)</option>
                           </select>
+                        </div>
+                        <div className="flex items-center justify-between pt-2.5" style={{borderTop: '1px dashed rgba(16,83,53,0.15)'}}>
+                          <div>
+                            <span className="text-[10px] font-black text-emerald-800 uppercase tracking-wider block">Auto-Renewal (TC56, TC57)</span>
+                            <span className="text-[9px] font-medium text-slate-450 block">Automatically extends validity on end date</span>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input 
+                              type="checkbox" 
+                              className="sr-only peer"
+                              defaultChecked={activeManageSubscription.auto_renew !== 0}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                updateSubscriptionAutoRenew(activeManageSubscription.id, checked)
+                                  .then(() => {
+                                    showToastNotification(
+                                      checked 
+                                        ? "Auto-renewal enabled! Validity will extend on expiry." 
+                                        : "Auto-renewal disabled. Renewal stopped.",
+                                      checked ? "🔄" : "⏸️"
+                                    );
+                                  })
+                                  .catch(err => {
+                                    console.error(err);
+                                    e.target.checked = !checked;
+                                  });
+                              }}
+                            />
+                            <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                          </label>
                         </div>
                       </div>
                     )}

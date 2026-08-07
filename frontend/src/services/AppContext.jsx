@@ -204,7 +204,10 @@ export const AppProvider = ({ children }) => {
   const [payments, setPayments] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const [subscriptions, setSubscriptions] = useState([]);
+  const [subscriptions, setSubscriptions] = useState(() => {
+    const saved = localStorage.getItem('nutritva_subscriptions');
+    return saved !== null ? JSON.parse(saved) : [];
+  });
   const [healthPreferences, setHealthPreferences] = useState([]);
 
   // Derived user statistics variables
@@ -539,7 +542,11 @@ export const AppProvider = ({ children }) => {
       if (nRes.ok) setNotifications(await nRes.json());
 
       const sRes = await authFetch('http://localhost:5000/api/subscriptions');
-      if (sRes.ok) setSubscriptions(await sRes.json());
+      if (sRes.ok) {
+        const subsData = await sRes.json();
+        setSubscriptions(subsData);
+        localStorage.setItem('nutritva_subscriptions', JSON.stringify(subsData));
+      }
 
       const hpRes = await authFetch('http://localhost:5000/api/health-preferences');
       if (hpRes.ok) setHealthPreferences(await hpRes.json());

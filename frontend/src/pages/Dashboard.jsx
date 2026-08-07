@@ -735,6 +735,7 @@ const Dashboard = () => {
     ];
   });
   const [chatInput, setChatInput] = useState('');
+  const [chatInputError, setChatInputError] = useState(''); // TC23, TC32: validation message for empty chat input
   const chatBoxRef = useRef(null);
 
   // TC20: Persist support history to localStorage so chat reloads retain messages after refresh
@@ -1103,20 +1104,33 @@ const Dashboard = () => {
 
   const handleSupportSend = (e) => {
     e.preventDefault();
-    if (!chatInput.trim()) return;
+    const rawText = chatInput || '';
+    const trimmedMsg = rawText.trim(); // TC28: trim leading and trailing spaces
+
+    // TC23, TC32: empty message validation
+    if (!trimmedMsg) {
+      setChatInputError('Please enter a message before sending.');
+      return;
+    }
+    setChatInputError('');
+
+    // TC24: long message handling — enforce max 1000 chars limit
+    const cleanMsg = trimmedMsg.length > 1000 ? trimmedMsg.substring(0, 1000) : trimmedMsg;
+
     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const userMsg = { sender: 'user', text: chatInput, time: timeNow };
+    const userMsg = { sender: 'user', text: cleanMsg, time: timeNow };
     setSupportHistory(prev => [...prev, userMsg]);
     setChatInput('');
 
     // Simulated automated response
     setTimeout(() => {
       let botText = "Thank you for reaching out. A support executive is looking into your request and will connect with you shortly.";
-      if (chatInput.toLowerCase().includes('order') || chatInput.toLowerCase().includes('delivery')) {
+      const lower = cleanMsg.toLowerCase();
+      if (lower.includes('order') || lower.includes('delivery')) {
         botText = activeOrder 
           ? `Your active order ${activeOrder.id} is currently in the "${activeOrder.status}" stage and will arrive in approx ${activeOrder.eta}.`
           : "I see you don't have any active deliveries. Your past orders are listed under 'My Orders'. Is there a specific transaction you need help with?";
-      } else if (chatInput.toLowerCase().includes('refund') || chatInput.toLowerCase().includes('money')) {
+      } else if (lower.includes('refund') || lower.includes('money')) {
         botText = "For refund queries, it generally takes 3-5 business days to reflect in your original payment source. You can check the transaction status under 'Payments & UPI'.";
       }
       setSupportHistory(prev => [...prev, { sender: 'bot', text: botText, time: timeNow }]);
@@ -3769,7 +3783,7 @@ const Dashboard = () => {
                 <div ref={chatBoxRef} id="support-chat-container" className="flex-grow p-4 overflow-y-auto space-y-3 bg-slate-50/50">
                   {supportHistory.map((chat, idx) => (
                     <div key={idx} className={`flex flex-col max-w-[80%] ${chat.sender === 'user' ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
-                      <div className={`p-3 rounded-2xl text-xs font-bold leading-relaxed ${
+                      <div className={`p-3 rounded-2xl text-xs font-bold leading-relaxed break-words whitespace-pre-wrap ${
                         chat.sender === 'user' 
                           ? 'bg-[#105335] text-white rounded-tr-none' 
                           : 'bg-white text-slate-800 border border-slate-100 rounded-tl-none shadow-3xs'
@@ -3781,14 +3795,26 @@ const Dashboard = () => {
                   ))}
                 </div>
 
+                {/* TC23, TC32: Inline validation message for empty chat input */}
+                {chatInputError && (
+                  <div id="chat-input-error-msg" className="px-4 py-1.5 bg-red-50 border-t border-red-100 text-[11px] text-red-600 font-bold flex items-center gap-1.5 animate-fade-in">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    <span>⚠️ {chatInputError}</span>
+                  </div>
+                )}
+
                 {/* Chat Input form */}
                 <form onSubmit={handleSupportSend} className="p-3 border-t border-slate-150 flex gap-2 bg-white">
                   <input 
                     type="text" 
                     placeholder="Type order queries, refund help..." 
                     value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    className="flex-grow bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2 text-xs font-semibold focus:outline-none focus:bg-white focus:border-brand-green"
+                    maxLength={1000}
+                    onChange={(e) => {
+                      setChatInput(e.target.value);
+                      if (chatInputError) setChatInputError('');
+                    }}
+                    className={`flex-grow bg-slate-50 border ${chatInputError ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-brand-green'} rounded-2xl px-4 py-2 text-xs font-semibold focus:outline-none focus:bg-white transition-all`}
                   />
                   <button 
                     type="submit"

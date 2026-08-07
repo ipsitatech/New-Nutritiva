@@ -661,6 +661,9 @@ const Dashboard = () => {
   const [activeManageSubscription, setActiveManageSubscription] = useState(null);
   const [subActionLoading, setSubActionLoading] = useState(false);
   const [subActionError, setSubActionError] = useState('');
+  const [subPage, setSubPage] = useState(1);   // TC68: pagination
+  const [subFetchError, setSubFetchError] = useState(''); // TC69: network error
+  const SUB_PAGE_SIZE = 4;
 
   useEffect(() => {
     setTempProfile({
@@ -1285,7 +1288,7 @@ const Dashboard = () => {
                       {notifications.length === 0 ? (
                         <div className="p-6 text-center text-slate-400 text-xs font-semibold">No notifications yet!</div>
                       ) : (
-                        notifications.slice(0, 50).map(notification => (
+                        notifications.map(notification => (
                           <div 
                             key={notification.id} 
                             onClick={() => markNotificationRead(notification.id)}
@@ -3375,11 +3378,45 @@ const Dashboard = () => {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-xl font-black text-slate-800">My Subscriptions</h3>
-                  <p className="text-xs font-semibold text-slate-400">Manage your active plans</p>
+                  <p className="text-xs font-semibold text-slate-400">
+                    {subscriptions.length > 0 ? `${subscriptions.length} plan${subscriptions.length > 1 ? 's' : ''} found` : 'Manage your active plans'}
+                  </p>
                 </div>
+                {/* TC69: Retry button shown if fetch failed */}
+                {subFetchError && (
+                  <button
+                    onClick={() => {
+                      setSubFetchError('');
+                      authFetch('http://localhost:5000/api/subscriptions')
+                        .then(r => r.ok ? r.json() : Promise.reject('Network error'))
+                        .then(data => {
+                          setSubscriptions(data);
+                          localStorage.setItem('nutritva_subscriptions', JSON.stringify(data));
+                        })
+                        .catch(() => setSubFetchError('Still unable to reach server. Check your connection and try again.'));
+                    }}
+                    className="text-xs font-black text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5"
+                  >
+                    <span className="animate-spin inline-block w-3 h-3 border-2 border-emerald-600 border-t-transparent rounded-full"></span>
+                    Retry
+                  </button>
+                )}
               </div>
+
+              {/* TC69: Network interruption error banner */}
+              {subFetchError && (
+                <div className="flex items-start gap-3 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-left mb-2">
+                  <span className="text-xl mt-0.5">📡</span>
+                  <div>
+                    <p className="text-sm font-black text-rose-700">Network Interruption</p>
+                    <p className="text-xs font-semibold text-rose-500 mt-0.5">{subFetchError}</p>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {subscriptions.map(sub => {
+                {/* TC68: paginate subscription list - show SUB_PAGE_SIZE at a time */}
+                {subscriptions.slice(0, subPage * SUB_PAGE_SIZE).map(sub => {
                   const getStatusBadge = (status) => {
                     const cleanStatus = (status || '').toUpperCase();
                     const validStatuses = ['ACTIVE', 'PAUSED', 'CANCELLED', 'EXPIRED'];
@@ -3457,6 +3494,36 @@ const Dashboard = () => {
                   );
                 })}
               </div>
+
+              {/* TC68: Empty state if no subscriptions */}
+              {subscriptions.length === 0 && !subFetchError && (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <span className="text-5xl mb-4">📦</span>
+                  <p className="text-sm font-black text-slate-600">No Active Subscriptions</p>
+                  <p className="text-xs font-semibold text-slate-400 mt-1">Choose a VIP plan from the Dashboard to get started.</p>
+                </div>
+              )}
+
+              {/* TC68: Load More / Show Less pagination controls - keeps page responsive with high data */}
+              {subscriptions.length > SUB_PAGE_SIZE && (
+                <div className="flex justify-center gap-3 pt-2">
+                  {subPage * SUB_PAGE_SIZE < subscriptions.length ? (
+                    <button
+                      onClick={() => setSubPage(p => p + 1)}
+                      className="text-xs font-black text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-5 py-2 rounded-xl transition-all"
+                    >
+                      ⬇ Load More ({subscriptions.length - subPage * SUB_PAGE_SIZE} remaining)
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setSubPage(1)}
+                      className="text-xs font-black text-slate-500 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-5 py-2 rounded-xl transition-all"
+                    >
+                      ⬆ Show Less
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Manage Subscription Modal Overlay */}
               {activeManageSubscription && (

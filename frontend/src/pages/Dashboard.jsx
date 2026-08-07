@@ -1197,9 +1197,21 @@ const Dashboard = () => {
                           errors.email = "Invalid Email Address format.";
                         }
 
+                        const dobVal = tempProfile.dob;
+                        if (dobVal) {
+                          const dobDate = new Date(dobVal);
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          if (isNaN(dobDate.getTime())) {
+                            errors.dob = "Invalid Date of Birth format.";
+                          } else if (dobDate > today) {
+                            errors.dob = "Date of Birth cannot be in the future.";
+                          }
+                        }
+
                         if (Object.keys(errors).length > 0) {
                           setProfileErrors(errors);
-                          openDialog("Validation Error", errors.name || errors.phone || errors.email, "⚠️");
+                          openDialog("Validation Error", errors.name || errors.phone || errors.email || errors.dob, "⚠️");
                           return;
                         }
 
@@ -1319,10 +1331,16 @@ const Dashboard = () => {
                         value={tempProfile.dob}
                         onChange={e => setTempProfile({ ...tempProfile, dob: e.target.value })}
                         className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none transition-all"
-                        style={{background: '#f8fafc', border: '1.5px solid rgba(255,160,190,0.4)'}}
+                        style={{
+                          background: '#f8fafc',
+                          border: profileErrors.dob ? '1.5px solid #ef4444' : '1.5px solid rgba(255,160,190,0.4)'
+                        }}
                         onFocus={e => e.target.style.borderColor = '#105335'}
-                        onBlur={e => e.target.style.borderColor = 'rgba(255,160,190,0.4)'}
+                        onBlur={e => e.target.style.borderColor = profileErrors.dob ? '#ef4444' : 'rgba(255,160,190,0.4)'}
                       />
+                      {profileErrors.dob && (
+                        <p className="text-red-500 text-[10px] font-bold mt-1">{profileErrors.dob}</p>
+                      )}
                     </div>
                     <div>
                       <label className="text-xs font-black text-slate-700 block mb-1.5">Gender</label>

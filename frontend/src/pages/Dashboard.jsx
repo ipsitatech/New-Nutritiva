@@ -657,6 +657,7 @@ const Dashboard = () => {
   };
   const [isDropdownHovered, setIsDropdownHovered] = useState(false);
   const [activeManageSubscription, setActiveManageSubscription] = useState(null);
+  const [subActionLoading, setSubActionLoading] = useState(false);
 
   useEffect(() => {
     setTempProfile({
@@ -3491,46 +3492,75 @@ const Dashboard = () => {
                     <div className="space-y-2.5">
                       {activeManageSubscription.status.toUpperCase() === 'ACTIVE' && (
                         <button
+                          disabled={subActionLoading}
                           onClick={() => {
+                            if (subActionLoading) return;
+                            setSubActionLoading(true);
                             updateSubscriptionStatus(activeManageSubscription.id, 'PAUSED')
-                              .then(() => setActiveManageSubscription(null));
+                              .then(() => setActiveManageSubscription(null))
+                              .catch(err => console.error(err))
+                              .finally(() => setSubActionLoading(false));
                           }}
-                          className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white text-xs font-black rounded-xl transition-colors flex items-center justify-center gap-2"
+                          className="w-full py-3 bg-amber-500 hover:bg-amber-600 hover:shadow-md text-white text-xs font-black rounded-xl transition-all active:scale-98 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          ⏸️ Pause Subscription
+                          {subActionLoading ? '⏳ Processing...' : '⏸️ Pause Subscription'}
                         </button>
                       )}
 
                       {activeManageSubscription.status.toUpperCase() === 'PAUSED' && (
                         <button
+                          disabled={subActionLoading}
                           onClick={() => {
+                            if (subActionLoading) return;
+                            setSubActionLoading(true);
                             updateSubscriptionStatus(activeManageSubscription.id, 'ACTIVE')
-                              .then(() => setActiveManageSubscription(null));
+                              .then(() => setActiveManageSubscription(null))
+                              .catch(err => console.error(err))
+                              .finally(() => setSubActionLoading(false));
                           }}
-                          className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl transition-colors flex items-center justify-center gap-2"
+                          className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 hover:shadow-md text-white text-xs font-black rounded-xl transition-all active:scale-98 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          ▶️ Resume Subscription
+                          {subActionLoading ? '⏳ Processing...' : '▶️ Resume Subscription'}
                         </button>
                       )}
 
-                      {activeManageSubscription.status.toUpperCase() !== 'CANCELLED' && (
+                      {(activeManageSubscription.status.toUpperCase() === 'ACTIVE' || activeManageSubscription.status.toUpperCase() === 'PAUSED') && (
                         <button
+                          disabled={subActionLoading}
                           onClick={() => {
+                            if (subActionLoading) return;
                             if (confirm("Are you sure you want to cancel this subscription? This action cannot be undone.")) {
+                              setSubActionLoading(true);
                               updateSubscriptionStatus(activeManageSubscription.id, 'CANCELLED')
-                                .then(() => setActiveManageSubscription(null));
+                                .then(() => setActiveManageSubscription(null))
+                                .catch(err => console.error(err))
+                                .finally(() => setSubActionLoading(false));
                             }
                           }}
-                          className="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-xl transition-colors flex items-center justify-center gap-2"
+                          className="w-full py-3 bg-rose-600 hover:bg-rose-700 hover:shadow-md text-white text-xs font-black rounded-xl transition-all active:scale-98 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          ❌ Cancel Subscription
+                          {subActionLoading ? '⏳ Processing...' : '❌ Cancel Subscription'}
                         </button>
                       )}
 
-                      {activeManageSubscription.status.toUpperCase() === 'CANCELLED' && (
-                        <div className="text-center p-3 text-rose-500 bg-rose-50 rounded-xl text-xs font-bold border border-rose-100">
-                          This subscription is Cancelled and cannot be modified.
-                        </div>
+                      {(activeManageSubscription.status.toUpperCase() === 'CANCELLED' || activeManageSubscription.status.toUpperCase() === 'EXPIRED') && (
+                        <button
+                          disabled={subActionLoading}
+                          onClick={() => {
+                            if (subActionLoading) return;
+                            setSubActionLoading(true);
+                            updateSubscriptionStatus(activeManageSubscription.id, 'ACTIVE')
+                              .then(() => {
+                                setActiveManageSubscription(null);
+                                alert("Subscription reactivated successfully!");
+                              })
+                              .catch(err => console.error(err))
+                              .finally(() => setSubActionLoading(false));
+                          }}
+                          className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 hover:shadow-md text-white text-xs font-black rounded-xl transition-all active:scale-98 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {subActionLoading ? '⏳ Processing...' : '🔄 Reactivate / Renew Subscription'}
+                        </button>
                       )}
                     </div>
                   </div>

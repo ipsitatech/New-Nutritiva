@@ -648,6 +648,13 @@ const Dashboard = () => {
 
   const [profileErrors, setProfileErrors] = useState({});
   const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]);
+
+  const formatSubDate = (dateVal) => {
+    if (!dateVal) return "——"; // Missing date placeholder (TC37)
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return "Not Available"; // Invalid date handling (TC36)
+    return d.toLocaleDateString();
+  };
   const [isDropdownHovered, setIsDropdownHovered] = useState(false);
   const [activeManageSubscription, setActiveManageSubscription] = useState(null);
 
@@ -3419,11 +3426,11 @@ const Dashboard = () => {
                       <div className="space-y-2 mb-6">
                         <div className="flex justify-between text-xs font-semibold text-slate-500">
                           <span>Started On</span>
-                          <span className="text-slate-800 font-bold">{new Date(sub.start_date).toLocaleDateString()}</span>
+                          <span className="text-slate-800 font-bold">{formatSubDate(sub.start_date)}</span>
                         </div>
                         <div className="flex justify-between text-xs font-semibold text-slate-500">
                           <span>Valid Until</span>
-                          <span className="text-slate-800 font-bold">{new Date(sub.end_date).toLocaleDateString()}</span>
+                          <span className="text-slate-800 font-bold">{formatSubDate(sub.end_date)}</span>
                         </div>
                       </div>
                       <button 
@@ -3473,11 +3480,11 @@ const Dashboard = () => {
                       </div>
                       <div className="flex justify-between text-xs font-semibold text-slate-500">
                         <span>Start Date</span>
-                        <span className="font-bold text-slate-800">{new Date(activeManageSubscription.start_date).toLocaleDateString()}</span>
+                        <span className="font-bold text-slate-800">{formatSubDate(activeManageSubscription.start_date)}</span>
                       </div>
                       <div className="flex justify-between text-xs font-semibold text-slate-500">
                         <span>Expiry Date</span>
-                        <span className="font-bold text-slate-800">{new Date(activeManageSubscription.end_date).toLocaleDateString()}</span>
+                        <span className="font-bold text-slate-800">{formatSubDate(activeManageSubscription.end_date)}</span>
                       </div>
                     </div>
 

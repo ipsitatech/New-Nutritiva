@@ -255,7 +255,17 @@ export const AppProvider = ({ children }) => {
         }
         return data;
       })
-      .then(freshUser => _setUser(freshUser))
+      .then(freshUser => {
+        _setUser(freshUser);
+        authFetch('http://localhost:5000/api/notifications')
+          .then(async r => {
+            if (r.ok) {
+              const freshNotifs = await r.json();
+              setNotifications(freshNotifs);
+            }
+          })
+          .catch(e => console.error('Error updating notifications after profile sync:', e));
+      })
       .catch(err => {
         console.error('Failed to sync user profile:', err);
         alert(err.message);
@@ -343,6 +353,16 @@ export const AppProvider = ({ children }) => {
     .then(res => res.json())
     .then(setNotifications)
     .catch(err => console.error('Error marking notification as read:', err));
+  };
+  const refreshNotifications = () => {
+    authFetch('http://localhost:5000/api/notifications')
+      .then(async r => {
+        if (r.ok) {
+          const data = await r.json();
+          setNotifications(data);
+        }
+      })
+      .catch(e => console.error('Error refreshing notifications:', e));
   };
 
   const updateSubscriptionStatus = (id, status) => {
@@ -658,6 +678,7 @@ export const AppProvider = ({ children }) => {
         healthPreferences,
         toggleHealthPreference,
         markNotificationRead,
+        refreshNotifications,
         updateSubscriptionStatus,
         authFetch,
         setCart,

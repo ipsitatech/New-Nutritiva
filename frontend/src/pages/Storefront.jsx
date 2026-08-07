@@ -164,6 +164,7 @@ const Storefront = () => {
     savedCards,
     upiHandles,
     authFetch,
+    refreshNotifications,
     setCart,
     setOrders,
     setOrderItems,
@@ -2441,6 +2442,7 @@ const Storefront = () => {
                         setUser(freshUser);
                         setVipJoined(true);
                         setVipActivating(false);
+                        refreshNotifications();
                         
                         if (oldRank !== 0) {
                           if (newRank > oldRank) {

@@ -97,7 +97,7 @@ const imageMap = {
 };
 
 const VipMembershipPage = ({ onClose }) => {
-  const { user, setUser, authFetch } = useApp();
+  const { user, setUser, authFetch, refreshNotifications } = useApp();
   const [yearly, setYearly] = useState(true);
   const [selected, setSelected] = useState('gold');
   const [joined, setJoined] = useState(false);
@@ -471,6 +471,7 @@ const VipMembershipPage = ({ onClose }) => {
                 .then(freshUser => {
                   setUser(freshUser);
                   setJoined(true);
+                  refreshNotifications();
                 })
                 .catch(err => {
                   console.error('Error activating VIP plan:', err);
@@ -522,6 +523,7 @@ const VipMembershipPage = ({ onClose }) => {
             .then(freshUser => {
               setUser(freshUser);
               setJoined(true);
+              refreshNotifications();
             })
             .catch(err => {
               console.error('Error upgrading VIP plan in dashboard:', err);
@@ -606,6 +608,7 @@ const Dashboard = () => {
     healthPreferences,
     toggleHealthPreference,
     markNotificationRead,
+    refreshNotifications,
     updateSubscriptionStatus,
     products,
     addresses,
@@ -1614,6 +1617,49 @@ const Dashboard = () => {
                         <option value="Pune, Maharashtra" />
                       </datalist>
                     </div>
+
+                    {/* VIP Membership Status Field */}
+                    <div>
+                      <label className="text-xs font-black text-slate-700 block mb-1.5">VIP Membership Status</label>
+                      <div 
+                        className="w-full px-4 py-2.5 rounded-xl text-sm font-black flex items-center justify-between"
+                        style={{
+                          background: user.status.includes('Silver')
+                            ? '#f1f5f9'
+                            : user.status.includes('Gold')
+                            ? '#fffbeb'
+                            : user.status.includes('Platinum')
+                            ? '#f5f3ff'
+                            : '#f8fafc',
+                          border: user.status.includes('Silver')
+                            ? '1.5px solid #cbd5e1'
+                            : user.status.includes('Gold')
+                            ? '1.5px solid #fef3c7'
+                            : user.status.includes('Platinum')
+                            ? '1.5px solid #ddd6fe'
+                            : '1.5px solid rgba(255,160,190,0.4)',
+                          color: user.status.includes('Silver')
+                            ? '#475569'
+                            : user.status.includes('Gold')
+                            ? '#d97706'
+                            : user.status.includes('Platinum')
+                            ? '#7c3aed'
+                            : '#105335'
+                        }}
+                      >
+                        <span className="flex items-center gap-2">
+                          👑 {user.status}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setActiveSidebarTab('vip')}
+                          className="text-[10px] font-black underline uppercase transition-all text-slate-500 hover:text-brand-green"
+                        >
+                          Manage Plan
+                        </button>
+                      </div>
+                    </div>
+
                   </div>
 
                   {/* Dietary Preferences */}

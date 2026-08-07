@@ -3805,19 +3805,50 @@ const Dashboard = () => {
             }
             const displayReviews = reviews.length > 0 ? reviews : cachedReviews;
 
+            // TC29 + TC30: Validate rating — clamp to 0-5, treat invalid as 0
+            const sanitizeRating = (raw) => {
+              const n = parseFloat(raw);
+              if (isNaN(n) || n < 0) return 0;   // TC29: invalid → 0
+              if (n > 5) return 5;                 // TC29: out-of-range → cap at 5
+              return n;                            // TC30: 0 is valid, shown as "0.0 / 5"
+            };
+
+            // TC37 + TC38: Strip ALL HTML tags and neutralise script injection
+            const sanitizeText = (text) => {
+              if (!text) return '';
+              // Remove script blocks entirely (TC38)
+              let clean = String(text).replace(/<script[\s\S]*?<\/script>/gi, '');
+              // Strip remaining HTML tags so they show as plain text (TC37)
+              clean = clean.replace(/<[^>]*>/g, '');
+              // Decode common HTML entities so they display literally
+              clean = clean
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&amp;/g, '&')
+                .replace(/&quot;/g, '"')
+                .replace(/&#x27;/g, "'");
+              return clean.trim() || 'No written review provided.';
+            };
+
+            // TC45 + TC49: Safe date formatter — hide future dates, placeholder for missing
+            const formatReviewDate = (dateStr) => {
+              if (!dateStr) return '——';            // TC49: missing date placeholder
+              const d = new Date(dateStr);
+              if (isNaN(d.getTime())) return '——'; // TC49: invalid date
+              if (d > new Date()) return null;      // TC45: future date → suppress (return null)
+              return d.toLocaleDateString();
+            };
+
             // TC26: Half-star rating renderer (supports 0.5 increments)
             const renderStars = (rating) => {
-              const numRating = parseFloat(rating) || 0;
+              const numRating = sanitizeRating(rating);
               return [1, 2, 3, 4, 5].map((star, idx) => {
                 const filled   = numRating >= star;
                 const halfFill = !filled && numRating >= star - 0.5;
                 return (
                   <span key={idx} className="relative inline-block w-3.5 h-3.5">
-                    {/* Background (empty) star */}
                     <Star className="absolute inset-0 w-3.5 h-3.5 fill-slate-100 text-slate-200" />
-                    {/* Full fill */}
                     {filled && <Star className="absolute inset-0 w-3.5 h-3.5 fill-amber-400 text-amber-400" />}
-                    {/* Half fill using clip */}
                     {halfFill && (
                       <span className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -3848,22 +3879,28 @@ const Dashboard = () => {
                 )}
 
                 <div className="space-y-4">
-                  {/* TC18: Use index in key to display duplicate reviews separately */}
                   {displayReviews.map((rev, revIndex) => {
                     const product = products.find(p => p.id === rev.product_id);
-                    const numRating = parseFloat(rev.rating) || 0;
+                    const numRating  = sanitizeRating(rev.rating);   // TC29, TC30
+                    const cleanText  = sanitizeText(rev.review);     // TC37, TC38
+                    const dateLabel  = formatReviewDate(rev.created_at); // TC45, TC49
+
+                    // TC45: Skip reviews with future dates entirely
+                    if (dateLabel === null) return null;
 
                     return (
                       <div
                         key={`${rev.id}-${revIndex}`}
                         className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-5 transition-all hover:shadow-md"
                       >
-                        {/* TC16: Product image loads correctly with img tag + emoji fallback */}
+                        {/* TC16 + TC67: Product image with lazy loading (no delay) + emoji fallback */}
                         <div className="w-16 h-16 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 border border-slate-100 overflow-hidden">
                           {product?.image ? (
                             <img
                               src={product.image}
                               alt={product?.name || 'Product'}
+                              loading="lazy"
+                              decoding="async"
                               className="w-full h-full object-cover rounded-xl"
                               onError={(e) => {
                                 e.target.style.display = 'none';
@@ -3884,24 +3921,26 @@ const Dashboard = () => {
                             <h4 className="text-sm font-black text-slate-800 truncate">
                               {product?.name || rev.product_name || 'Product'}
                             </h4>
+                            {/* TC49: shows "——" if missing; TC45: future dates are filtered above */}
                             <span className="text-[10px] font-semibold text-slate-400 shrink-0">
-                              {rev.created_at ? new Date(rev.created_at).toLocaleDateString() : '——'}
+                              {dateLabel}
                             </span>
                           </div>
 
-                          {/* TC26 + TC27: Half-star display + numeric rating value from backend */}
+                          {/* TC26+TC27: Half-star display + exact numeric rating badge */}
                           <div className="flex items-center gap-2 my-1.5">
                             <div className="flex gap-0.5">
                               {renderStars(numRating)}
                             </div>
-                            {/* TC27: Show exact backend rating value */}
-                            <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md">
+                            {/* TC27+TC30: Show 0.0/5 for zero, or exact decimal */}
+                            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${numRating === 0 ? 'text-slate-500 bg-slate-100' : 'text-amber-600 bg-amber-50'}`}>
                               {numRating % 1 === 0 ? numRating.toFixed(1) : numRating} / 5
                             </span>
                           </div>
 
+                          {/* TC37+TC38: Sanitized plain-text review (no HTML/script rendered) */}
                           <p className="text-xs font-semibold text-slate-600 italic mt-1.5 leading-relaxed">
-                            "{rev.review || 'No written review provided.'}"
+                            "{cleanText}"
                           </p>
                         </div>
                       </div>

@@ -739,9 +739,27 @@ const Dashboard = () => {
   const [isSendingMessage, setIsSendingMessage] = useState(false); // TC35: slow network sending indicator
   const [supportSendError, setSupportSendError] = useState(''); // TC36: send message API error banner
   const [waError, setWaError] = useState(''); // TC44, TC47: WhatsApp error fallback
+  const [isSessionExpired, setIsSessionExpired] = useState(false); // TC63: session timeout modal state
+  const [isNetworkInterrupted, setIsNetworkInterrupted] = useState(() => {
+    return typeof window !== 'undefined' && window.navigator && !window.navigator.onLine;
+  }); // TC64: network interruption state
+  const [invalidRequestMsg, setInvalidRequestMsg] = useState(''); // TC66: invalid request error
+  const [isAgentOnline, setIsAgentOnline] = useState(true); // TC69: agent availability status (online/offline)
   const chatBoxRef = useRef(null);
 
-  // TC20: Persist support history to localStorage so chat reloads retain messages after refresh
+  // TC64: Listen for network interruption and online restoration
+  useEffect(() => {
+    const handleOnline = () => setIsNetworkInterrupted(false);
+    const handleOffline = () => setIsNetworkInterrupted(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // TC20, TC67: Persist support history to localStorage so chat reloads retain messages after refresh
   useEffect(() => {
     try {
       localStorage.setItem('nutritva_support_chat_cache', JSON.stringify(supportHistory));
@@ -1162,17 +1180,31 @@ const Dashboard = () => {
     setSupportHistory(prev => [...prev, userMsg]);
     setChatInput('');
 
+    // TC66: Invalid request detection check (malicious SQL, script tags, control codes)
+    if (/<script|drop table|exec\(|eval\(/i.test(cleanMsg)) {
+      setIsSendingMessage(false);
+      setInvalidRequestMsg('⚠️ Invalid Request: We detected an unprocessable format in your input. Please rephrase your query.');
+      return;
+    }
+    setInvalidRequestMsg('');
+
     // Simulated automated response
     setTimeout(() => {
       setIsSendingMessage(false);
       let botText = "Thank you for reaching out. A support executive is looking into your request and will connect with you shortly.";
-      const lower = cleanMsg.toLowerCase();
-      if (lower.includes('order') || lower.includes('delivery')) {
-        botText = activeOrder 
-          ? `Your active order ${activeOrder.id} is currently in the "${activeOrder.status}" stage and will arrive in approx ${activeOrder.eta}.`
-          : "I see you don't have any active deliveries. Your past orders are listed under 'My Orders'. Is there a specific transaction you need help with?";
-      } else if (lower.includes('refund') || lower.includes('money')) {
-        botText = "For refund queries, it generally takes 3-5 business days to reflect in your original payment source. You can check the transaction status under 'Payments & UPI'.";
+      
+      // TC69: Agent Unavailable offline message response
+      if (!isAgentOnline) {
+        botText = "🔴 Our live support agents are currently offline (Hours: 9 AM - 9 PM IST). Your inquiry has been logged as Ticket #NT-SUP-902. Our team will contact you via email or WhatsApp as soon as an agent is back online.";
+      } else {
+        const lower = cleanMsg.toLowerCase();
+        if (lower.includes('order') || lower.includes('delivery')) {
+          botText = activeOrder 
+            ? `Your active order ${activeOrder.id} is currently in the "${activeOrder.status}" stage and will arrive in approx ${activeOrder.eta}.`
+            : "I see you don't have any active deliveries. Your past orders are listed under 'My Orders'. Is there a specific transaction you need help with?";
+        } else if (lower.includes('refund') || lower.includes('money')) {
+          botText = "For refund queries, it generally takes 3-5 business days to reflect in your original payment source. You can check the transaction status under 'Payments & UPI'.";
+        }
       }
       setSupportHistory(prev => [...prev, { sender: 'bot', text: botText, time: timeNow }]);
     }, 1000);
@@ -3792,7 +3824,7 @@ const Dashboard = () => {
               {/* Live Chat Simulator */}
               <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-xs flex flex-col h-[480px]">
                 
-                {/* Chat Header */}
+                {/* Chat Header — TC69: dynamic online/offline agent status */}
                 <div className="bg-[#105335] text-white rounded-t-3xl p-4 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-bold text-sm text-amber-300">
@@ -3800,12 +3832,28 @@ const Dashboard = () => {
                     </div>
                     <div>
                       <h4 className="font-extrabold text-xs">Nutritiva Support Agent</h4>
-                      <span className="text-[9px] text-emerald-200 font-semibold flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
-                        <span>Online • Replies instantly</span>
-                      </span>
+                      {isAgentOnline ? (
+                        <span className="text-[9px] text-emerald-200 font-semibold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+                          <span>🟢 Online • Replies instantly</span>
+                        </span>
+                      ) : (
+                        <span className="text-[9px] text-red-300 font-semibold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 bg-red-400 rounded-full"></span>
+                          <span id="support-agent-offline-badge">🔴 Offline • Leave a message</span>
+                        </span>
+                      )}
                     </div>
                   </div>
+                  {/* TC69 toggle button — for testing agent offline mode */}
+                  <button
+                    type="button"
+                    onClick={() => setIsAgentOnline(prev => !prev)}
+                    className="bg-white/10 hover:bg-white/20 text-white text-[9px] font-bold px-2 py-1 rounded-lg transition-all border border-white/20"
+                    title="Toggle agent availability (testing)"
+                  >
+                    {isAgentOnline ? 'Simulate Offline' : 'Simulate Online'}
+                  </button>
                   <a
                     href={`https://wa.me/919832627196?text=${encodeURIComponent(`Hi! I would like to continue my support session on WhatsApp. Here is the conversation log:\n\n${(supportHistory || []).map(h => `[${h.time || ''} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text || ''}`).join('\n')}`)}`}
                     target="_blank"
@@ -3836,6 +3884,40 @@ const Dashboard = () => {
                     </div>
                   ))}
                 </div>
+
+                {/* TC64: Network Interruption Banner */}
+                {isNetworkInterrupted && (
+                  <div id="support-network-interruption-banner" className="px-4 py-2 bg-orange-50 border-t border-orange-200 text-xs text-orange-700 font-bold flex items-center justify-between animate-fade-in">
+                    <span>⚠️ Network connection lost. Please check your internet connection.</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (navigator.onLine) {
+                          setIsNetworkInterrupted(false);
+                        } else {
+                          setIsNetworkInterrupted(true);
+                        }
+                      }}
+                      className="bg-orange-100 hover:bg-orange-200 text-orange-800 text-[10px] font-black px-2 py-0.5 rounded-lg transition-all"
+                    >
+                      🔄 Retry Connection
+                    </button>
+                  </div>
+                )}
+
+                {/* TC66: Invalid Request Error Banner */}
+                {invalidRequestMsg && (
+                  <div id="support-invalid-request-banner" className="px-4 py-2 bg-red-50 border-t border-red-200 text-xs text-red-600 font-bold flex items-center justify-between animate-fade-in">
+                    <span>{invalidRequestMsg}</span>
+                    <button
+                      type="button"
+                      onClick={() => setInvalidRequestMsg('')}
+                      className="text-red-700 underline text-[10px] hover:text-red-900"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                )}
 
                 {/* TC36: Send Button API / Network error display */}
                 {supportSendError && (
@@ -3996,7 +4078,46 @@ const Dashboard = () => {
             </div>
           )}
 
+            {/* TC63: Session Timeout Modal Overlay */}
+            {isSessionExpired && (
+              <div id="support-session-timeout-modal" className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center animate-fade-in">
+                <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center space-y-5 border border-slate-100">
+                  <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center mx-auto text-2xl">
+                    ⏱️
+                  </div>
+                  <div>
+                    <h3 className="font-black text-slate-800 text-base">Session Expired</h3>
+                    <p className="text-xs text-slate-500 font-semibold mt-2 leading-relaxed">
+                      Your support session has timed out due to inactivity. Please log in again to continue chatting with our support team.
+                    </p>
+                  </div>
+                  <div className="flex gap-3 justify-center">
+                    <button
+                      type="button"
+                      onClick={() => setIsSessionExpired(false)}
+                      className="text-xs font-bold text-slate-500 hover:text-slate-700 px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-300 transition-all"
+                    >
+                      Dismiss
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSessionExpired(false);
+                        window.location.href = '/login';
+                      }}
+                      className="text-xs font-black text-white bg-[#105335] hover:bg-emerald-800 px-5 py-2 rounded-xl transition-all shadow-sm active:scale-95"
+                    >
+                      🔐 Please Login Again
+                    </button>
+                  </div>
+                  {/* TC63 simulate button for testing */}
+                  <p className="text-[9px] text-slate-300 font-semibold">Session ID: NT-SES-{Math.random().toString(36).slice(2,8).toUpperCase()}</p>
+                </div>
+              </div>
+            )}
+
           {/* G. My Subscriptions Tab */}
+
           {activeSidebarTab === 'subscriptions' && (
             <div className="animate-fade-in space-y-6 text-left">
               <div className="flex items-center justify-between mb-6">

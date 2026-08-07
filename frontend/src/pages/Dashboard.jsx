@@ -419,6 +419,7 @@ const Dashboard = () => {
     healthPreferences,
     toggleHealthPreference,
     markNotificationRead,
+    updateSubscriptionStatus,
     products,
     addresses,
     setAddresses,
@@ -458,6 +459,7 @@ const Dashboard = () => {
   const [profileErrors, setProfileErrors] = useState({});
   const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]);
   const [isDropdownHovered, setIsDropdownHovered] = useState(false);
+  const [activeManageSubscription, setActiveManageSubscription] = useState(null);
 
   useEffect(() => {
     setTempProfile({
@@ -3152,11 +3154,109 @@ const Dashboard = () => {
                           <span className="text-slate-800 font-bold">{new Date(sub.end_date).toLocaleDateString()}</span>
                         </div>
                       </div>
-                      <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl transition-colors">Manage Subscription</button>
+                      <button 
+                        onClick={() => setActiveManageSubscription(sub)}
+                        className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl transition-colors"
+                      >
+                        Manage Subscription
+                      </button>
                     </div>
                   );
                 })}
               </div>
+
+              {/* Manage Subscription Modal Overlay */}
+              {activeManageSubscription && (
+                <div 
+                  className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-9999 p-4 animate-fade-in"
+                  onClick={(e) => { if (e.target === e.currentTarget) setActiveManageSubscription(null); }}
+                >
+                  <div 
+                    className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 text-left relative overflow-hidden"
+                    style={{ animation: 'scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
+                  >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50/50 rounded-bl-[100px] -z-10"></div>
+                    
+                    {/* Close Button */}
+                    <button
+                      onClick={() => setActiveManageSubscription(null)}
+                      className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center bg-slate-50 hover:bg-slate-100 text-slate-550 font-bold transition-colors"
+                    >
+                      ✕
+                    </button>
+
+                    <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg uppercase tracking-wider">
+                      Subscription Control
+                    </span>
+                    
+                    <h3 className="text-xl font-black text-slate-800 mt-3 mb-1">
+                      {activeManageSubscription.plan_name || "Standard Nutrition Plan"}
+                    </h3>
+                    <p className="text-xs text-slate-400 font-bold mb-6">ID: SUB-{activeManageSubscription.id.toUpperCase()}</p>
+
+                    <div className="space-y-3 p-4 bg-slate-50/60 rounded-2xl border border-slate-100 mb-6">
+                      <div className="flex justify-between text-xs font-semibold text-slate-500">
+                        <span>Current Status</span>
+                        <span className="font-bold text-slate-800 uppercase">{activeManageSubscription.status}</span>
+                      </div>
+                      <div className="flex justify-between text-xs font-semibold text-slate-500">
+                        <span>Start Date</span>
+                        <span className="font-bold text-slate-800">{new Date(activeManageSubscription.start_date).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex justify-between text-xs font-semibold text-slate-500">
+                        <span>Expiry Date</span>
+                        <span className="font-bold text-slate-800">{new Date(activeManageSubscription.end_date).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      {activeManageSubscription.status.toUpperCase() === 'ACTIVE' && (
+                        <button
+                          onClick={() => {
+                            updateSubscriptionStatus(activeManageSubscription.id, 'PAUSED')
+                              .then(() => setActiveManageSubscription(null));
+                          }}
+                          className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white text-xs font-black rounded-xl transition-colors flex items-center justify-center gap-2"
+                        >
+                          ⏸️ Pause Subscription
+                        </button>
+                      )}
+
+                      {activeManageSubscription.status.toUpperCase() === 'PAUSED' && (
+                        <button
+                          onClick={() => {
+                            updateSubscriptionStatus(activeManageSubscription.id, 'ACTIVE')
+                              .then(() => setActiveManageSubscription(null));
+                          }}
+                          className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl transition-colors flex items-center justify-center gap-2"
+                        >
+                          ▶️ Resume Subscription
+                        </button>
+                      )}
+
+                      {activeManageSubscription.status.toUpperCase() !== 'CANCELLED' && (
+                        <button
+                          onClick={() => {
+                            if (confirm("Are you sure you want to cancel this subscription? This action cannot be undone.")) {
+                              updateSubscriptionStatus(activeManageSubscription.id, 'CANCELLED')
+                                .then(() => setActiveManageSubscription(null));
+                            }
+                          }}
+                          className="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-xl transition-colors flex items-center justify-center gap-2"
+                        >
+                          ❌ Cancel Subscription
+                        </button>
+                      )}
+
+                      {activeManageSubscription.status.toUpperCase() === 'CANCELLED' && (
+                        <div className="text-center p-3 text-rose-500 bg-rose-50 rounded-xl text-xs font-bold border border-rose-100">
+                          This subscription is Cancelled and cannot be modified.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

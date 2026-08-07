@@ -1624,31 +1624,31 @@ const Dashboard = () => {
                       <div 
                         className="w-full px-4 py-2.5 rounded-xl text-sm font-black flex items-center justify-between"
                         style={{
-                          background: user.status.includes('Silver')
+                          background: (user.status || '').includes('Silver')
                             ? '#f1f5f9'
-                            : user.status.includes('Gold')
+                            : (user.status || '').includes('Gold')
                             ? '#fffbeb'
-                            : user.status.includes('Platinum')
+                            : (user.status || '').includes('Platinum')
                             ? '#f5f3ff'
                             : '#f8fafc',
-                          border: user.status.includes('Silver')
+                          border: (user.status || '').includes('Silver')
                             ? '1.5px solid #cbd5e1'
-                            : user.status.includes('Gold')
+                            : (user.status || '').includes('Gold')
                             ? '1.5px solid #fef3c7'
-                            : user.status.includes('Platinum')
+                            : (user.status || '').includes('Platinum')
                             ? '1.5px solid #ddd6fe'
                             : '1.5px solid rgba(255,160,190,0.4)',
-                          color: user.status.includes('Silver')
+                          color: (user.status || '').includes('Silver')
                             ? '#475569'
-                            : user.status.includes('Gold')
+                            : (user.status || '').includes('Gold')
                             ? '#d97706'
-                            : user.status.includes('Platinum')
+                            : (user.status || '').includes('Platinum')
                             ? '#7c3aed'
                             : '#105335'
                         }}
                       >
                         <span className="flex items-center gap-2">
-                          👑 {user.status}
+                          👑 {user.status || 'Regular Member'}
                         </span>
                         <button
                           type="button"

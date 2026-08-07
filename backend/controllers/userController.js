@@ -33,18 +33,28 @@ exports.updateUserProfile = async (req, res) => {
       }
     }
 
-    const oldUser = await dbGet('SELECT status FROM users WHERE id = ?', [userId]);
+    const oldUser = await dbGet('SELECT * FROM users WHERE id = ?', [userId]);
     const oldStatus = oldUser ? oldUser.status : 'Regular Member';
+    const oldReward = oldUser ? oldUser.reward_points : 0;
+    const oldSavings = oldUser ? oldUser.monthly_savings : 0;
+    const oldOrders = oldUser ? oldUser.total_orders : 0;
+    const oldAvatar = oldUser ? oldUser.avatar : '';
+
+    const finalStatus = status !== undefined ? status : oldStatus;
+    const finalReward = reward_points !== undefined ? reward_points : oldReward;
+    const finalSavings = monthly_savings !== undefined ? monthly_savings : oldSavings;
+    const finalOrders = total_orders !== undefined ? total_orders : oldOrders;
+    const finalAvatar = avatar !== undefined ? avatar : oldAvatar;
 
     await dbRun(`
       UPDATE users 
       SET name = ?, email = ?, phone = ?, dob = ?, gender = ?, city = ?, status = ?, reward_points = ?, monthly_savings = ?, total_orders = ?, avatar = ?
       WHERE id = ?
-    `, [name, email, phone, dob, gender, city, status, reward_points, monthly_savings, total_orders, avatar, userId]);
+    `, [name, email, phone, dob, gender, city, finalStatus, finalReward, finalSavings, finalOrders, finalAvatar, userId]);
 
-    if (status && status !== oldStatus && status.startsWith('VIP')) {
+    if (finalStatus && finalStatus !== oldStatus && finalStatus.startsWith('VIP')) {
       const notifId = 'notif_vip_' + Date.now();
-      const planName = status.replace('VIP ', '').replace(' Member', '');
+      const planName = finalStatus.replace('VIP ', '').replace(' Member', '');
       await dbRun(`
         INSERT INTO notifications (id, buyer_id, type, title, message, is_read, created_at)
         VALUES (?, ?, 'GENERAL', ?, ?, 0, NOW())

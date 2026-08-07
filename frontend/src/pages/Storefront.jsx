@@ -1880,7 +1880,15 @@ const Storefront = () => {
 
         {/* ── VIP Member Banner (full width) ── */}
         <div
-          onClick={() => { setVipJoined(false); setShowVipModal(true); }}
+          onClick={() => {
+            if (!isLoggedIn) {
+              alert("Please log in to view and choose VIP Plans.");
+              setShowLoginModal(true);
+              return;
+            }
+            setVipJoined(false);
+            setShowVipModal(true);
+          }}
           className="text-white rounded-3xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden group cursor-pointer hover:scale-[1.01] active:scale-[0.99] transition-all my-8"
           style={{ background: 'linear-gradient(135deg, #0d4a2e 0%, #105335 50%, #0a3d26 100%)', border: '1px solid rgba(16,83,53,0.4)', boxShadow: '0 12px 40px rgba(16,83,53,0.35)' }}
         >
@@ -2372,9 +2380,26 @@ const Storefront = () => {
                 <div className="flex flex-col items-center gap-3">
                   <button
                     onClick={() => {
+                      const oldStatus = user.status || 'Regular Member';
+                      const newStatus = vipSelectedPlan === 'silver' ? 'VIP Silver Member' : vipSelectedPlan === 'gold' ? 'VIP Gold Member' : 'VIP Platinum Member';
+                      
+                      const oldRank = oldStatus.includes('Platinum') ? 3 : oldStatus.includes('Gold') ? 2 : oldStatus.includes('Silver') ? 1 : 0;
+                      const newRank = vipSelectedPlan === 'platinum' ? 3 : vipSelectedPlan === 'gold' ? 2 : 1;
+                      
                       setVipJoined(true);
-                      const statusName = vipSelectedPlan === 'silver' ? 'VIP Silver Member' : vipSelectedPlan === 'gold' ? 'VIP Gold Member' : 'VIP Platinum Member';
-                      setUser(prev => ({ ...prev, status: statusName }));
+                      setUser(prev => ({ ...prev, status: newStatus }));
+                      
+                      if (oldRank !== 0) {
+                        if (newRank > oldRank) {
+                          showToastNotification("👑 Membership Upgraded Successfully!", "👑");
+                        } else if (newRank < oldRank) {
+                          showToastNotification("✅ Membership Changed Successfully!", "✅");
+                        } else {
+                          showToastNotification("✅ Membership Re-activated Successfully!", "✅");
+                        }
+                      } else {
+                        showToastNotification("🎉 Membership Activated Successfully!", "🎉");
+                      }
                     }}
                     className="w-full max-w-sm font-black text-base py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
                     style={{
@@ -2433,10 +2458,32 @@ const Storefront = () => {
                   {vipSelectedPlan === 'silver' ? '🥈' : vipSelectedPlan === 'gold' ? '🥇' : '💎'}
                 </div>
                 <h2 className="text-3xl font-black text-white mb-2">
-                  Welcome to Nutritiva {vipSelectedPlan.charAt(0).toUpperCase() + vipSelectedPlan.slice(1)}!
+                  {(() => {
+                    const oldStatus = user.status || 'Regular Member';
+                    const oldRank = oldStatus.includes('Platinum') ? 3 : oldStatus.includes('Gold') ? 2 : oldStatus.includes('Silver') ? 1 : 0;
+                    const newRank = vipSelectedPlan === 'platinum' ? 3 : vipSelectedPlan === 'gold' ? 2 : 1;
+                    if (oldRank === 0) {
+                      return `Welcome to Nutritiva ${vipSelectedPlan.charAt(0).toUpperCase() + vipSelectedPlan.slice(1)}!`;
+                    } else if (newRank > oldRank) {
+                      return "Membership Upgraded Successfully!";
+                    } else {
+                      return "Membership Changed Successfully!";
+                    }
+                  })()}
                 </h2>
                 <p className="text-emerald-300 font-semibold mb-8 text-sm max-w-sm">
-                  Your membership is now active. Enjoy exclusive perks starting from your very next order!
+                  {(() => {
+                    const oldStatus = user.status || 'Regular Member';
+                    const oldRank = oldStatus.includes('Platinum') ? 3 : oldStatus.includes('Gold') ? 2 : oldStatus.includes('Silver') ? 1 : 0;
+                    const newRank = vipSelectedPlan === 'platinum' ? 3 : vipSelectedPlan === 'gold' ? 2 : 1;
+                    if (oldRank === 0) {
+                      return "Your membership is now active. Enjoy exclusive perks starting from your very next order!";
+                    } else if (newRank > oldRank) {
+                      return `Congratulations! You have successfully upgraded to the ${vipSelectedPlan.charAt(0).toUpperCase() + vipSelectedPlan.slice(1)} plan.`;
+                    } else {
+                      return `Your membership has been successfully updated to the ${vipSelectedPlan.charAt(0).toUpperCase() + vipSelectedPlan.slice(1)} plan.`;
+                    }
+                  })()}
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 w-full max-w-sm mb-8">

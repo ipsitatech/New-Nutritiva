@@ -3,11 +3,19 @@ import WhatsAppIcon from "./WhatsAppIcon.jsx";
 export default function WhatsAppButton() {
   const whatsappUrl = "https://wa.me/917262866254";
 
+  const handleClick = (e) => {
+    if (!navigator.onLine) {
+      e.preventDefault();
+      alert("Network Error: Internet is currently unavailable. Please check your network connection and try again.");
+    }
+  };
+
   return (
     <a
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={handleClick}
       className="fixed bottom-6 right-6 z-9999 w-14 h-14 bg-[#2D7A4F] rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(37,211,102,0.4)] hover:scale-110 active:scale-95 transition-all duration-300 group"
       aria-label="Chat on WhatsApp"
     >

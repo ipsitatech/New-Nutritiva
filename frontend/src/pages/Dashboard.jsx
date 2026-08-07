@@ -1431,6 +1431,15 @@ const Dashboard = () => {
                         );
                       })}
                     </div>
+                    <button
+                      onClick={() => {
+                        showToastNotification("🎉 Dietary preferences updated successfully!", "🎉");
+                      }}
+                      className="mt-4 text-xs font-black px-4 py-2 rounded-xl text-white transition-all hover:scale-105 active:scale-95 text-center"
+                      style={{background: 'linear-gradient(135deg, #105335, #0a3d26)'}}
+                    >
+                      Save Preferences
+                    </button>
                   </div>
                 </div>
 
@@ -1491,6 +1500,15 @@ const Dashboard = () => {
                         </button>
                       </div>
                     ))}
+                    <button
+                      onClick={() => {
+                        showToastNotification("🎉 Preferences saved successfully!", "🎉");
+                      }}
+                      className="mt-4 w-full text-xs font-black py-2 rounded-xl text-white transition-all hover:scale-105 active:scale-95 text-center"
+                      style={{background: 'linear-gradient(135deg, #105335, #0a3d26)'}}
+                    >
+                      Save Preferences
+                    </button>
                   </div>
 
                   {/* Account Actions */}

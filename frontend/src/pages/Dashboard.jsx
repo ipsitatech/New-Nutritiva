@@ -712,6 +712,8 @@ const Dashboard = () => {
   const [newAddressLng, setNewAddressLng] = useState('77.3769');
   const [newAddressInstructions, setNewAddressInstructions] = useState('');
   const [newAddressIsDefault, setNewAddressIsDefault] = useState(false);
+  const [addressFormErrors, setAddressFormErrors] = useState({}); // TC33: field validation
+  const [addrDuplicateWarn, setAddrDuplicateWarn] = useState(false); // TC37: duplicate warning
 
   // Support State
   const [supportHistory, setSupportHistory] = useState([
@@ -870,8 +872,36 @@ const Dashboard = () => {
 
   const handleAddAddressSubmit = (e) => {
     e.preventDefault();
-    if (!newAddressLine1 || !newAddressPhone || !newAddressFullName) return;
-    
+    setAddrDuplicateWarn(false);
+
+    // TC33: Validate all mandatory fields and collect errors
+    const errors = {};
+    if (!newAddressFullName.trim()) errors.full_name = 'Recipient name is required.';
+    if (!newAddressPhone.trim() || newAddressPhone.length < 10) errors.phone = 'Valid 10-digit phone is required.';
+    if (!newAddressLine1.trim()) errors.line1 = 'Address Line 1 is required.';
+    if (!newAddressLine2.trim()) errors.line2 = 'Address Line 2 is required.';
+    if (!newAddressPostalCode.trim() || newAddressPostalCode.length < 6) errors.postal = 'Valid 6-digit postal code is required.';
+    if (!newAddressCity.trim()) errors.city = 'City is required.';
+    if (!newAddressState.trim()) errors.state = 'State is required.';
+    if (!newAddressCountry.trim()) errors.country = 'Country is required.';
+
+    if (Object.keys(errors).length > 0) {
+      setAddressFormErrors(errors);
+      return;
+    }
+    setAddressFormErrors({});
+
+    // TC37: Check for duplicate address (same line1 + postal + phone)
+    const isDuplicate = addresses.some(a =>
+      a.address_line1?.toLowerCase().trim() === newAddressLine1.toLowerCase().trim() &&
+      a.postal_code?.trim() === newAddressPostalCode.trim() &&
+      a.phone?.trim() === newAddressPhone.trim()
+    );
+    if (isDuplicate) {
+      setAddrDuplicateWarn(true);
+      return;
+    }
+
     const newId = addresses.length + 1;
     const nowStr = new Date().toISOString();
     
@@ -901,8 +931,12 @@ const Dashboard = () => {
     if (newAddressIsDefault) {
       updatedAddresses = updatedAddresses.map(a => ({ ...a, is_default: false }));
     }
-    
-    setAddresses([...updatedAddresses, newAddressObj]);
+
+    const finalAddresses = [...updatedAddresses, newAddressObj];
+    setAddresses(finalAddresses);
+
+    // TC10 + TC26: Persist addresses (including default) to localStorage on every save
+    try { localStorage.setItem('nutritva_addresses_cache', JSON.stringify(finalAddresses)); } catch {}
     
     // Clear inputs
     setNewAddressLine1('');
@@ -2540,8 +2574,16 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* D. Saved Addresses Tab */}
-          {activeSidebarTab === 'addresses' && (
+          {/* D. Saved Addresses Tab — TC10/TC26: restore from localStorage on mount */}
+          {activeSidebarTab === 'addresses' && (() => {
+            // TC10 + TC26: Restore addresses (incl. default) from localStorage if live list is empty
+            if (addresses.length === 0) {
+              try {
+                const cached = localStorage.getItem('nutritva_addresses_cache');
+                if (cached) setAddresses(JSON.parse(cached));
+              } catch {}
+            }
+            return (
             <div className="space-y-6 animate-fade-in text-left">
               
               {!showAddAddress ? (
@@ -2607,9 +2649,18 @@ const Dashboard = () => {
                                 Set Default
                               </button>
                             )}
-                            <button 
-                              onClick={() => setAddresses(addresses.filter(a => a.id !== addr.id))}
-                              className="text-slate-350 hover:text-red-650 hover:underline bg-transparent border-none p-1 font-semibold"
+                            {/* TC41: Delete button always visible with unique id for testability */}
+                            <button
+                              id={`delete-address-${addr.id}`}
+                              onClick={() => {
+                                const updated = addresses.filter(a => a.id !== addr.id);
+                                setAddresses(updated);
+                                // TC10+TC26: sync cache after delete
+                                try { localStorage.setItem('nutritva_addresses_cache', JSON.stringify(updated)); } catch {};
+                                showToastNotification('🗑️ Address removed.', '🗑️');
+                              }}
+                              className="text-slate-400 hover:text-red-600 hover:underline bg-transparent border-none p-1 font-semibold transition-colors"
+                              title="Delete this address"
                             >
                               Delete
                             </button>
@@ -2634,7 +2685,19 @@ const Dashboard = () => {
                     </button>
                   </div>
 
-                  <form onSubmit={handleAddAddressSubmit} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-sm space-y-6 text-left">
+                  {/* TC37: Duplicate address warning banner */}
+                  {addrDuplicateWarn && (
+                    <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl mb-2">
+                      <span className="text-xl">⚠️</span>
+                      <div>
+                        <p className="text-sm font-black text-amber-700">Duplicate Address Detected</p>
+                        <p className="text-xs font-semibold text-amber-500 mt-0.5">This address (Line 1 + Postal + Phone) already exists in your saved list. Please use a different address or edit the existing one.</p>
+                      </div>
+                      <button onClick={() => setAddrDuplicateWarn(false)} className="ml-auto text-amber-400 hover:text-amber-600 font-black text-lg leading-none">✕</button>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleAddAddressSubmit} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-sm space-y-6 text-left" noValidate>
                     
                     {/* Section 1: Contact Info */}
                     <div className="space-y-4">
@@ -2646,26 +2709,27 @@ const Dashboard = () => {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                           <span className="text-[10px] text-slate-500 font-bold uppercase block">Recipient Full Name</span>
-                          <input 
+                          <input
                             type="text"
-                            required
                             placeholder="e.g. Ipsita Panda"
                             value={newAddressFullName}
-                            onChange={(e) => setNewAddressFullName(e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:border-[#105335] focus:ring-2 focus:ring-[#105335]/25 transition-all"
+                            onChange={(e) => { setNewAddressFullName(e.target.value); setAddressFormErrors(p => ({...p, full_name: ''})); }}
+                            className={`w-full bg-slate-50 border rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:ring-2 transition-all ${addressFormErrors.full_name ? 'border-red-400 focus:border-red-400 focus:ring-red-400/25' : 'border-slate-200 focus:border-[#105335] focus:ring-[#105335]/25'}`}
                           />
+                          {/* TC33: inline validation message */}
+                          {addressFormErrors.full_name && <p className="text-[10px] text-red-500 font-bold mt-1">{addressFormErrors.full_name}</p>}
                         </div>
                         <div className="space-y-1.5">
                           <span className="text-[10px] text-slate-500 font-bold uppercase block">Contact Phone Number</span>
-                          <input 
+                          <input
                             type="tel"
-                            required
                             maxLength={10}
                             placeholder="10-digit mobile number"
                             value={newAddressPhone}
-                            onChange={(e) => setNewAddressPhone(e.target.value.replace(/\D/g, ''))}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:border-[#105335] focus:ring-2 focus:ring-[#105335]/25 transition-all"
+                            onChange={(e) => { setNewAddressPhone(e.target.value.replace(/\D/g, '')); setAddressFormErrors(p => ({...p, phone: ''})); }}
+                            className={`w-full bg-slate-50 border rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:ring-2 transition-all ${addressFormErrors.phone ? 'border-red-400 focus:border-red-400 focus:ring-red-400/25' : 'border-slate-200 focus:border-[#105335] focus:ring-[#105335]/25'}`}
                           />
+                          {addressFormErrors.phone && <p className="text-[10px] text-red-500 font-bold mt-1">{addressFormErrors.phone}</p>}
                         </div>
                       </div>
                     </div>
@@ -2680,25 +2744,25 @@ const Dashboard = () => {
                       <div className="grid grid-cols-1 gap-4">
                         <div className="space-y-1.5">
                           <span className="text-[10px] text-slate-500 font-bold uppercase block">Address Line 1</span>
-                          <input 
+                          <input
                             type="text"
-                            required
                             placeholder="Flat no., Building name, Apartment, Block"
                             value={newAddressLine1}
-                            onChange={(e) => setNewAddressLine1(e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:border-[#105335] focus:ring-2 focus:ring-[#105335]/25 transition-all"
+                            onChange={(e) => { setNewAddressLine1(e.target.value); setAddressFormErrors(p => ({...p, line1: ''})); setAddrDuplicateWarn(false); }}
+                            className={`w-full bg-slate-50 border rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:ring-2 transition-all ${addressFormErrors.line1 ? 'border-red-400 focus:border-red-400 focus:ring-red-400/25' : 'border-slate-200 focus:border-[#105335] focus:ring-[#105335]/25'}`}
                           />
+                          {addressFormErrors.line1 && <p className="text-[10px] text-red-500 font-bold mt-1">{addressFormErrors.line1}</p>}
                         </div>
                         <div className="space-y-1.5">
                           <span className="text-[10px] text-slate-500 font-bold uppercase block">Address Line 2</span>
-                          <input 
+                          <input
                             type="text"
-                            required
                             placeholder="Street name, Sector, Area, Locality"
                             value={newAddressLine2}
-                            onChange={(e) => setNewAddressLine2(e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:border-[#105335] focus:ring-2 focus:ring-[#105335]/25 transition-all"
+                            onChange={(e) => { setNewAddressLine2(e.target.value); setAddressFormErrors(p => ({...p, line2: ''})); }}
+                            className={`w-full bg-slate-50 border rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:ring-2 transition-all ${addressFormErrors.line2 ? 'border-red-400 focus:border-red-400 focus:ring-red-400/25' : 'border-slate-200 focus:border-[#105335] focus:ring-[#105335]/25'}`}
                           />
+                          {addressFormErrors.line2 && <p className="text-[10px] text-red-500 font-bold mt-1">{addressFormErrors.line2}</p>}
                         </div>
                       </div>
 
@@ -2715,25 +2779,25 @@ const Dashboard = () => {
                         </div>
                         <div className="space-y-1.5">
                           <span className="text-[10px] text-slate-500 font-bold uppercase block">Postal Code</span>
-                          <input 
+                          <input
                             type="text"
-                            required
                             placeholder="6-digit pincode"
                             value={newAddressPostalCode}
-                            onChange={(e) => setNewAddressPostalCode(e.target.value.replace(/\D/g, ''))}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:border-[#105335] focus:ring-2 focus:ring-[#105335]/25 transition-all"
+                            onChange={(e) => { setNewAddressPostalCode(e.target.value.replace(/\D/g, '')); setAddressFormErrors(p => ({...p, postal: ''})); setAddrDuplicateWarn(false); }}
+                            className={`w-full bg-slate-50 border rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:ring-2 transition-all ${addressFormErrors.postal ? 'border-red-400 focus:border-red-400 focus:ring-red-400/25' : 'border-slate-200 focus:border-[#105335] focus:ring-[#105335]/25'}`}
                           />
+                          {addressFormErrors.postal && <p className="text-[10px] text-red-500 font-bold mt-1">{addressFormErrors.postal}</p>}
                         </div>
                         <div className="space-y-1.5">
                           <span className="text-[10px] text-slate-500 font-bold uppercase block">City</span>
-                          <input 
+                          <input
                             type="text"
-                            required
                             placeholder="City"
                             value={newAddressCity}
-                            onChange={(e) => setNewAddressCity(e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:border-[#105335] focus:ring-2 focus:ring-[#105335]/25 transition-all"
+                            onChange={(e) => { setNewAddressCity(e.target.value); setAddressFormErrors(p => ({...p, city: ''})); }}
+                            className={`w-full bg-slate-50 border rounded-2xl px-4 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:bg-white focus:ring-2 transition-all ${addressFormErrors.city ? 'border-red-400 focus:border-red-400 focus:ring-red-400/25' : 'border-slate-200 focus:border-[#105335] focus:ring-[#105335]/25'}`}
                           />
+                          {addressFormErrors.city && <p className="text-[10px] text-red-500 font-bold mt-1">{addressFormErrors.city}</p>}
                         </div>
                       </div>
 
@@ -2860,7 +2924,8 @@ const Dashboard = () => {
               )}
 
             </div>
-          )}
+            );
+          })()}
 
           {/* E. Payments & UPI Tab */}
           {activeSidebarTab === 'payments' && (

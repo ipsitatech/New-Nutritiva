@@ -1,20 +1,61 @@
-const express = require('express');
-const cors = require('cors');
-const authRoutes = require('./routes/authRoutes');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+
+const db = require("./config/db");
+
+// Import Routes
+const sellerRoutes = require("./routes/sellerRoutes");
+const productRoutes = require("./routes/productRoutes");
+const orderRoutes = require("./routes/orderRoutes"); // NEW
 
 const app = express();
 
-// Allow requests from the Vite frontend dev server
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
-  credentials: true,
-}));
-
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-// Auth Routes
-app.use('/api/auth', authRoutes);
+// Serve product images
+app.use("/uploads", express.static("uploads"));
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Nutritva Backend running on port ${PORT}`));
+// Root Route
+app.get("/", (req, res) => {
+  res.send("Backend Running 🚀");
+});
+
+// API Routes
+app.use("/api/seller", sellerRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes); // NEW
+
+// Test Database API
+app.get("/test-db", async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT 1 + 1 AS result");
+
+    res.json({
+      message: "DB Working Fine",
+      result: rows[0].result,
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+    });
+  }
+});
+
+// Test MySQL connection when server starts
+db.query("SELECT 1")
+  .then(() => {
+    console.log("✅ MySQL Connected Successfully");
+  })
+  .catch((err) => {
+    console.error("❌ MySQL Connection Failed");
+    console.error(err.message);
+  });
+
+const PORT = process.env.PORT || 5001;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});

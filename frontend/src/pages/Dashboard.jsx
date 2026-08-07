@@ -3090,29 +3090,72 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {subscriptions.map(sub => (
-                  <div key={sub.id} className="bg-white p-6 rounded-3xl border border-emerald-100 shadow-sm relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-[100px] -z-10"></div>
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg uppercase tracking-wider">{sub.status}</span>
-                        <h4 className="text-lg font-black text-slate-800 mt-2">{sub.plan_name}</h4>
+                {subscriptions.map(sub => {
+                  const getStatusBadge = (status) => {
+                    const cleanStatus = (status || '').toUpperCase();
+                    const validStatuses = ['ACTIVE', 'PAUSED', 'CANCELLED', 'EXPIRED'];
+                    const displayStatus = validStatuses.includes(cleanStatus) ? cleanStatus : 'UNKNOWN';
+                    
+                    switch(displayStatus) {
+                      case 'ACTIVE':
+                        return (
+                          <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                            🟢 Active
+                          </span>
+                        );
+                      case 'PAUSED':
+                        return (
+                          <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                            ⏸️ Paused
+                          </span>
+                        );
+                      case 'CANCELLED':
+                        return (
+                          <span className="text-[10px] font-black text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                            ❌ Cancelled
+                          </span>
+                        );
+                      case 'EXPIRED':
+                        return (
+                          <span className="text-[10px] font-black text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                            ⚠️ Expired
+                          </span>
+                        );
+                      default:
+                        return (
+                          <span className="text-[10px] font-black text-red-600 bg-red-50 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                            ❓ Unknown
+                          </span>
+                        );
+                    }
+                  };
+
+                  return (
+                    <div key={sub.id} className="bg-white p-6 rounded-3xl border border-emerald-100 shadow-sm relative overflow-hidden transition-all hover:shadow-md">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50/50 rounded-bl-[100px] -z-10"></div>
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          {getStatusBadge(sub.status)}
+                          <h4 className="text-lg font-black text-slate-800 mt-3.5">
+                            {sub.plan_name ? sub.plan_name : "Standard Nutrition Plan"}
+                          </h4>
+                        </div>
+                        <Repeat className="w-6 h-6 text-emerald-300" />
                       </div>
-                      <Repeat className="w-6 h-6 text-emerald-200" />
+                      <div className="space-y-2 mb-6">
+                        <div className="flex justify-between text-xs font-semibold text-slate-500">
+                          <span>Started On</span>
+                          <span className="text-slate-800 font-bold">{new Date(sub.start_date).toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-semibold text-slate-500">
+                          <span>Valid Until</span>
+                          <span className="text-slate-800 font-bold">{new Date(sub.end_date).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl transition-colors">Manage Subscription</button>
                     </div>
-                    <div className="space-y-2 mb-6">
-                      <div className="flex justify-between text-xs font-semibold text-slate-500">
-                        <span>Started On</span>
-                        <span className="text-slate-800 font-bold">{new Date(sub.start_date).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex justify-between text-xs font-semibold text-slate-500">
-                        <span>Valid Until</span>
-                        <span className="text-slate-800 font-bold">{new Date(sub.end_date).toLocaleDateString()}</span>
-                      </div>
-                    </div>
-                    <button className="w-full py-2.5 bg-emerald-600 text-white text-xs font-black rounded-xl hover:bg-emerald-700 transition-colors">Manage Subscription</button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

@@ -736,6 +736,9 @@ const Dashboard = () => {
   });
   const [chatInput, setChatInput] = useState('');
   const [chatInputError, setChatInputError] = useState(''); // TC23, TC32: validation message for empty chat input
+  const [isSendingMessage, setIsSendingMessage] = useState(false); // TC35: slow network sending indicator
+  const [supportSendError, setSupportSendError] = useState(''); // TC36: send message API error banner
+  const [waError, setWaError] = useState(''); // TC44, TC47: WhatsApp error fallback
   const chatBoxRef = useRef(null);
 
   // TC20: Persist support history to localStorage so chat reloads retain messages after refresh
@@ -1102,8 +1105,35 @@ const Dashboard = () => {
     }
   };
 
+  // TC41, TC44, TC47: Safe WhatsApp redirection handler with graceful error handling & offline check
+  const handleWhatsAppClick = (e, customText = '') => {
+    if (e && e.preventDefault) e.preventDefault();
+    setWaError('');
+
+    if (typeof window !== 'undefined' && window.navigator && window.navigator.onLine === false) {
+      setWaError("⚠️ You are currently offline. Please check your internet connection before connecting to WhatsApp.");
+      showToastNotification("⚠️ Offline: Cannot open WhatsApp", "⚠️");
+      return;
+    }
+
+    try {
+      const msgBody = customText || `Hi Nutritiva Support! My name is ${user?.name || 'Customer'} (${user?.email || 'N/A'}). I need assistance.`;
+      const encodedMsg = encodeURIComponent(msgBody);
+      const waUrl = `https://wa.me/919832627196?text=${encodedMsg}`;
+      
+      const newTab = window.open(waUrl, '_blank', 'noopener,noreferrer');
+      if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+        setWaError("⚠️ Popup blocked or WhatsApp unavailable. You can reach out directly to +91 9832627196.");
+      }
+    } catch (err) {
+      console.error("WhatsApp redirect error:", err);
+      setWaError("⚠️ Unable to launch WhatsApp link. Please ensure your browser supports external links.");
+    }
+  };
+
   const handleSupportSend = (e) => {
     e.preventDefault();
+    setSupportSendError('');
     const rawText = chatInput || '';
     const trimmedMsg = rawText.trim(); // TC28: trim leading and trailing spaces
 
@@ -1114,16 +1144,27 @@ const Dashboard = () => {
     }
     setChatInputError('');
 
+    // TC36: Check if offline / connection error
+    if (typeof window !== 'undefined' && window.navigator && window.navigator.onLine === false) {
+      setSupportSendError("⚠️ Connection failed: You appear to be offline. Message could not be sent.");
+      return;
+    }
+
+    // TC35: Slow network loading indicator trigger
+    setIsSendingMessage(true);
+
     // TC24: long message handling — enforce max 1000 chars limit
     const cleanMsg = trimmedMsg.length > 1000 ? trimmedMsg.substring(0, 1000) : trimmedMsg;
 
     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const userMsg = { sender: 'user', text: cleanMsg, time: timeNow };
+    
     setSupportHistory(prev => [...prev, userMsg]);
     setChatInput('');
 
     // Simulated automated response
     setTimeout(() => {
+      setIsSendingMessage(false);
       let botText = "Thank you for reaching out. A support executive is looking into your request and will connect with you shortly.";
       const lower = cleanMsg.toLowerCase();
       if (lower.includes('order') || lower.includes('delivery')) {
@@ -3769,7 +3810,8 @@ const Dashboard = () => {
                     href={`https://wa.me/919832627196?text=${encodeURIComponent(`Hi! I would like to continue my support session on WhatsApp. Here is the conversation log:\n\n${(supportHistory || []).map(h => `[${h.time || ''} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text || ''}`).join('\n')}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-[#25D366] hover:bg-[#20ba59] text-white font-black text-[10px] px-3 py-1.5 rounded-xl transition-all shadow-xs flex items-center gap-1 shrink-0 hover:scale-105 active:scale-95"
+                    onClick={(e) => handleWhatsAppClick(e, `Hi! I would like to continue my support session on WhatsApp. Here is the conversation log:\n\n${(supportHistory || []).map(h => `[${h.time || ''} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text || ''}`).join('\n')}`)}
+                    className="bg-[#25D366] hover:bg-[#20ba59] text-white font-black text-[10px] px-3 py-1.5 rounded-xl transition-all shadow-xs flex items-center gap-1 shrink-0 hover:scale-105 active:scale-95 cursor-pointer"
                     title="Export conversation to WhatsApp support"
                   >
                     <svg className="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24">
@@ -3795,6 +3837,34 @@ const Dashboard = () => {
                   ))}
                 </div>
 
+                {/* TC36: Send Button API / Network error display */}
+                {supportSendError && (
+                  <div id="support-send-api-error" className="px-4 py-2 bg-red-50 border-t border-red-200 text-xs text-red-600 font-bold flex items-center justify-between animate-fade-in">
+                    <span>{supportSendError}</span>
+                    <button 
+                      type="button" 
+                      onClick={() => setSupportSendError('')}
+                      className="text-red-700 underline text-[10px] hover:text-red-900"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                )}
+
+                {/* TC44, TC47: WhatsApp Error / Unavailable Banner */}
+                {waError && (
+                  <div id="wa-support-error-banner" className="px-4 py-2 bg-amber-50 border-t border-amber-200 text-xs text-amber-800 font-bold flex items-center justify-between animate-fade-in">
+                    <span>{waError}</span>
+                    <button 
+                      type="button" 
+                      onClick={() => setWaError('')}
+                      className="text-amber-900 underline text-[10px] hover:text-amber-950"
+                    >
+                      Close
+                    </button>
+                  </div>
+                )}
+
                 {/* TC23, TC32: Inline validation message for empty chat input */}
                 {chatInputError && (
                   <div id="chat-input-error-msg" className="px-4 py-1.5 bg-red-50 border-t border-red-100 text-[11px] text-red-600 font-bold flex items-center gap-1.5 animate-fade-in">
@@ -3813,26 +3883,34 @@ const Dashboard = () => {
                     onChange={(e) => {
                       setChatInput(e.target.value);
                       if (chatInputError) setChatInputError('');
+                      if (supportSendError) setSupportSendError('');
                     }}
                     className={`flex-grow bg-slate-50 border ${chatInputError ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-brand-green'} rounded-2xl px-4 py-2 text-xs font-semibold focus:outline-none focus:bg-white transition-all`}
                   />
+                  {/* TC34, TC35, TC37, TC39: Send button with hover effect, disabled state when empty, & loading indicator */}
                   <button 
                     type="submit"
-                    className="bg-[#105335] hover:bg-emerald-800 text-white font-black text-xs px-5 py-2 rounded-2xl transition-all shadow-xs active:scale-95 flex items-center gap-1 shrink-0"
+                    disabled={!chatInput.trim() || isSendingMessage}
+                    className="bg-[#105335] hover:bg-emerald-800 hover:shadow-md hover:scale-[1.02] text-white font-black text-xs px-5 py-2 rounded-2xl transition-all shadow-xs active:scale-95 flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#105335] disabled:hover:scale-100"
+                    title={!chatInput.trim() ? "Type a message to enable Send" : "Send message"}
                   >
-                    Send
+                    {isSendingMessage ? (
+                      <>
+                        <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                        <span>Sending...</span>
+                      </>
+                    ) : (
+                      <span>Send</span>
+                    )}
                   </button>
                   <button 
                     type="button"
-                    onClick={() => {
+                    onClick={(e) => {
                       if (!chatInput.trim()) return;
                       const msgText = chatInput.trim();
-                      const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                      setSupportHistory(prev => [...prev, { sender: 'user', text: msgText, time: timeNow }]);
-                      setChatInput('');
-                      window.open(`https://wa.me/919832627196?text=${encodeURIComponent(msgText)}`, '_blank');
+                      handleWhatsAppClick(e, msgText);
                     }}
-                    className="bg-[#25D366] hover:bg-[#20ba59] text-white font-black text-xs px-4 py-2 rounded-2xl transition-all shadow-xs active:scale-95 flex items-center gap-1.5 shrink-0"
+                    className="bg-[#25D366] hover:bg-[#20ba59] hover:scale-105 text-white font-black text-xs px-4 py-2 rounded-2xl transition-all shadow-xs active:scale-95 flex items-center gap-1.5 shrink-0 cursor-pointer"
                     title="Send message to WhatsApp support"
                   >
                     <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24">
@@ -3849,13 +3927,14 @@ const Dashboard = () => {
                     href={`https://wa.me/919832627196?text=${encodeURIComponent(`Hi! I'm contacting Nutritiva support. My name is ${user?.name || ''} (${user?.email || ''}). Here is our current chat history:\n\n${(supportHistory || []).map(h => `[${h.time || ''} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text || ''}`).join('\n')}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#25D366] hover:text-[#20ba59] font-bold flex items-center gap-1 transition-all"
+                    onClick={(e) => handleWhatsAppClick(e, `Hi! I'm contacting Nutritiva support. My name is ${user?.name || ''} (${user?.email || ''}). Here is our chat history:\n\n${(supportHistory || []).map(h => `[${h.time || ''} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text || ''}`).join('\n')}`)}
+                    className="text-[#25D366] hover:text-[#20ba59] font-bold flex items-center gap-1 transition-all cursor-pointer"
                   >
                     <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                       <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.458L0 24zm5.735-3.305c1.62.96 3.238 1.455 4.881 1.456 5.485 0 9.95-4.463 9.953-9.94.002-2.653-1.03-5.148-2.905-7.025C15.845 3.311 13.354 2.28 10.701 2.28c-5.49 0-9.956 4.466-9.96 9.943-.001 1.765.487 3.418 1.417 4.907L1.137 20.89l3.968-.971-1.313 1.306zM18.006 14.86c-.328-.164-1.944-.96-2.247-1.07-.303-.11-.524-.165-.744.165-.22.329-.853 1.07-1.045 1.29-.193.22-.386.247-.714.083-.328-.164-1.385-.51-2.637-1.627-.975-.87-1.632-1.947-1.823-2.275-.192-.329-.02-.507.144-.67.147-.147.329-.384.493-.576.164-.192.219-.329.329-.548.11-.22.055-.411-.027-.575-.082-.164-.744-1.793-1.02-2.457-.27-.648-.544-.56-.744-.57l-.63-.01c-.22 0-.576.082-.88.411-.303.329-1.157 1.13-1.157 2.756 0 1.626 1.184 3.197 1.348 3.417.164.22 2.328 3.555 5.64 4.986.788.34 1.402.544 1.882.697.79.25 1.512.215 2.08.13.635-.094 1.944-.795 2.218-1.564.275-.769.275-1.427.193-1.565-.083-.138-.303-.22-.63-.385z" />
-                      </svg>
-                      <span>Chat on WhatsApp</span>
-                    </a>
+                    </svg>
+                    <span>Chat on WhatsApp</span>
+                  </a>
                 </div>
 
               </div>
@@ -3883,7 +3962,8 @@ const Dashboard = () => {
                     href={`https://wa.me/919832627196?text=${encodeURIComponent(`Hi! I'm contacting Nutritiva support. My name is ${user?.name || ''} (${user?.email || ''}). Here is our current chat history:\n\n${(supportHistory || []).map(h => `[${h.time || ''} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text || ''}`).join('\n')}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-2.5 rounded-2xl text-[10px] font-black text-white transition-all bg-[#25D366] hover:bg-[#20ba59] active:scale-95 shadow-xs flex items-center justify-center gap-1.5"
+                    onClick={(e) => handleWhatsAppClick(e, `Hi! I'm contacting Nutritiva support. My name is ${user?.name || ''} (${user?.email || ''}). Here is our chat history:\n\n${(supportHistory || []).map(h => `[${h.time || ''} - ${h.sender === 'user' ? 'User' : 'Agent'}]: ${h.text || ''}`).join('\n')}`)}
+                    className="w-full py-2.5 rounded-2xl text-[10px] font-black text-white transition-all bg-[#25D366] hover:bg-[#20ba59] active:scale-95 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <svg className="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24">
                       <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.458L0 24zm5.735-3.305c1.62.96 3.238 1.455 4.881 1.456 5.485 0 9.95-4.463 9.953-9.94.002-2.653-1.03-5.148-2.905-7.025C15.845 3.311 13.354 2.28 10.701 2.28c-5.49 0-9.956 4.466-9.96 9.943-.001 1.765.487 3.418 1.417 4.907L1.137 20.89l3.968-.971-1.313 1.306zM18.006 14.86c-.328-.164-1.944-.96-2.247-1.07-.303-.11-.524-.165-.744.165-.22.329-.853 1.07-1.045 1.29-.193.22-.386.247-.714.083-.328-.164-1.385-.51-2.637-1.627-.975-.87-1.632-1.947-1.823-2.275-.192-.329-.02-.507.144-.67.147-.147.329-.384.493-.576.164-.192.219-.329.329-.548.11-.22.055-.411-.027-.575-.082-.164-.744-1.793-1.02-2.457-.27-.648-.544-.56-.744-.57l-.63-.01c-.22 0-.576.082-.88.411-.303.329-1.157 1.13-1.157 2.756 0 1.626 1.184 3.197 1.348 3.417.164.22 2.328 3.555 5.64 4.986.788.34 1.402.544 1.882.697.79.25 1.512.215 2.08.13.635-.094 1.944-.795 2.218-1.564.275-.769.275-1.427.193-1.565-.083-.138-.303-.22-.63-.385z" />

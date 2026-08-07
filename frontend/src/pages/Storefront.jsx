@@ -196,9 +196,15 @@ const Storefront = () => {
   const [couponSuccess, setCouponSuccess] = useState('');
   const [showCartDropdown, setShowCartDropdown] = useState(false);
   const [showVipModal, setShowVipModal] = useState(false);
-  const [vipBillingYearly, setVipBillingYearly] = useState(true);
+  const [vipBillingYearly, setVipBillingYearly] = useState(() => {
+    const saved = localStorage.getItem('vipBillingYearly');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
   const [vipJoined, setVipJoined] = useState(false);
-  const [vipSelectedPlan, setVipSelectedPlan] = useState('gold');
+  const [vipSelectedPlan, setVipSelectedPlan] = useState(() => {
+    const saved = localStorage.getItem('vipSelectedPlan');
+    return saved !== null ? saved : 'gold';
+  });
   const [favToast, setFavToast] = useState({ show: false, msg: '', added: true });
 
   const [genericToast, setGenericToast] = useState({ show: false, msg: '', icon: 'ℹ️' });
@@ -270,6 +276,14 @@ const Storefront = () => {
       }, 150);
     }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('vipBillingYearly', JSON.stringify(vipBillingYearly));
+  }, [vipBillingYearly]);
+
+  useEffect(() => {
+    localStorage.setItem('vipSelectedPlan', vipSelectedPlan);
+  }, [vipSelectedPlan]);
 
   // Delivery Location Modal States & Helpers
   const [showLocationModal, setShowLocationModal] = useState(false);
@@ -2217,7 +2231,7 @@ const Storefront = () => {
                       className="w-14 h-7 rounded-full flex items-center px-1 transition-all duration-300 relative"
                       style={{background: vipBillingYearly ? '#FFB300' : '#334155'}}
                     >
-                      <span className="w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300 absolute" style={{left: vipBillingYearly ? '30px' : '4px'}}></span>
+                      <span className="w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300 absolute" style={{left: '4px', transform: vipBillingYearly ? 'translateX(26px)' : 'translateX(0px)'}}></span>
                     </button>
                     <span className={`text-sm font-bold transition-colors ${vipBillingYearly ? 'text-white' : 'text-slate-500'}`}>
                       Yearly

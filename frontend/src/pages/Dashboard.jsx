@@ -38,6 +38,28 @@ import quinoaImg from '../assets/quinoa.png';
 import turmericImg from '../assets/turmeric.png';
 import pepperImg from '../assets/pepper.png';
 import pistachiosImg from '../assets/pistachios.png';
+const COUNTRIES = [
+  { code: '+91', flag: '🇮🇳', name: 'India' },
+  { code: '+1', flag: '🇺🇸', name: 'United States' },
+  { code: '+1', flag: '🇨🇦', name: 'Canada' },
+  { code: '+44', flag: '🇬🇧', name: 'United Kingdom' },
+  { code: '+880', flag: '🇧🇩', name: 'Bangladesh' },
+  { code: '+971', flag: '🇦🇪', name: 'United Arab Emirates' },
+  { code: '+65', flag: '🇸🇬', name: 'Singapore' },
+  { code: '+60', flag: '🇲🇾', name: 'Malaysia' },
+  { code: '+61', flag: '🇦🇺', name: 'Australia' },
+  { code: '+966', flag: '🇸🇦', name: 'Saudi Arabia' },
+  { code: '+977', flag: '🇳🇵', name: 'Nepal' },
+  { code: '+94', flag: '🇱🇰', name: 'Sri Lanka' },
+  { code: '+92', flag: '🇵🇰', name: 'Pakistan' },
+  { code: '+49', flag: '🇩🇪', name: 'Germany' },
+  { code: '+33', flag: '🇫🇷', name: 'France' },
+  { code: '+39', flag: '🇮🇹', name: 'Italy' },
+  { code: '+81', flag: '🇯🇵', name: 'Japan' },
+  { code: '+86', flag: '🇨🇳', name: 'China' },
+  { code: '+64', flag: '🇳🇿', name: 'New Zealand' },
+  { code: '+27', flag: '🇿🇦', name: 'South Africa' }
+];
 
 const imageMap = {
   almonds: almondsImg,
@@ -434,6 +456,8 @@ const Dashboard = () => {
   });
 
   const [profileErrors, setProfileErrors] = useState({});
+  const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]);
+  const [isDropdownHovered, setIsDropdownHovered] = useState(false);
 
   useEffect(() => {
     setTempProfile({
@@ -1153,10 +1177,16 @@ const Dashboard = () => {
                           errors.phone = "Phone Number is required.";
                         } else if (/[^\d]/.test(phoneVal)) {
                           errors.phone = "Phone Number must contain only numeric digits.";
-                        } else if (phoneVal.length < 10) {
-                          errors.phone = "Phone Number must be at least 10 digits.";
-                        } else if (phoneVal.length > 10) {
-                          errors.phone = "Phone Number cannot exceed 10 digits.";
+                        } else if (selectedCountry.code === "+91") {
+                          if (phoneVal.length !== 10) {
+                            errors.phone = "Indian Phone Number must be exactly 10 digits.";
+                          } else if (!/^[5-9]/.test(phoneVal)) {
+                            errors.phone = "Indian Phone Number must start with a valid mobile digit (5-9).";
+                          }
+                        } else {
+                          if (phoneVal.length < 7 || phoneVal.length > 15) {
+                            errors.phone = `International Phone Number for ${selectedCountry.code} must be between 7 and 15 digits.`;
+                          }
                         }
 
                         const emailVal = (tempProfile.email || '').trim();
@@ -1206,17 +1236,45 @@ const Dashboard = () => {
                     <div>
                       <label className="text-xs font-black text-slate-700 block mb-1.5">Phone Number</label>
                       <div className="flex gap-2">
-                        <select
-                          className="px-3 py-2.5 rounded-xl text-sm font-bold text-slate-700 border bg-white focus:outline-none transition-all cursor-pointer"
-                          style={{
-                            borderColor: 'rgba(255,160,190,0.4)'
-                          }}
+                        {/* Custom Hover-Triggered Dropdown */}
+                        <div 
+                          className="relative"
+                          onMouseEnter={() => setIsDropdownHovered(true)}
+                          onMouseLeave={() => setIsDropdownHovered(false)}
                         >
-                          <option value="+91">🇮🇳 +91</option>
-                          <option value="+1">🇺🇸 +1</option>
-                          <option value="+44">🇬🇧 +44</option>
-                          <option value="+971">🇦🇪 +971</option>
-                        </select>
+                          <button
+                            type="button"
+                            className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-700 border bg-white hover:bg-slate-50 transition-all h-full shrink-0"
+                            style={{
+                              borderColor: 'rgba(255,160,190,0.4)'
+                            }}
+                          >
+                            <span>{selectedCountry.flag}</span>
+                            <span>{selectedCountry.code}</span>
+                            <span className="text-[10px] text-slate-400">▼</span>
+                          </button>
+                          
+                          {isDropdownHovered && (
+                            <div className="absolute left-0 mt-1 w-52 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1 animate-fade-in text-left">
+                              {COUNTRIES.map((c, i) => (
+                                <button
+                                  key={i}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedCountry(c);
+                                    setIsDropdownHovered(false);
+                                  }}
+                                  className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-[#f4fef5] hover:text-[#105335] flex items-center gap-2.5 transition-colors"
+                                >
+                                  <span className="text-sm">{c.flag}</span>
+                                  <span className="font-bold">{c.code}</span>
+                                  <span className="text-slate-450 text-[10px] truncate">({c.name})</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
                         <div className="flex-1">
                           <input
                             type="text"

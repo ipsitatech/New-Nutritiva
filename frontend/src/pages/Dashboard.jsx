@@ -454,16 +454,43 @@ const VipMembershipPage = ({ onClose }) => {
               ))}
             </ul>
 
-            {/* Select button */}
+            {/* Select/Activate button */}
             <button
-              className="mt-6 w-full py-2.5 rounded-xl font-black text-sm transition-all hover:scale-[1.02] active:scale-95"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelected(plan.id);
+                
+                const statusName = plan.id === 'silver' ? 'VIP Silver Member' : plan.id === 'gold' ? 'VIP Gold Member' : 'VIP Platinum Member';
+                
+                authFetch('http://localhost:5000/api/user', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ ...user, status: statusName })
+                })
+                .then(res => res.json())
+                .then(freshUser => {
+                  setUser(freshUser);
+                  setJoined(true);
+                })
+                .catch(err => {
+                  console.error('Error activating VIP plan:', err);
+                  setUser(prev => ({ ...prev, status: statusName }));
+                  setJoined(true);
+                });
+              }}
+              className="mt-6 w-full py-3 rounded-xl font-black text-sm transition-all hover:scale-[1.02] active:scale-95 hover:shadow-md"
               style={{
-                background: selected === plan.id ? plan.color : 'rgba(255,255,255,0.5)',
-                color: selected === plan.id ? (plan.id === 'gold' ? '#0d1f17' : 'white') : '#94a3b8',
-                border: `1.5px solid ${selected === plan.id ? plan.color : 'rgba(255,180,200,0.3)'}`
+                background: selected === plan.id 
+                  ? plan.color 
+                  : 'rgba(255,255,255,0.7)',
+                color: selected === plan.id 
+                  ? (plan.id === 'gold' ? '#0d1f17' : 'white') 
+                  : '#475569',
+                border: `1.5px solid ${selected === plan.id ? plan.color : 'rgba(255,180,200,0.3)'}`,
+                boxShadow: selected === plan.id ? `0 4px 12px ${plan.glow}` : 'none'
               }}
             >
-              {selected === plan.id ? '✓ Selected' : 'Select Plan'}
+              {selected === plan.id ? `✓ Activate ${plan.name} Plan` : `Select & Activate ${plan.name}`}
             </button>
           </div>
         ))}
